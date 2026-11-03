@@ -1,0 +1,27 @@
+# Robust Structural Controllability under Actuator Failures
+
+Mathematical research on fault-tolerant actuator placement in structured linear systems. The focus is on approximation algorithms, exact algorithms for restricted digraph classes, and verifiable combinatorial bounds.
+
+## Research target
+
+For the one-input-failure robust minimal structural controllability problem (1-RMSCP), study whether the known **5/2-approximation** for general directed graphs can be improved to **2**. The 2026 reference already provides a **2-approximation for strongly connected digraphs**.
+
+Secondary questions:
+
+- Exact algorithms or structural characterizations for restricted classes, including bounded-treewidth and planar digraphs.
+- Tightness examples and improved lower bounds for existing approximation schemes.
+- Extensions to multiple input failures when supported by new mathematical results.
+
+Distinguish the dedicated-input and unrestricted-input models, including whether multiple inputs may actuate the same state. All claims should use the precise model and cost measure from the cited paper.
+
+## Starting reference
+
+Diogo Poças, Sérgio Pequito, and Guilherme Ramos, **On the NP-hardness of the robust minimal structural controllability problem**, *Automatica*, 190 (2026), article 113074.
+
+DOI: https://doi.org/10.1016/j.automatica.2026.113074
+
+The reference establishes NP-hardness even for one input failure and approximation guarantees of 5/2 in general digraphs and 2 in strongly connected digraphs.
+
+## Research outputs
+
+Keep proved theorems, precise counterexamples, and minimal exact computational checks in this repository. A self-contained theorem for a restricted graph class is useful even if the main approximation target is not attained.
