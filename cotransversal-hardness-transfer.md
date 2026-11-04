@@ -6,6 +6,12 @@ class, a certificate that the larger class is actually needed, and an
 obstruction to a proposed directed-path reduction. It establishes no new
 numerical inapproximability constant.
 
+The incidence construction below assumes row size at most three.
+`row-splitting-equivalence.md` now removes that assumption by an exact
+row-splitting exchange and handles arbitrary, initially rank-deficient
+presentations. In particular every strongly connected control instance
+has an exact subcubic bidirected realization.
+
 ## A general reduction with no actuator baseline
 
 Let T be a transversal matroid on n elements, given by r full-rank rows,

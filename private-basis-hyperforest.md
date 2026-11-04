@@ -4,6 +4,11 @@ This extends `variable-basis-path-cover.md` to arbitrary option neighborhoods.
 It gives an exact objective and obstructions to several Set Cover reductions;
 it does not establish a stronger numerical hardness constant.
 
+`assignment-hardness-transfer.md` proves that the same optimum formula
+applies to every feasible unit-cost uniform robust assignment instance,
+even without private resources: adding those resources preserves OPT by
+a tight-Hall-set exchange.
+
 Let U be n jobs. For each job j there is a private resource b_j. Every other
 resource t_e can serve any job in a nonempty set S_e. Assume the S_e cover U;
 resources with identical neighborhoods are still distinct elements.
