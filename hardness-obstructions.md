@@ -16,6 +16,34 @@ positive deficiency the optimization is exactly the minimum complement of
 an independent flat of T; accessibility is automatic for a robust spanning
 set, which already has at least two elements.
 
+## Parallel copies do not lower the matroid optimum
+
+Let M be any coloop-free matroid with a polynomial rank oracle. Add arbitrary
+parallel copies of its elements and arbitrary loops. The minimum size of a
+set spanning after any one deletion is unchanged, with a polynomial reverse
+solution map. This statement concerns the matroid condition; additional
+accessibility quotas require a separate argument.
+
+Indeed project a robust extended set to its original support P. It spans M.
+Every coloop of M|P must have at least two selected copies: deleting its only
+copy would otherwise destroy spanning. Let K be this set of coloops, so the
+extended cost is at least |P|+|K|.
+
+For b in K that is still a coloop of the current support P', rank(P'-b)=d-1.
+Since M has no global coloop, an original e outside P' exists with
+rank(P'-b+e)=d. Add e. This protects b; adding elements cannot make any old
+noncoloop a coloop, and e is not a coloop because P' already spanned.
+At most |K| additions therefore produce a robust original set of size at
+most the extended cost. Conversely an original robust set remains robust
+in the extension. The rank-oracle procedure is `protect_coloops` in
+`hardness_gadgets.py`.
+
+Consequently removing literal mandatory states by parallel duplication does
+not by itself escape a forced-basis reduction: the original optimum can
+still be recovered. The private-basis example in
+`variable-basis-path-cover.md` instead has a genuine loss if that particular
+basis is required to be present.
+
 ## Removing one forced leaf destroys the Vertex Cover encoding
 
 In the original Set Cover gadget, remove one of the two forced private
@@ -117,3 +145,28 @@ It does not cover arbitrary non-forced-basis constructions, cost changes,
 or general accessibility interactions. A route to substantially stronger
 hardness must escape these assumptions rather than just shorten the
 existing private-leaf gadget.
+
+## Reversing the bicircular construction also collapses
+
+There is a different tempting family with a smaller rank baseline. Let H
+be a connected simple graph on n vertices and m>n edges. Use its bidirected
+incidence graph as the state graph: a center for each vertex and a target
+for each edge, adjacent to its two endpoint centers. The state transversal
+matroid on targets is the bicircular matroid B(H); the right centers are a
+free summand, since a spanning unicycle supplies a matching covering them.
+Thus the matching deficiency is m-n. Cubic sources already give degree-three
+bipartite, strongly connected targets, without forced actuators.
+
+Nevertheless every such instance has
+
+    OPT = m-n+1.
+
+Take the unactuated edge targets to be any spanning tree of H, together
+with all center states. They are independent in the state transversal
+matroid, and adding any one omitted target gives a unicycle and remains
+independent. This is an independent flat, hence a robust placement. Its
+size m-n+1>=2 supplies accessibility. The reverse bound is rank(M)+1,
+because deleting any selected element must leave at least rank(M) elements.
+Choosing which bicircular side to dualize therefore does not by itself
+produce a new hardness source. The private-basis hyperforest objective in
+`private-basis-hyperforest.md` is the remaining, more general candidate.

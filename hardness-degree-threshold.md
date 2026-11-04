@@ -39,6 +39,27 @@ states this on p.3 and in Corollary 18. This use of the stronger source gap
 also improves the numerical constant in the original unbounded-degree
 construction; it is not by itself a new gadget principle.
 
+Relevant earlier work is [Viktor Bindewald, *Bulk-Robust Assignment Problems:
+Hardness, Approximability and Algorithms*, dissertation, October 2017](https://eldorado.tu-dortmund.de/server/api/core/bitstreams/35dd3ec1-8ebf-443f-b970-76fbf17dc2e7/content).
+Theorem 4.5.3, printed pp.79–80, already gives APX-completeness and the
+694/693 lower bound for uniform node-robust assignment on degree-three
+bipartite graphs, using two forced resources per covering requirement.
+[Adjiashvili, Bindewald and Michaels, *Robust Assignments with Vulnerable
+Nodes*](https://arxiv.org/abs/1703.06074), Theorem 6, gives the related
+APX-hardness reduction. Thus neither the forced-resource cover mechanism
+nor degree-three hardness for robust assignment is new here. Assignment
+selects a robust spanning set of a transversal matroid; state placement uses
+its state matching matroid's **dual**, together with accessibility. The
+explicit control-graph realization and its degree/girth properties still
+need the proofs below; the assignment result alone does not establish them.
+
+The general fault-tolerant spanning formulation and bounded-core methods
+also predate these notes: see [Bentert, Fomin, Golovach and Morelle,
+*Fault-Tolerant Matroid Bases*, ESA 2025](https://doi.org/10.4230/LIPIcs.ESA.2025.83).
+The audit found no explicit prior statement of the complete outdegree-two
+formula or of this control model's N-dependent girth restriction in these
+sources. This is a scoped literature comparison, not a priority certificate.
+
 ## Outdegree at most two
 
 Let T be the state transversal matroid on right states, M=T*, and C_1,...,C_l
@@ -194,6 +215,16 @@ and Stockmeyer, *Some simplified NP-complete graph problems*, TCS 1 (1976),
 Membership in NP follows by checking a state/input matching and accessibility
 for each selected actuator failure.
 
+The cyclic-order qualification is essential in the implementation.
+`vertex_cover_graph(edges, port_order=rotation)` now accepts the neighbor
+rotation of a planar source embedding. Arbitrary/default orders can produce
+a nonplanar target even from a planar source: the wheel with spokes 0--i
+(i=1,2,3,4) and rim 1--3--2--4--1 is an explicit example.
+`audit_hardness.py` checks nine internally disjoint paths forming a K_3,3
+subdivision in that default target, and a genus-zero rotation system for
+the embedding-ordered target. The mathematical planarity statement above
+uses the latter construction.
+
 ## Preserving the optimum while increasing girth
 
 The following argument is necessary: subdivisions introduce new selectable
@@ -218,8 +249,15 @@ loop. The new right center is a matroid loop, as all centers remain freely
 matchable. Iterating proves that the subdivided state's dual matching
 matroid is a parallel extension of the original, plus loops.
 
-For the reduction above, even unrestricted parallel copies cannot reduce
-the optimum. Here is a normalization proof. The original a_e,b_e form a
+For any coloop-free matroid, unrestricted parallel copies cannot reduce
+the robust spanning optimum: project to its support and add one original
+exchange element for each coloop protected by duplicate copies. The proof
+and polynomial rank-oracle map are in `hardness-obstructions.md`.
+Accessibility is automatic here because the state graph is strongly
+connected and its matching deficiency is positive.
+
+For the reduction above there is also the following direct normalization,
+which avoids matching queries. The original a_e,b_e form a
 series pair of M (their pair is a circuit of T_R), so exchanging their names
 is a matroid automorphism. Also {a_e,b_e,x_e} is a circuit of M: x_e replaces
 either twin in the basis B and no other basis element.
@@ -249,6 +287,8 @@ This yields a robust original placement of no larger cost. Original
 placements remain robust in the extension. The two optima are equal, and
 the normalization is polynomial, providing the required reverse solution
 map for approximation hardness as well.
+The reverse map is implemented by `normalize_subdivision(base, padded, S)`;
+the cover is then obtained with `extract_cover(base, normalized)`.
 
 Now replace every center--target edge by a length-three path; leave the
 center--center connector bridges alone. Degrees, bipartiteness, connectivity
@@ -285,6 +325,7 @@ Python 3.10+, standard library only:
 
     python verify_outdegree_two.py
     python verify_hardness_gadgets.py
+    python audit_hardness.py
 
 The first script exhausts all 15,002 looped directed graphs of maximum
 outdegree two on one through four states and checks 500 fixed-seed graphs
@@ -304,3 +345,15 @@ girth multiplication through two rounds. It also exhausts a 15-state
 counterexample to the
 one-leaf compression in `hardness-obstructions.md`. Tests supplement the
 proofs; they do not establish an asymptotic approximation bound.
+
+The fresh audit uses a different representation for the subdivision lemma:
+it enumerates all bases as injections on all 3,672 full-row-rank bipartite
+presentations with at most three rows and four columns, checking all 23,071
+individual edge replacements and 14,038 multi-incidence target splits
+against the complete predicted dual basis family. It also checks the
+implemented reverse map on all 118,341
+multiplicity vectors (0,1,2 copies per nonloop state) for three source
+families, including all 46,779 robust vectors. Feasibility there is checked
+by explicit state-plus-input matching, rather than the dual-rank formula.
+This audit found the port-order implementation gap above; it found no
+counterexample to the subdivision identity, normalization or optimum maps.

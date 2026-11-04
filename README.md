@@ -28,4 +28,6 @@ Keep proved theorems, precise counterexamples, and minimal exact computational c
 
 [Degree threshold and sparse hardness](hardness-degree-threshold.md): exact optimization for state outdegree at most two; APX-hardness at degree three, including strongly connected bipartite graphs with undirected girth at least N^(1−delta) for every fixed 0<delta<1. The reduction preserves OPT=2|E|+tau and gives a 469/468−epsilon inapproximability bound. [Reduction obstructions](hardness-obstructions.md) explain the failure of one-leaf compression and a 5/4 barrier for forced-basis covering constructions.
 
-Exact checks: `python verify_outdegree_two.py` and `python verify_hardness_gadgets.py` (Python 3.10+, standard library only).
+[Variable-basis path-cover equivalence](variable-basis-path-cover.md): an unforced construction with exact optimum `n+pc(H)`, polynomial solution maps, degree-three compression and the same girth padding. The classical (1,2)-TSP 8/7 algorithm limits this particular route to stronger hardness. [Private-basis hyperforest objective](private-basis-hyperforest.md) extends the construction to larger neighborhoods, proves `OPT=n+min_C(|C|-r_C)`, and explains why frequency-two and regular incidence sources lose their covering gaps.
+
+Exact checks (Python 3.10+, standard library only): `python verify_outdegree_two.py`, `python verify_hardness_gadgets.py`, `python audit_hardness.py`, `python verify_variable_basis.py`, and `python verify_private_basis_spares.py`.
