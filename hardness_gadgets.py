@@ -161,6 +161,103 @@ def protect_coloops(rank, ground, support):
     return frozenset(support)
 
 
+def cotransversal_graph(presentation, n, port_order=None):
+    """Realize the dual of a full-row-rank, loopless transversal presentation.
+
+    Rows have at most three neighbors, and 0 < row_count < n. The result
+    is strongly connected, bidirected, loopless, bipartite and subcubic.
+    Its matching matroid is the prescribed dual plus parallel copies and
+    loops. `projection` maps back to the n original matroid elements.
+    For planarity, port_order[v] lists the incident rows in embedding order.
+    """
+    from bounded_core_solver import matching_number
+    presentation = tuple(presentation)
+    r, full = len(presentation), (1 << n) - 1
+    if not 0 < r < n or any(row <= 0 or row & ~full or row.bit_count() > 3
+                           for row in presentation):
+        raise ValueError('Use 0<r<n nonempty rows of size at most three.')
+    if matching_number(presentation + (0,) * (n - r), full) != r:
+        raise ValueError('The presentation must have full row rank.')
+    incident = [[j for j, row in enumerate(presentation) if row >> v & 1]
+                for v in range(n)]
+    if any(not part for part in incident):
+        raise ValueError('The transversal matroid must have no loops.')
+    if port_order is not None:
+        for v, part in enumerate(incident):
+            ordered = tuple(port_order[v])
+            if len(ordered) != len(part) or set(ordered) != set(part):
+                raise ValueError('Each port order must list exactly the incident rows.')
+            incident[v] = ordered
+    rows = [0] * (n + r)
+    labels = [('element', v) for v in range(n)] + [('row', j) for j in range(r)]
+    centers = set(range(n, n + r))
+    projection = list(range(n)) + [-1] * r
+
+    def state(label, center=False, origin=-1):
+        index = len(rows)
+        rows.append(0)
+        labels.append(label)
+        projection.append(origin)
+        if center:
+            centers.add(index)
+        return index
+
+    def link(u, v):
+        rows[u] |= 1 << v
+        rows[v] |= 1 << u
+
+    for v, part in enumerate(incident):
+        previous = v
+        for position, j in enumerate(part):
+            if position:
+                c = state(('split_row', v, position), True)
+                t = state(('copy', v, position), origin=v)
+                link(previous, c)
+                link(c, t)
+                previous = t
+            link(previous, n + j)
+    unseen, components = set(range(len(rows))), []
+    while unseen:
+        component, queue = {min(unseen)}, [min(unseen)]
+        for u in queue:
+            neighbors = rows[u]
+            while neighbors:
+                bit = neighbors & -neighbors
+                neighbors ^= bit
+                v = bit.bit_length() - 1
+                if v not in component:
+                    component.add(v)
+                    queue.append(v)
+        unseen.difference_update(component)
+        components.append(component)
+    connectors = []
+    for j, component in enumerate(components):
+        available = sorted(v for v in component & centers if rows[v].bit_count() <= 2)
+        if available:
+            port = available[0]
+        else:
+            # This component is a single three-leaf row star. Subdivide
+            # one incidence to create a degree-two center port.
+            c = min(component & centers)
+            t = (rows[c] & -rows[c]).bit_length() - 1
+            rows[c] ^= 1 << t
+            rows[t] ^= 1 << c
+            a = state(('port_copy', j), origin=projection[t])
+            port = state(('port_row', j), True)
+            link(c, a)
+            link(a, port)
+            link(port, t)
+        p = state(('connector', j), True)
+        q = state(('prefix', j))
+        link(p, q)
+        link(q, port)
+        connectors.append(p)
+    for a, b in zip(connectors, connectors[1:]):
+        link(a, b)
+    return Instance(tuple(rows), tuple(labels), (), frozenset(centers),
+                    (), (), {}, {}, tuple(projection))
+
+
 def normalize_subdivision(base, subdivided, actuators):
     """Map a robust subdivided placement to a no-larger original placement.
 
