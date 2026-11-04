@@ -5,7 +5,7 @@ without the existing rank or matching routines. The normalization audit
 uses explicit dedicated-input rows and tests every failure of the support.
 Python 3.10+, standard library only.
 """
-from itertools import permutations, product
+from itertools import combinations, permutations, product
 from hardness_gadgets import (vertex_cover_graph, subdivide_ports,
                               normalize_subdivision, extract_cover)
 
@@ -197,8 +197,44 @@ def audit_planarity_ports():
     print('Wheel: default K_3,3 certificate; corrected genus-zero rotation PASS')
 
 
+def audit_raw_incidence():
+    """Bicircular duals: a complementary spanning tree is always optimal."""
+    count = 0
+    for n in (4, 5):
+        pairs = list(combinations(range(n), 2))
+        for mask in range(1 << len(pairs)):
+            edges = [e for j, e in enumerate(pairs) if mask >> j & 1]
+            if len(edges) <= n:
+                continue
+            seen, tree = {0}, set()
+            while True:
+                crossing = next((e for e in edges if
+                                 (e[0] in seen) != (e[1] in seen)), None)
+                if crossing is None:
+                    break
+                seen.update(crossing)
+                tree.add(crossing)
+            if len(seen) != n:
+                continue
+            rows = [0] * (n + len(edges))
+            for j, (u, v) in enumerate(edges):
+                for w in (u, v):
+                    rows[w] |= 1 << (n + j)
+                    rows[n + j] |= 1 << w
+            selected = {n + j for j, e in enumerate(edges) if e not in tree}
+            assert len(selected) == len(edges) - n + 1
+            assert augmented_matchable(rows, selected)
+            assert all(augmented_matchable(rows, selected - {v}) for v in selected)
+            # At most 2n state edges can be matched in this bipartite graph.
+            # A failure leaves m-n inputs, so these full matchings also
+            # certify state matching size 2n and the lower bound m-n+1.
+            count += 1
+    print('Raw bicircular incidence collapse:', count, 'connected sources PASS')
+
+
 if __name__ == '__main__':
     audit_edge_subdivision()
     for edges in (((0, 1),), ((0, 1), (1, 2)), ((0, 1), (2, 3))):
         audit_normalization(edges)
     audit_planarity_ports()
+    audit_raw_incidence()

@@ -170,3 +170,6 @@ because deleting any selected element must leave at least rank(M) elements.
 Choosing which bicircular side to dualize therefore does not by itself
 produce a new hardness source. The private-basis hyperforest objective in
 `private-basis-hyperforest.md` is the remaining, more general candidate.
+`audit_hardness.py` checks the spanning-tree placement and every actuator
+failure on all 388 connected simple source graphs with m>n through five
+vertices; the returned full matchings also certify the matching deficiency.
