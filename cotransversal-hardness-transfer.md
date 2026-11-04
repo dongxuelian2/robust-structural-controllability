@@ -260,3 +260,9 @@ The verifier checks r=2,...,8 by integer vertex-capacitated flow, checks
 the complete original-restriction rank tables through r=5, and exhausts
 both optima through r=3. It also checks individual avoidance of every
 added element and verifies simplicity of the full dual through r=3.
+
+Another distinct failure of a source conversion is proved in
+`basis-relaxation-gap.md`: the assignment model of fundamental exchanges
+at an arbitrary basis can underestimate robust OPT by a factor tending
+to 3/2, even when the original matroid is fundamental transversal and has
+no parallel elements or two-element cocircuits.
