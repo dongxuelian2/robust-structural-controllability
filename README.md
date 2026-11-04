@@ -25,3 +25,7 @@ The reference establishes NP-hardness even for one input failure and approximati
 ## Research outputs
 
 Keep proved theorems, precise counterexamples, and minimal exact computational checks in this repository. A self-contained theorem for a restricted graph class is useful even if the main approximation target is not attained.
+
+## Weighted fault tolerant spanning manuscript
+
+The [paper PDF](paper/weighted-fault-tolerant-spanning.pdf) and [editable LaTeX source](paper/weighted-fault-tolerant-spanning.tex) give an exact FPT result for weighted selected-set spanning in oracle matroids, parameterized by rank and failure budget, with a safe/vulnerable extension. See the [paper guide](paper/README.md) for model boundaries, compilation, and the existing verification scripts.
