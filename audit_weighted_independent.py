@@ -5,6 +5,7 @@ and a worst-case-deletion DP, plus an exact 85-element threshold example.
 Run: python3 audit_weighted_independent.py
 """
 from functools import lru_cache
+from itertools import combinations
 from random import Random
 
 from weighted_fault_core import solve, weighted_core
@@ -138,6 +139,43 @@ def check_edges():
             raise AssertionError(('invalid input accepted', weights, k, vulnerable))
 
 
+def check_preserver_distinction():
+    """Preserving cheapest surviving ordinary bases need not preserve robust OPT.
+
+    Rank-two truncation with parallel classes {0,1}, {2,3}, {4} and
+    costs 2,2,2,2,3. The first four points preserve every minimum basis
+    under zero or one ground-element failure, but lose a cheaper robust set.
+    """
+    labels = (0, 0, 1, 1, 2)
+    weights = (2, 2, 2, 2, 3)
+    ground, preserver = frozenset(range(5)), frozenset(range(4))
+
+    def rank(elements):
+        return min(2, len({labels[e] for e in elements}))
+
+    def minimum_basis_cost(available):
+        return min(sum(weights[e] for e in pair)
+                   for pair in combinations(sorted(available), 2)
+                   if rank(pair) == 2)
+
+    def robust_optimum(available):
+        feasible_costs = []
+        for size in range(len(available) + 1):
+            for candidate in combinations(sorted(available), size):
+                selected = frozenset(candidate)
+                if rank(selected) == 2 and all(
+                        rank(selected - {e}) == 2 for e in selected):
+                    feasible_costs.append(sum(weights[e] for e in selected))
+        return min(feasible_costs)
+
+    failures = [frozenset()] + [frozenset({e}) for e in ground]
+    for failure in failures:
+        assert minimum_basis_cost(ground - failure) == 4
+        assert minimum_basis_cost(preserver - failure) == 4
+    assert robust_optimum(ground) == 7
+    assert robust_optimum(preserver) == 8
+
+
 def main():
     rng = Random(202611041236)
     count = reduced = feasible = 0
@@ -155,11 +193,13 @@ def main():
             feasible += exists
     core_size = check_threshold()
     check_edges()
+    check_preserver_distinction()
     print(f'PASS: {count} seeded instances; {feasible} feasible; '
           f'{reduced} strictly reduced cores.')
     print(f'PASS: 85-element threshold instance; core={core_size}; '
           'original/core optimum=3; uniform-only optimum=13.')
     print('PASS: iterator inputs, rank zero, infeasibility, and validation.')
+    print('PASS: minimum-basis preserver costs remain 4; robust optima differ (7 vs 8).')
 
 
 if __name__ == '__main__':

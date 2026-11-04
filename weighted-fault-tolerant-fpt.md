@@ -3,17 +3,13 @@
 ## Question and result
 
 Bentert, Fomin, Golovach and Morelle, [*Fault-Tolerant Matroid Bases*,
-ESA 2025, Section 7](https://doi.org/10.4230/LIPIcs.ESA.2025.83), explicitly
-ask whether their rank-plus-failure-budget FPT algorithm extends to weights
-and to safe/vulnerable elements. The proof below addresses both questions.
-It extends their uniform-set and bounded-solution arguments; the essential
-change is weight-ordered selection and retaining lower-rank branches **even
-when the uniform-set size threshold is reached**.
-
-The source's [full version](https://arxiv.org/html/2506.22010v1) still lists
-these questions. Targeted public searches on 4 November 2026 found no later
-resolution. This identifies a specific published open question, not a
-guarantee that no subsequent result exists.
+ESA 2025, Sections 1.1 and 7](https://doi.org/10.4230/LIPIcs.ESA.2025.83),
+ask whether weighted fault-tolerant spanning is FPT in rank plus failure
+budget. The theorem below proves this statement for their weighted
+model, and a safe/vulnerable extension defined explicitly below.
+It builds on their uniform-set and bounded-solution ideas. The essential
+change is weight-ordered exchange and retaining lower-rank branches
+**even when the uniform-set size threshold is reached**.
 
 **Theorem.** Given a rank-r matroid M on n elements by an independence
 oracle, nonnegative binary-encoded integer weights, a vulnerable subset V,
@@ -28,9 +24,27 @@ containing an optimum; it is not a polynomial-size or standard encoded
 kernel claim. It does not improve the general actuator-placement
 approximation factor, and does not impose source-SCC quotas.
 
-Safe elements are never deleted. The displayed selected-set condition is
-the intended nonuniform model, rather than testing the full ground set
-after failure. Loops may be discarded. If r=0 the empty set is optimal.
+**Model alignment.** With V=E, the theorem matches the weighted problem
+in Section 1.1: the objective is the total purchase weight of B, and the
+surviving selected set must span the original rank. The input model is
+an independence oracle, not a supplied linear representation; weights
+are binary-encoded and the parameter is r+k, not weight or solution cost.
+
+For the nonuniform question, Section 7 of both the proceedings and
+[full version](https://arxiv.org/html/2506.22010v1) literally prints
+rank(M minus F)=rank(M), not rank(B minus F)=rank(M). These conditions
+are inequivalent: in U_(1,2) with both elements vulnerable, k=1 and
+B={a}, B initially spans and the literal condition holds, but deleting
+a leaves B empty. Without an initial-spanning requirement even B=empty
+satisfies the literal condition. The theorem here uses **selected-set
+survival**, consistent with the claimed all-vulnerable special case and
+with the selected-subgraph model in [Adjiashvili et al., SWAT 2022](https://doi.org/10.4230/LIPIcs.SWAT.2022.5).
+This is an explicit interpretation, not a confirmed correction by the
+authors or an unqualified resolution of Section 7's literal second question.
+
+Safe elements are never deleted. Loops may be discarded: they do not
+increase any surviving rank, and their weights are nonnegative. If r=0
+the empty set is optimal.
 Assume r>=1 below. Write
 
     q=(k+1)r, H=binom(q-1,r-1), t_h=(h-1)H+q.
@@ -39,7 +53,7 @@ Assume r>=1 below. Write
 
 For any feasible B, successively take a maximal independent subset I_j
 of the remaining elements, for j=0,...,k, and let B0 be their union.
-Its size is at most q. For any allowed failure F subset B0 of size at most k,
+Its size is at most q. For any allowed failure F subset B0 intersect V of size at most k,
 one of these k+1 disjoint layers avoids F. Every omitted element belongs
 to the closure of that layer, by maximality at the time it was selected.
 Consequently B minus F is contained in cl(B0 minus F). Feasibility of B
@@ -119,13 +133,20 @@ Every replacement lies in Z subset U and removes one element outside U.
 The resulting feasible set has its A-part in U, the same size and no
 greater weight. Its outside-A part is unchanged.
 
-Now process each child A_T, applying its induction hypothesis to the
-current solution. Each operation changes only elements in that child
-and introduces elements only in that child's core. All child cores are
-subsets of the final output. Thus an element not in the final output,
-once removed, can never be reintroduced. Since every initial element of
-the A-part lies in at least one child, after all children are processed
-the A-part is contained in the output. This proves the strong property.
+Now fix the final output W_A and process each child A_i=A_T, applying
+its induction hypothesis to the current solution. Write
+
+    Bad(B)=(B intersect A) minus W_A.
+
+Each child operation changes only elements in A_i and leaves the new
+intersection with A_i inside Core(A_i), a subset of W_A. Hence
+
+    Bad(B_new) subset Bad(B_old) minus A_i.
+
+Initially Bad(B) is contained in U, the union of all children. Processing
+every child therefore leaves Bad empty, even when children overlap.
+Every operation preserves feasibility and size (hence |B|<=q) and does
+not increase weight. This proves the strong property.
 
 Apply the procedure separately to V and E minus V after removing loops.
 The two ground subsets are disjoint, so the two compressions do not
@@ -140,16 +161,21 @@ Define K_0=0, K_1=q and, for 2<=h<=r,
 Every rank-h call returns at most K_h elements. This includes the
 small-input shortcut, because t_h<=K_h. The sequence is nondecreasing,
 so |W|<=2K_r (or K_r if all elements are vulnerable).
-The number of recursive nodes, retained elements per node, and subsets
-tested at a node are functions of r,k. Each node scans at most n elements
-and constructs its children by polynomially many rank/independence
-queries times a parameter-only factor. Ranks can themselves be computed
-greedily from an independence oracle. Sorting and binary-weight
-comparisons have polynomial bit cost. Thus core construction is FPT.
+For an explicit conservative bound, let T=t_r and
+N=2r T^((r-1)^2). The two recursion trees have depth at most r and
+branching at most T^(r-1), hence at most N nodes and |W|<=NT. This
+also covers r=1. At each node, scanning and constructing child closures
+uses O(n(1+T^(r-1))) independence queries, plus rank computation using
+at most n greedy independence tests. Sorting has polynomial bit cost.
+All queried small sets have size bounded by the parameters; no n^r
+search or dependence polynomial in the numerical weight value is used.
 
 Enumerate all subsets B of W with |B|<=q. For each, enumerate allowed
 failures of size at most k and test the surviving rank. Choose the
-minimum-weight feasible set. Both enumerations have parameter-only size.
+minimum-weight feasible set. There are at most (NT+1)^q candidates and at most 2^q failure
+sets per candidate. Each surviving rank is computed greedily. Weight
+sums have polynomial bit length. Thus the total bit and oracle-query
+cost is a parameter-only function times a polynomial in the input size.
 If none is feasible, the optimum-preservation property certifies
 infeasibility. Nonnegative rational weights work as well with exact
 arithmetic; the reference code takes nonnegative integers.
@@ -194,6 +220,41 @@ failure, the exact optimum is the minimum of the four cheapest distinct
 class minima and the three cheapest class-pair sums, so this test needs
 no enumeration of all 85-element subsets.
 
+## Literature positioning and limits of the novelty check
+
+As checked on 4 November 2026, the ESA proceedings and the sole listed
+arXiv version (v1) explicitly pose the weighted FPT question. Exact-title,
+arXiv-ID and weighted/nonuniform keyword searches, author publication
+listings, and follow-on references did not identify a result proving the
+same theorem. This is a bounded search, not certification that the question
+remains open today or a claim of priority. One author's publication page
+could not be fetched; no complete citation-index coverage is asserted.
+
+A relevant later citing paper is Dey and Kavitha,
+[*Low-Cost Arborescence Under Edge Faults*, May 2026, Definition 1.2 and
+Section 4](https://arxiv.org/html/2605.13800v1). Its matroid preserver keeps
+a cheapest **ordinary basis after each failure**. That guarantee alone
+does not preserve the minimum total weight of a robust purchased set.
+For example, take a rank-two truncation with parallel classes A and B
+of two elements each, all weight 2, and a singleton class C of weight 3.
+The four A/B elements preserve a cheapest ordinary basis of weight 4
+after every single failure in the full ground set. Yet their robust
+optimum is 8, whereas the full instance has optimum 7 using one element
+from each class. Successively taking two cheapest residual bases also
+returns the four-element set. Thus this particular preserver construction
+cannot substitute for optimum-preservation in the proof above.
+
+[Fomin, Lokshtanov, Panolan and Saurabh's representative-family
+construction](https://arxiv.org/abs/1304.4626) preserves independent
+extensions of sets including weight-respecting variants, and provides algebraic algorithms for represented
+linear matroids (with a separate uniform-matroid construction). Those
+hypotheses and extension predicate are not the arbitrary-oracle,
+all-failures optimum-preservation statement proved here. We do not
+claim that representative-family methods cannot yield another proof.
+The contributions needing scrutiny are the weight-respecting exchange
+and recursive optimum-preservation argument, not the general idea of
+small cores, which is already central to the ESA paper.
+
 ## Verification
 
 `weighted_fault_core.py` implements the core and the exact enumeration
@@ -216,3 +277,6 @@ worst-case-deletion dynamic programming on 1,200 seeded instances with
 1,...,12 elements, plus the 85-element exact threshold example above.
 Finite checks supplement the theorem; no linear representation is
 assumed in the proof.
+
+The independent audit additionally verifies the five-element preserver
+separation above against every single failure and every purchased subset.
