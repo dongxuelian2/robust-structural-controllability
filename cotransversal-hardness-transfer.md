@@ -10,7 +10,8 @@ The incidence construction below assumes row size at most three.
 `row-splitting-equivalence.md` now removes that assumption by an exact
 row-splitting exchange and handles arbitrary, initially rank-deficient
 presentations. In particular every strongly connected control instance
-has an exact subcubic bidirected realization.
+has an exact bidirected realization with every degree in {2,3} and no
+mandatory actuator, by completing leaves with balanced cycles.
 
 ## A general reduction with no actuator baseline
 
@@ -216,3 +217,46 @@ A stronger hardness proof still needs an asymptotic gap within this larger
 cotransversal class. The realization theorem removes the graph-degree and
 actuator-baseline obstacles; the remaining source construction must retain
 its gap when every internal routing vertex can itself be selected.
+
+## Making an arbitrary gammoid representation strict can lose almost two
+
+The exact cotransversal reduction does not justify simply making all
+vertices of an arbitrary gammoid representation selectable. Here is a
+sharp obstruction even for an acyclic network, with every added vertex
+reachable from an original resource.
+
+For r>=2 use r sinks b_1,...,b_r, r gates g_1,...,g_r, and two original
+resources p_i,q_i for each i. Add arcs p_i->g_i, q_i->g_i, and g_i->b_j
+for every i,j. Let E consist only of the original 2r resources. Its
+gammoid is the direct sum of r copies of U_(1,2): at most one input per
+gate can be linked, and any inputs using distinct gates can be linked to
+distinct sinks. Thus E is robust and its robust optimum is exactly 2r.
+
+Now make all vertices selectable. Select one original input per gate and
+the single physical sink b_1, giving r+1 resources. After failure of b_1,
+the r gates match all sinks. After failure of an input, b_1 covers itself
+and the other r-1 gates match the other sinks. Rank r gives the matching
+lower bound r+1. Consequently
+
+    original OPT = 2r,      completed OPT = r+1.
+
+In the strict dual presentation the rows are {p_i,g_i}, {q_i,g_i}, and
+{g_i,b_1,...,b_r}. Every added gate column has three row neighbors and
+every sink column has r>=2. Each added vertex can therefore be avoided
+individually in an optimum by the local deletion lemma in
+`row-splitting-equivalence.md`. They cannot all be avoided at once.
+The full dual presentation is simple, so no completed actuator is mandatory.
+The subcubic realization preserves the completed value r+1.
+
+The distortion 2r/(r+1) is sharp among rank-preserving completions. Every
+feasible rank-r matroid has a robust set of at most 2r elements: complete
+a basis with at most one addition per initial coloop, as in
+`hardness-obstructions.md`. Every robust spanning set of a positive-rank
+completion has at least r+1 elements. The displayed family attains both
+bounds. This rules out the naive representation-completion map, not the
+existence of a different exact reduction for a larger source class.
+
+The verifier checks r=2,...,8 by integer vertex-capacitated flow, checks
+the complete original-restriction rank tables through r=5, and exhausts
+both optima through r=3. It also checks individual avoidance of every
+added element and verifies simplicity of the full dual through r=3.

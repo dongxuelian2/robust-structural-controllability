@@ -9,11 +9,12 @@ class Instance:
     labels: tuple
     edges: tuple
     centers: frozenset
+    # Pairs in the original cover instance; later copies may replace them.
     forced_pairs: tuple
     repair_sets: tuple
     terminals: dict
     owner: dict
-    # Subdivision vertices project to parallel copies of these original states.
+    # Added targets project to parallel copies of original states; -1 is a loop.
     projection: tuple
 
 
@@ -258,11 +259,45 @@ def cotransversal_graph(presentation, n, port_order=None):
                     (), (), {}, {}, tuple(projection))
 
 
+def complete_leaves(instance):
+    """Remove leaves of a subcubic incidence realization without actuator cost.
+
+    Attach a balanced four-cycle to each old leaf by one bridge. A target
+    attachment creates two parallel copies of that target and two dual loops;
+    a center attachment creates four dual loops. The input must be one of
+    the incidence realizations with freely matchable right centers.
+    """
+    rows, labels = list(instance.rows), list(instance.labels)
+    centers, projection = set(instance.centers), list(instance.projection)
+    leaves = [v for v, row in enumerate(rows) if row.bit_count() == 1]
+
+    def link(u, v):
+        rows[u] |= 1 << v
+        rows[v] |= 1 << u
+
+    for v in leaves:
+        c0, c1, t0, t1 = range(len(rows), len(rows) + 4)
+        rows.extend((0, 0, 0, 0))
+        labels.extend((('leaf_center', v, 0), ('leaf_center', v, 1),
+                       ('leaf_target', v, 0), ('leaf_target', v, 1)))
+        centers.update((c0, c1))
+        origin = -1 if v in instance.centers else instance.projection[v]
+        projection.extend((-1, -1, origin, origin))
+        for c in (c0, c1):
+            for t in (t0, t1):
+                link(c, t)
+        link(v, t0 if v in instance.centers else c0)
+    return Instance(tuple(rows), tuple(labels), instance.edges, frozenset(centers),
+                    instance.forced_pairs, instance.repair_sets, instance.terminals,
+                    instance.owner, tuple(projection))
+
+
 def normalize_subdivision(base, subdivided, actuators):
     """Map a robust subdivided placement to a no-larger original placement.
 
-    `base` is the unsubdivided instance. `subdivided` is obtained by any
-    number of calls to subdivide_ports(base). Feasibility is a precondition;
+    `base` is the original cover instance. `subdivided` is obtained by
+    complete_leaves and/or any number of subdivide_ports calls.
+    Feasibility is a precondition;
     the audit checks the actual actuator-failure model independently.
     """
     forced = {v for pair in base.forced_pairs for v in pair}

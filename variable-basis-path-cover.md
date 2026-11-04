@@ -2,7 +2,7 @@
 
 This direction uses the same unit-cost dedicated one-failure model, with
 distinct actuator states. It escapes the forced-basis normalization of the
-cover construction, but does **not** improve the general 469/468 lower bound.
+cover construction, but does **not** improve the general 2238/2233 lower bound.
 It establishes an exact source/target equivalence and identifies a further
 obstruction to reaching 3/2 through this particular family.
 
@@ -222,7 +222,7 @@ The published [Karpinski–Schmied 535/534 lower bound for (1,2)-TSP](https://ar
 therefore transfers as 535/534-epsilon hardness for this unforced family:
 the additive three is absorbed for sufficiently large n, and bounded n
 can be solved by constant-size exhaustive search. This is weaker numerically
-than 469/468, and is a different reduction rather than an improvement of
+than 2238/2233, and is a different reduction rather than an improvement of
 that bound. The source constant is also restated in [Behnezhad, Roghani,
 Rubinstein and Saberi,
 *Sublinear Algorithms for TSP via Path Covers*, ICALP 2024, Section 1](https://drops.dagstuhl.de/storage/00lipics/lipics-vol297-icalp2024/LIPIcs.ICALP.2024.19/LIPIcs.ICALP.2024.19.pdf).

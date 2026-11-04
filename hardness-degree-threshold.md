@@ -12,8 +12,8 @@ bidirected graph always has directed two-cycles.
    polynomial-time solvable. An exact formula is given below, including source
    SCC accessibility and infeasibility.
 2. It is APX-hard on strongly connected, loopless, bidirected, bipartite graphs
-   of maximum undirected degree three. On this class, approximation within
-   `469/468 - epsilon` is NP-hard for every fixed positive epsilon for which
+   with every undirected degree in {2,3} and no mandatory actuator. On this class, approximation within
+   `2238/2233 - epsilon` is NP-hard for every fixed positive epsilon for which
    the factor exceeds one, unless P=NP.
 3. For every fixed 0<delta<1 the hardness in item 2 persists even when the
    undirected girth is at least N^(1-delta), where N is the number of states.
@@ -33,7 +33,8 @@ element: OPT=2|U|+tau. The construction here retains that cost relation and
 replaces high-degree ports without increasing the actuator baseline. For the
 source approximation gap, [Chlebík and Chlebíková, *Complexity of approximating
 bounded variants of optimization problems*, TCS 354 (2006), 320–338](https://doi.org/10.1016/j.tcs.2005.11.029)
-give 53/52 hardness for Vertex Cover on 4-regular graphs. A
+give 53/52 hardness for Vertex Cover on 4-regular graphs. Retaining the
+absolute gap sizes in their proof gives the sharper constant stated here. A
 [public author manuscript](https://pure.port.ac.uk/ws/portalfiles/portal/1887750/3DM_JOURNAL_revision_old.pdf)
 states this on p.3 and in Corollary 18. This use of the stronger source gap
 also improves the numerical constant in the original unbounded-degree
@@ -200,9 +201,38 @@ the extracted source cover has size at most
     rho*tau(H) + 2m*(rho-1)
       <= [1+(2*Delta+1)*(rho-1)]*tau(H).
 
-For Delta=4, a factor below 1+(53/52-1)/9 = **469/468** would contradict
-the cited source hardness. APX-hardness also follows from subcubic Vertex
-Cover, with constants (7,1).
+For Delta=4, the quoted 53/52 source ratio alone gives
+1+(53/52-1)/9 = 469/468. The original proof provides a stronger absolute
+gap. In the notation of Chlebík--Chlebíková's Theorem 17 proof (printed
+pp.23--24), for arbitrarily small eta>0 it is NP-hard to distinguish
+4-regular graphs on n vertices with
+
+    tau <= n*(2*mu+8+2*eta)/(4*mu+12)
+
+from those with
+
+    tau >= n*(2*mu+9-2*eta)/(4*mu+12),
+
+where, for each fixed eta, the consistency gadget can be chosen with
+mu<=217/10+eta. Their Section 3.2 and Theorem 16 provide this parameter
+bound. The same
+absolute thresholds are restated in [Lee--Schmidt--Wright, *Improved and
+Simplified Inapproximability for k-means*, Theorem 2 and Appendix A](https://www.cs.utexas.edu/~wright/papers/kmeans.pdf).
+The original source proof retains the vanishing eta terms; they are
+needed when stating a hardness factor with an arbitrary fixed loss.
+
+Since m=2n, the two target thresholds have ratio
+
+    [4+(2*mu+9-2*eta)/(4*mu+12)]
+      / [4+(2*mu+8+2*eta)/(4*mu+12)]
+      = 1+(1-4*eta)/(18*mu+56+2*eta)
+      >= 1+(1-4*eta)/(2233/5+20*eta).
+
+As eta tends to zero this lower bound tends to 1+5/2233=2238/2233.
+Taking eta sufficiently small proves **2238/2233-epsilon** hardness for
+each fixed epsilon>0 with the factor above one. This is a tighter use of
+the published source gap, not a different reduction. APX-hardness also
+follows from subcubic Vertex Cover, with constants (7,1).
 
 If H is supplied with a planar embedding, order the ports in its cyclic
 incidence order. The port chain is a tree drawable in the vertex disk with
@@ -314,10 +344,25 @@ Furthermore
     girth >= 4L >= N^(1-delta).
 
 The polynomial normalization above still extracts a source cover with the
-same error bound. Thus the same 469/468 inapproximability and APX-hardness
+same error bound. Thus the same 2238/2233 inapproximability and APX-hardness
 hold at this girth, and the same construction proves the planar decision
 claim at this girth. This stronger statement uses O(log m) rounds rather
 than a fixed number of rounds; no actuator baseline grows with the padding.
+
+For the minimum-degree-two version, first apply `complete_leaves` from
+`hardness_gadgets.py`: attach a balanced four-cycle by a bridge at each
+leaf. The proof in `row-splitting-equivalence.md` shows that this adds only
+parallel targets and dual loops, preserves OPT and both solution maps,
+and removes all mandatory actuators. It preserves planarity as well.
+The completed cover graph has at most 50m states and 60m center--target
+edges. Its padding therefore has N<=60mL; replacing 10m by 60m in the
+preceding calculation gives the same N-dependent girth restriction.
+`normalize_subdivision` also accepts these completed instances.
+
+The degree-two vertices matter. A connected 3-regular bipartite graph has
+a perfect matching by Hall's theorem, and its robust control optimum is
+two. The hardness statement is for degrees in {2,3}, not for regular
+bipartite graphs.
 
 ## Exact computational checks
 

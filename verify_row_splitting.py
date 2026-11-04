@@ -3,8 +3,9 @@ from itertools import combinations, combinations_with_replacement
 from random import Random
 from audit_hardness import augmented_matchable
 from bounded_core_solver import matching_number, source_components
-from hardness_gadgets import subdivide_ports
+from hardness_gadgets import complete_leaves, subdivide_ports
 from row_splitting import (cotransversal_from_placement, cotransversal_reduction,
+                           avoid_presentation_element,
                            dual_rank_oracle, full_rank_presentation, normalize_row_splits,
                            ternary_presentation)
 from verify_gammoid_obstructions import dual_ranks, robust, transversal_ranks
@@ -23,6 +24,33 @@ def audit_compression():
                     row.bit_count() for row in rows)
                 count += 1
     print('Full-rank presentation compression:', count, 'presentations PASS', flush=True)
+
+
+def audit_local_deletion():
+    sources = exchanges = 0
+    for n in range(2, 5):
+        full = (1 << n) - 1
+        for r in range(1, n):
+            for rows in combinations_with_replacement(range(1, 1 << n), r):
+                tr = transversal_ranks(rows, n)
+                if tr[-1] != r or any(tr[1 << v] == 0 for v in range(n)):
+                    continue
+                ranks = dual_ranks(rows, n)
+                robust_masks = [mask for mask in range(1 << n) if robust(ranks, mask)]
+                for x in range(n):
+                    if sum(bool(row >> x & 1) for row in rows) < 2:
+                        continue
+                    assert min(mask.bit_count() for mask in robust_masks) == min(
+                        mask.bit_count() for mask in robust_masks if not mask >> x & 1)
+                    for mask in robust_masks:
+                        selected = {v for v in range(n) if mask >> v & 1}
+                        normalized = avoid_presentation_element(rows, n, selected, x)
+                        assert x not in normalized and len(normalized) <= len(selected)
+                        assert robust(ranks, sum(1 << v for v in normalized))
+                        exchanges += 1
+                sources += 1
+    print('Individual column deletion:', sources, 'sources,', exchanges,
+          'exchanges PASS', flush=True)
 
 
 def audit():
@@ -177,7 +205,54 @@ def audit_control_sources():
     print('Actual strongly connected directed sources:', count, 'PASS', flush=True)
 
 
+def audit_leaf_completion():
+    rng = Random(1265)
+    count = queries = reverse = 0
+    fixtures = (((3,), 2), ((7,), 3), ((3, 12), 4), ((3, 4), 3),
+                ((15,), 4), ((31, 3, 12), 5),
+                ((1033, 4612, 2084, 1064, 560, 352, 448, 4114), 13))
+    for rows, n in fixtures:
+        for pad in (False, True):
+            graph = complete_leaves(cotransversal_reduction(rows, n))
+            if pad:
+                graph = subdivide_ports(graph)
+            total, full = len(graph.rows), (1 << len(graph.rows)) - 1
+            assert all(2 <= row.bit_count() <= 3 for row in graph.rows)
+            assert source_components(graph.rows) == [full]
+            nu = matching_number(graph.rows, full)
+            rank = dual_rank_oracle(rows, n)
+            split, size, _ = ternary_presentation(rows, n)
+            split_rank = dual_rank_oracle(split, size)
+            assert total - nu == n - len(rows)
+            for _ in range(80):
+                selected = {v for v in range(total) if rng.randrange(2)}
+                support = {graph.projection[v] for v in selected if graph.projection[v] >= 0}
+                mask = sum(1 << v for v in selected)
+                actual = len(selected) + matching_number(graph.rows, full ^ mask) - nu
+                assert actual == split_rank(support)
+                queries += 1
+                if (actual != n - len(rows) or any(
+                        len(selected) - 1 + matching_number(graph.rows, full ^ (mask ^ (1 << v)))
+                        - nu != actual for v in selected)):
+                    continue
+                original = cotransversal_from_placement(rows, n, graph, selected)
+                assert len(original) <= len(selected)
+                assert rank(original) == actual and all(rank(original - {v}) == actual for v in original)
+                reverse += 1
+            # Explicit failures after deliberately omitting a prescribed state
+            # certify absence of mandatory actuators in the actual control model.
+            for excluded in range(min(5, total)):
+                selected = set(range(total)) - {excluded}
+                for failed in sorted(selected)[:3]:
+                    assert augmented_matchable(graph.rows, selected - {failed})
+            count += 1
+    print('Leaf completion:', count, 'realizations,', queries,
+          'full-state ranks,', reverse, 'reverse maps PASS', flush=True)
+
+
 if __name__ == '__main__':
     audit_compression()
+    audit_local_deletion()
     audit()
     audit_control_sources()
+    audit_leaf_completion()

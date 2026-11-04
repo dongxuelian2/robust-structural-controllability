@@ -120,6 +120,11 @@ no control actuator is mandatory: the original solutions avoid every new
 branch resource, and they lift while avoiding any prescribed copy of an
 avoidable original resource.
 
+For an unconditional version without mandatory locations, compose the
+construction with `complete_leaves` as proved in
+`row-splitting-equivalence.md`. This gives all degrees in {2,3}, preserves
+OPT and the same reverse map, and permits the same girth padding.
+
 The reduction is implemented in `assignment_transfer.py`. A source set
 lifts to its retained original-root indices. To reverse a placement, call
 `assignment_from_placement`, including after `subdivide_ports` padding.

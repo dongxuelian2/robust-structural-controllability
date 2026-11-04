@@ -104,6 +104,38 @@ def dual_rank_oracle(presentation, n):
     return rank
 
 
+def avoid_presentation_element(presentation, n, selected, x):
+    """Avoid x at no extra cost when its column has at least two row neighbors.
+
+    The selected set must robustly span the dual transversal matroid. The
+    output spans robustly in its deletion of x; that deletion need not itself
+    be cotransversal. This operation cannot in general be composed to avoid
+    a prescribed set of columns.
+    """
+    presentation = tuple(presentation)
+    if not 0 <= x < n or sum(bool(row >> x & 1) for row in presentation) < 2:
+        raise ValueError('The column must have at least two row neighbors.')
+    rows = full_rank_presentation(presentation, n)
+    rank = dual_rank_oracle(rows, n)
+    d, selected = n - len(rows), set(selected)
+
+    def robust(support):
+        return rank(support) == d and all(rank(support - {e}) == d for e in support)
+
+    if not selected <= set(range(n)) or not robust(selected):
+        raise ValueError('The selected set must be robust.')
+    if x not in selected:
+        return frozenset(selected)
+    selected.remove(x)
+    if robust(selected):
+        return frozenset(selected)
+    replacement = next((w for w in range(n) if w != x and w not in selected
+                        and robust(selected | {w})), None)
+    if replacement is None:
+        raise AssertionError('The tight-Hall-set deletion exchange failed.')
+    return frozenset(selected | {replacement})
+
+
 def normalize_row_splits(presentation, n, selected):
     """Map a robust set after all row splits to a no-larger original robust set."""
     rows, size, steps = ternary_presentation(presentation, n)

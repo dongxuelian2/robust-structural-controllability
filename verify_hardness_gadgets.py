@@ -2,7 +2,7 @@
 from itertools import combinations
 from random import Random
 from hardness_gadgets import (vertex_cover_graph, lift_cover, extract_cover,
-                              subdivide_ports)
+                              subdivide_ports, complete_leaves, normalize_subdivision)
 from verify_outdegree_two import matching_subsets, brute_robust, independent_sources
 
 
@@ -213,6 +213,32 @@ def compressed_triangle():
     return len(rows), 1 << len(rows)
 
 
+def check_leaf_completion():
+    rng, count = Random(15513), 0
+    for edges in (((0, 1),), ((0, 1), (1, 2)), ((0, 1), (2, 3)),
+                  ((0, 1), (0, 2), (1, 2))):
+        base = vertex_cover_graph(edges)
+        completed = complete_leaves(base)
+        padded = subdivide_ports(completed)
+        assert girth(padded.rows) == 3 * girth(completed.rows)
+        best = min(source_covers(edges), key=len)
+        for graph in (completed, padded):
+            structural_checks(graph)
+            assert min(row.bit_count() for row in graph.rows) == 2
+            assert robust(graph.rows, lift_cover(base, best))
+            for _ in range(60):
+                selected = {v for v in range(len(graph.rows)) if rng.randrange(2)}
+                if not robust(graph.rows, selected):
+                    continue
+                normalized = normalize_subdivision(base, graph, selected)
+                assert len(normalized) <= len(selected) and robust(base.rows, normalized)
+                cover = extract_cover(base, normalized)
+                assert len(cover) <= len(selected) - 2 * len(edges)
+                count += 1
+    print('Leafless cover gadgets: eight realizations,', count,
+          'robust reverse maps PASS', flush=True)
+
+
 if __name__ == '__main__':
     count = 0
     for n in range(2, 5):
@@ -247,3 +273,4 @@ if __name__ == '__main__':
     vertices, subsets = compressed_triangle()
     print('Compressed triangle: n=%d, all %d placements, optimum 4 (not 5) PASS'
           % (vertices, subsets))
+    check_leaf_completion()

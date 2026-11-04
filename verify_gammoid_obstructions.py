@@ -5,6 +5,7 @@ from random import Random
 from audit_hardness import augmented_matchable
 from bounded_core_solver import matching_number
 from hardness_gadgets import cotransversal_graph, protect_coloops, subdivide_ports
+from row_splitting import avoid_presentation_element
 
 
 def transversal_ranks(rows, n):
@@ -311,8 +312,48 @@ def audit_general_realization():
           'full-state ranks,', reverse, 'reverse maps PASS', flush=True)
 
 
+def audit_completion_collapse(r):
+    # Original inputs 0..2r-1, gates 2r..3r-1, physical sinks 3r..4r-1.
+    n = 4 * r
+    rows = [0] * n
+    for i in range(r):
+        rows[2 * i] = rows[2 * i + 1] = 1 << (2 * r + i)
+        rows[2 * r + i] = sum(1 << j for j in range(3 * r, 4 * r))
+    sinks, original = set(range(3 * r, 4 * r)), set(range(2 * r))
+    presentation = tuple((1 << v) | rows[v] for v in range(3 * r))
+    for v in original:
+        assert linkage_rank(rows, sinks, original - {v}) == r
+    selected = {2 * i for i in range(r)} | {3 * r}
+    for v in selected:
+        assert linkage_rank(rows, sinks, selected - {v}) == r
+    # The original matroid is a partition matroid; check its full rank table
+    # independently by max flow on the first four family members.
+    if r <= 5:
+        for mask in range(1 << (2 * r)):
+            support = {v for v in original if mask >> v & 1}
+            expected = sum(bool(mask & (3 << (2 * i))) for i in range(r))
+            assert linkage_rank(rows, sinks, support) == expected
+    # Every new element has >=2 neighbors and is avoidable individually,
+    # even though forbidding all new elements raises the optimum to 2r.
+    for x in range(2 * r, n):
+        normalized = avoid_presentation_element(presentation, n, selected, x)
+        assert x not in normalized and len(normalized) == r + 1
+        assert all(linkage_rank(rows, sinks, normalized - {v}) == r for v in normalized)
+    if r <= 3:
+        ranks = dual_ranks(presentation, n)
+        assert min(mask.bit_count() for mask in range(1 << n) if robust(ranks, mask)) == r + 1
+        assert min(mask.bit_count() for mask in range(1 << (2 * r))
+                   if robust(ranks, mask)) == 2 * r
+        tr = transversal_ranks(presentation, n)
+        assert all(tr[(1 << u) | (1 << v)] == 2 for u, v in combinations(range(n), 2))
+    print('Reachable acyclic completion rank', r, ': original OPT', 2 * r,
+          '; completed OPT', r + 1, 'PASS', flush=True)
+
+
 if __name__ == '__main__':
     audit_nontransversal()
     for k in range(4, 13):
         audit_directed_comb(k)
     audit_general_realization()
+    for r in range(2, 9):
+        audit_completion_collapse(r)
