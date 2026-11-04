@@ -45,3 +45,6 @@ Adjiashvili, Bindewald and Michaels, *Robust Assignments with Vulnerable Nodes*,
 
 ## Independent audit commands
 Run `python audit_seven_fourths.py` to check all optimum relaxation sets, residual cocircuit disjointness, packing lower bounds and the guarantee, using subset-DP rank calculations independent of the solver matching. Run `python audit_joint_implementation.py` to check the actual solver, full repair coverage, exact relaxation, residual disjointness, robust output and iterator inputs. Each audit covers all 66,066 looped digraphs through four vertices plus 800 fixed-seed random graphs on five through eight vertices (seed 20261104). These finite checks supplement the proof.
+
+## A limitation of maximum-coverage tie choices
+[The path-family obstruction](joint-repair-obstruction.md) gives legal optimum-relaxation and maximum-coverage choices with ratio approaching 5/3, and an explicit d=12 instance where the actual implementation returns 20 versus OPT=13. Run `python audit_path_family.py` for independent explicit witnesses and implementation checks. This rules out a 3/2 guarantee for the present deterministic implementation, not for the underlying optimization problem; it does not prove 7/4 tightness.
