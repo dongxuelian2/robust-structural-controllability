@@ -15,7 +15,8 @@ bidirected graph always has directed two-cycles.
    of maximum undirected degree three. On this class, approximation within
    `469/468 - epsilon` is NP-hard for every fixed positive epsilon for which
    the factor exceeds one, unless P=NP.
-3. The hardness in item 2 persists at every prescribed fixed undirected girth.
+3. For every fixed 0<delta<1 the hardness in item 2 persists even when the
+   undirected girth is at least N^(1-delta), where N is the number of states.
    With planarity also required, the decision problem remains NP-complete;
    no APX-hardness assertion is made for the planar subclass.
 
@@ -256,6 +257,27 @@ component, so its length is multiplied by three. Repeat a fixed number of
 times to exceed any prescribed fixed girth g. The graph size still grows by
 only a constant factor depending on g, and OPT remains 2m+tau(H). This proves
 the stated large-girth hardness.
+
+In fact polynomial padding gives the stronger N-dependent statement.
+The base graph has at most 10m states and at most 10m center--target edges.
+After k rounds let L=3^k. The new number of states satisfies N<=10mL,
+while every undirected cycle has length at least 4L. Fix 0<delta<1 and an
+integer a>=max(1,(1-delta)/delta). Choose k minimally so
+
+    L=3^k >= (10m)^a.
+
+Then L<3(10m)^a, hence N=O(m^(a+1)), polynomial in the source size.
+Furthermore
+
+    L^delta >= (10m)^(1-delta),
+    (10mL)^(1-delta) <= L,
+    girth >= 4L >= N^(1-delta).
+
+The polynomial normalization above still extracts a source cover with the
+same error bound. Thus the same 469/468 inapproximability and APX-hardness
+hold at this girth, and the same construction proves the planar decision
+claim at this girth. This stronger statement uses O(log m) rounds rather
+than a fixed number of rounds; no actuator baseline grows with the padding.
 
 ## Exact computational checks
 
