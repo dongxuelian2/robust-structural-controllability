@@ -25,3 +25,7 @@ The reference establishes NP-hardness even for one input failure and approximati
 ## Research outputs
 
 Keep proved theorems, precise counterexamples, and minimal exact computational checks in this repository. A self-contained theorem for a restricted graph class is useful even if the main approximation target is not attained.
+
+[Degree threshold and sparse hardness](hardness-degree-threshold.md): exact optimization for state outdegree at most two; APX-hardness at degree three, including strongly connected bipartite graphs of arbitrarily large fixed undirected girth. The reduction preserves OPT=2|E|+tau and gives a 469/468−epsilon inapproximability bound. [Reduction obstructions](hardness-obstructions.md) explain the failure of one-leaf compression and a 5/4 barrier for forced-basis covering constructions.
+
+Exact checks: `python verify_outdegree_two.py` and `python verify_hardness_gadgets.py` (Python 3.10+, standard library only).
