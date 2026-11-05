@@ -1,5 +1,10 @@
 # Exact transfer with resource-group quotas and genuine choices
 
+`general-sparse-equivalence.md` extends the source model below to every
+coloop-free cotransversal matroid and permits disjoint quota groups on
+only part of the ground set. The assignment-specific construction here
+has the smaller base size and needs no global connector.
+
 The source-SCC method extends beyond a fixed private basis. Let U be n>=1
 jobs and E a collection of m unit-cost resources with nonempty job
 neighborhoods. Every resource is vulnerable. Suppose the full resource

@@ -193,9 +193,11 @@ bidirected even cycle on at least four states as the target and map any
 two target actuators to any two source states. Its girth equals its order,
 and no target state is mandatory.
 
-This statement concerns strongly connected graphs. Multiple source-SCC
-accessibility quotas in general directed graphs require a separate
-reduction and are not absorbed into the matroid argument.
+This statement concerns strongly connected graphs. The separate construction
+in `general-sparse-equivalence.md` now retains multiple source-SCC quotas
+as well, using new source representatives and a connector of dual loops.
+Its target is weakly connected and need not be bidirected. It gives exact
+degree-{2,3} universality for the general directed problem.
 
 ## Verification
 
