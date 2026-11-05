@@ -1,6 +1,7 @@
 """Check parity presentations and the exact variable-deletion transfer."""
 from fractions import Fraction
 from itertools import combinations, product
+from math import prod
 
 from assignment_transfer import assignment_from_placement, assignment_graph, robust_assignment
 from bounded_core_solver import source_components
@@ -62,7 +63,7 @@ def check_k4():
 def check_fill():
     equations = tuple((*edge, rhs) for edge in combinations(range(4), 3) for rhs in (0, 1))
     for partial in product((-1, 0, 1), repeat=4):
-        deleted = [i for i, bit in enumerate(partial) if bit == -1]
+        deleted = {i for i, bit in enumerate(partial) if bit == -1}
         untouched = [eq for eq in equations if not set(eq[:3]).intersection(deleted)]
         full = []
         for bits in product((0, 1), repeat=len(deleted)):
@@ -72,7 +73,38 @@ def check_fill():
             full.append(violated(assignment, equations))
         expected = violated(partial, untouched) + Fraction(len(equations) - len(untouched), 2)
         assert Fraction(sum(full), len(full)) == expected
-    assert Fraction(7**7, 3**6) * (Fraction(5, 7) + Fraction(1, 10000))**21 < 1
+        collisions = sum(max(0, len(deleted.intersection(eq[:3])) - 1) for eq in equations)
+        assert len(equations) - len(untouched) + collisions == 6 * len(deleted)
+        if len(deleted) < 4:
+            bad = [eq for eq in untouched if violated(partial, (eq,))]
+            incident = [Fraction(sum(v in eq[:3] for eq in bad), 6)
+                        for v in range(4) if v not in deleted]
+            assert sum(incident) == Fraction(len(bad), 2)
+            survival = prod((1 - rate)**3 for rate in incident)
+            assert survival <= (1 - sum(incident) / len(incident))**(3 * len(incident))
+
+
+def check_exponent():
+    p = Fraction(3, 20)
+    base = (Fraction(1, 2) + Fraction(1, 10000) + p / 2) / (1 - p)
+    g = (1 - p)**3 + 3 * p * (1 - p)**2 + 3 * p**2 * (1 - p) / 512 + p**3 / 512**2
+    # The first four exponential-series terms show exp(7/10) > 2.
+    r = Fraction(7, 10)
+    assert 1 + r + r**2 / 2 + r**3 / 6 > 2
+    assert 1 / (2 * base) > r
+    assert 1 / p > 2 * base**3 / (1 - p)
+    assert (1 / p)**9 * (2 * base**3 / (1 - p))**51 * g**20 < 1
+    assert 1 + p / 13 == Fraction(263, 260)
+    assert 1 + p / 25 == Fraction(503, 500)
+
+    # All four triples on four variables give n/m = 1 and degree three.
+    triples = tuple(combinations(range(4), 3))
+    moment = 0
+    for mask in range(1 << 4):
+        d = mask.bit_count()
+        overlap = sum(max(0, sum(mask >> v & 1 for v in triple) - 1) for triple in triples)
+        moment += p**d * (1 - p)**(4 - d) / 8**overlap
+    assert moment**3 <= g**4
 
 
 def check_assignment(strong):
@@ -116,6 +148,7 @@ if __name__ == '__main__':
     check_tight(4)
     check_k4()
     check_fill()
-    print('Parity presentations, 81 random-fill identities and exponent PASS')
+    check_exponent()
+    print('Parity presentations, 81 partial assignments and rational stratified exponent PASS')
     for strong in (False, True):
         check_assignment(strong)
