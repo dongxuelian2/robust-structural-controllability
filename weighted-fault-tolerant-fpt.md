@@ -47,7 +47,7 @@ increase any surviving rank, and their weights are nonnegative. If r=0
 the empty set is optimal.
 Assume r>=1 below. Write
 
-    q=(k+1)r, H=binom(q-1,r-1), t_h=(h-1)H+q.
+    q=(k+1)r, H=binom(r+k-1,k), t_h=(h-1)H+q.
 
 ## A small optimum exists, also with weights and safe elements
 
@@ -61,6 +61,30 @@ therefore implies feasibility of B0. Nonnegative weights give w(B0)<=w(B).
 Starting with a minimum-weight solution thus yields an optimum of size<=q.
 This argument needs only a bound on the number of failures, not that every
 element is vulnerable.
+
+## Sharp deficient-hyperplane count
+
+For any Y subset E, at most H distinct hyperplanes have the form
+cl(Y minus F) for |F|<=k. This follows from the classical
+[Bollobas set-pairs inequality](https://doi.org/10.1007/BF01904851),
+with a short self-contained proof.
+
+For each such hyperplane P_i choose a basis A_i inside Y intersect P_i
+of size r-1, and set D_i=Y minus P_i. Then |D_i|<=k and A_i is disjoint
+from D_i. For distinct i,j, A_i intersects D_j: otherwise P_i=cl(A_i)
+is contained in P_j, contradicting distinctness of equal-rank flats.
+In a uniformly random ordering of Y, the event that all of A_i precedes
+all of D_i has probability 1/binom(r-1+|D_i|,r-1). These events are
+pairwise disjoint: a point in A_i intersect D_j must precede a point in
+A_j intersect D_i for the first event, while the second requires the
+opposite order. Their probabilities sum to at most one, and every term
+is at least 1/H. This proves the claim, including r=1 and k=0.
+
+The count is sharp: in M=U_(r,r+k), take B=E, all elements vulnerable,
+and Y=B minus {x}. Deleting each k-subset of Y leaves a distinct
+(r-1)-element hyperplane, and B is resilient. Sharpness concerns this
+count, not the complete core threshold. It improves the earlier
+basis-subset count binom(q-1,r-1); no new set-pairs theorem is claimed.
 
 ## Weight-respecting exchange lemma
 
@@ -76,8 +100,8 @@ feasible, has the same size, and has weight no larger than B.
 Proof. Put Y=B minus {x}. For every allowed F subset Y intersect V of
 size<=k for which rank(Y minus F)<r, feasibility of B implies that this
 rank is exactly r-1 and x is outside the hyperplane cl(Y minus F).
-Every such hyperplane has a basis of r-1 elements from Y; hence there
-are at most binom(q-1,r-1)=H distinct hyperplanes. Each contains at most
+The preceding count gives at most H distinct hyperplanes. It also
+covers safe x and deficient failures of size less than k. Each contains at most
 h-1 elements of Z. Otherwise h independent elements of Z would span A,
 forcing x into the hyperplane. At most q-1 elements of Z belong to B.
 Since |Z|>=(h-1)H+q, some y in Z minus B avoids all these hyperplanes.
@@ -176,6 +200,11 @@ minimum-weight feasible set. There are at most (NT+1)^q candidates and at most 2
 sets per candidate. Each surviving rank is computed greedily. Weight
 sums have polynomial bit length. Thus the total bit and oracle-query
 cost is a parameter-only function times a polynomial in the input size.
+More explicitly, put p=r+k. Since H<=2^(p-1), q=O(p^2), and
+log(t_r)=O(p), the core size is 2^O(r^2 p) and the running time is
+2^O(q r^2 p) poly(n,L), hence 2^O(p^5) poly(n,L), where L is the input
+bit length. For fixed k>=1, H=O_k(r^k), giving core size r^O_k(r^2)
+and running time r^O_k(r^3) poly(n,L).
 If none is feasible, the optimum-preservation property certifies
 infeasibility. Nonnegative rational weights work as well with exact
 arithmetic; the reference code takes nonnegative integers.
@@ -205,7 +234,7 @@ and are not covered by this corollary.
 In rank two with k=1, take two parallel classes of size two and weights
 0,0 and 1,1, followed by five distinct additional directions of weight
 100 each. This is a rank-two truncation of a partition matroid. Here q=4
-and t_2=7. A greedy 2-uniform set reaches the threshold but retains only
+and t_2=6. A greedy 2-uniform set reaches the threshold but retains only
 one element from each cheap class. Within that set a robust solution
 costs at least 101; the original optimum uses both cheap pairs and costs
 2. The lower-rank branches retain them. The important difference is not
@@ -214,11 +243,14 @@ sorting alone: the recursion must survive the successful threshold case.
 A higher-rank version uses a rank-three truncation: three parallel pairs
 with costs (0,1) each, followed by 79 singleton classes of costs 13,...,91.
 The optimum is 3, from all three cheap pairs; a uniform-only output has
-optimum 13. Here t_3=26. The implemented recursion retains 29 of the 85
+optimum 13. Here H=3 and t_3=12. The implemented recursion retains 15 of the 85
 elements, including all cheap pairs. For rank-three truncations under one
 failure, the exact optimum is the minimum of the four cheapest distinct
 class minima and the three cheapest class-pair sums, so this test needs
 no enumeration of all 85-element subsets.
+The earlier basis-subset count gave threshold 26 and a 29-element core
+on this same instance; the set-pairs refinement preserves the optimum
+with fewer retained elements.
 
 ## Literature positioning and limits of the novelty check
 
@@ -270,7 +302,7 @@ weights on specified rank-two, graphic, sparse-paving and nonrepresentable
 Vamos matroids, all status assignments on a specified nine-element
 instance, and seeded wider-weight tests. It also exercises successful
 threshold termination together with rejected cheap elements.
-The recorded run passed 18,779 comparisons, including 3,751 cases with
+The 5 November rerun with the sharper threshold passed 18,779 comparisons, including 4,667 cases with
 both threshold termination and rejection, and 42 infeasible cases.
 The second uses independent binary-linear rank tables and repeated
 worst-case-deletion dynamic programming on 1,200 seeded instances with
@@ -280,3 +312,7 @@ assumed in the proof.
 
 The independent audit additionally verifies the five-element preserver
 separation above against every single failure and every purchased subset.
+It also checks the sharp hyperplane count directly, independently of the
+core implementation: equality on uniform matroids, and every selected
+subset of fixed Vamos and Fano matroids under at most two deletions.
+

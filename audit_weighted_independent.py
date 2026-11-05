@@ -5,7 +5,9 @@ and a worst-case-deletion DP, plus an exact 85-element threshold example.
 Run: python3 audit_weighted_independent.py
 """
 from functools import lru_cache
+from fractions import Fraction
 from itertools import combinations
+from math import comb
 from random import Random
 
 from weighted_fault_core import solve, weighted_core
@@ -108,7 +110,7 @@ def check_threshold():
     oracle = TruncatedParallelRanks(labels, 3)
     core, stats = weighted_core(weights, oracle, 1)
     assert stats['capped'] >= 1 and stats['rejected'] >= 1
-    assert set(range(6)) <= core and len(core) == 29
+    assert set(range(6)) <= core and len(core) == 15
     assert rank_three_one_failure_optimum(labels, weights, range(85)) == 3
     assert rank_three_one_failure_optimum(labels, weights, core) == 3
     # Demonstrate that discarding rejected cheap points at saturation fails.
@@ -117,7 +119,7 @@ def check_threshold():
         if labels[i] not in seen:
             seen.add(labels[i])
             uniform.append(i)
-        if len(uniform) == 26:
+        if len(uniform) == 12:
             break
     assert rank_three_one_failure_optimum(labels, weights, uniform) == 13
     return len(core)
@@ -176,6 +178,63 @@ def check_preserver_distinction():
     assert robust_optimum(preserver) == 8
 
 
+def check_hyperplane_bound():
+    """Audit the new count directly, without calling the core or solver.
+
+    Uniform matroids attain equality, including k=0 and rank one.
+    On the nonrepresentable Vamos matroid and the Fano matroid, inspect
+    every Y and all deletions of at most two elements. This tests the
+    more general counting lemma, without assuming Y=B-{x} or resilience.
+    """
+    def inspect(rank, n, selected, k):
+        ground = frozenset(range(n))
+        r = rank(ground)
+        planes = set()
+        for size in range(min(k, len(selected)) + 1):
+            for failed in combinations(sorted(selected), size):
+                survivor = selected - frozenset(failed)
+                if rank(survivor) == r - 1:
+                    planes.add(frozenset(e for e in ground
+                                        if rank(survivor | {e}) == r - 1))
+        pairs = []
+        for plane in planes:
+            basis = frozenset()
+            for e in sorted(selected & plane):
+                if rank(basis | {e}) > rank(basis):
+                    basis |= {e}
+            deleted = selected - plane
+            assert len(basis) == r - 1 and len(deleted) <= k
+            assert not basis & deleted
+            pairs.append((basis, deleted))
+        for i, (basis, _) in enumerate(pairs):
+            assert all(basis & deleted for j, (_, deleted) in enumerate(pairs)
+                       if i != j)
+        probability_sum = sum((Fraction(1, comb(r - 1 + len(deleted), r - 1))
+                               for _, deleted in pairs), Fraction(0))
+        assert probability_sum <= 1
+        assert len(planes) <= comb(r + k - 1, k)
+        return len(planes)
+
+    for r in range(1, 6):
+        for k in range(4):
+            n = r + k
+            rank = lambda s, r=r: min(r, len(s))
+            assert inspect(rank, n, frozenset(range(n - 1)), k) == comb(r+k-1, k)
+
+    forbidden = {frozenset(s) for s in (
+        (0,1,2,3), (0,1,4,5), (0,1,6,7), (2,3,4,5), (2,3,6,7))}
+    def vamos_rank(s):
+        return 3 if s in forbidden else min(4, len(s))
+    fano_table = binary_ranks(tuple(range(1, 8)))
+    def fano_rank(s):
+        return fano_table[sum(1 << e for e in s)]
+    for n, rank in ((8, vamos_rank), (7, fano_rank)):
+        for mask in range(1 << n):
+            selected = frozenset(e for e in range(n) if mask >> e & 1)
+            for k in range(3):
+                inspect(rank, n, selected, k)
+
+
 def main():
     rng = Random(202611041236)
     count = reduced = feasible = 0
@@ -194,13 +253,17 @@ def main():
     core_size = check_threshold()
     check_edges()
     check_preserver_distinction()
+    check_hyperplane_bound()
     print(f'PASS: {count} seeded instances; {feasible} feasible; '
           f'{reduced} strictly reduced cores.')
     print(f'PASS: 85-element threshold instance; core={core_size}; '
           'original/core optimum=3; uniform-only optimum=13.')
     print('PASS: iterator inputs, rank zero, infeasibility, and validation.')
     print('PASS: minimum-basis preserver costs remain 4; robust optima differ (7 vs 8).')
+    print('PASS: sharp set-pairs hyperplane bound, uniform equality, and '
+          'all selected subsets of Vamos/Fano fixtures.')
 
 
 if __name__ == '__main__':
     main()
+

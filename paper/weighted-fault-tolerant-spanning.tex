@@ -17,13 +17,13 @@
 \newcommand{\setminusf}{\setminus}
 \title{Weighted Fault Tolerant Matroid Spanning\newline with Safe and Vulnerable Elements}
 \author{}
-\date{4 November 2026}
+\date{5 November 2026}
 \begin{document}
 \begin{center}
 {\LARGE Weighted Fault Tolerant Matroid Spanning\\[0.3em]
 with Safe and Vulnerable Elements\par}
 \vspace{1em}
-4 November 2026
+5 November 2026
 \end{center}
 \vspace{0.7em}
 \begin{abstract}
@@ -49,9 +49,9 @@ Failures could equivalently be quantified over all subsets of $V$ of size at mos
 \begin{theorem}\label{thm:main}
 For an $n$-element rank-$r$ matroid given by an independence oracle, nonnegative binary-encoded integer weights, a vulnerable subset $V$, and an integer $k\geq0$, a minimum-weight resilient set can be found, or infeasibility reported, in $f(r,k)\operatorname{poly}(n,L)$ time and independence-oracle calls, where $L$ is the input bit length and oracle calls have unit cost. For $r\geq2$, putting $q=(k+1)r$, a bound is
 \[
- q^{O(qr^3)}\operatorname{poly}(n,L).
+ 2^{O(qr^2(r+k))}\operatorname{poly}(n,L).
 \]
-The cases $r\leq1$ or $k=0$ are polynomial-time solvable. For $r\geq2$ and $k\geq1$, the displayed bound is $(kr)^{O(kr^4)}\operatorname{poly}(n,L)$.
+In particular, this is $2^{O((r+k)^5)}\operatorname{poly}(n,L)$. For fixed $k\geq1$, a bound is $r^{O_k(r^3)}\operatorname{poly}(n,L)$. The cases $r\leq1$ or $k=0$ are polynomial-time solvable.
 \end{theorem}
 
 The algorithm retains an optimum in an FPT-sized subset of $E$. This is an oracle reduction with parameter-bounded output cardinality; it is not a claim of a polynomial-size encoded kernel. Oracle access to the original matroid is retained.
@@ -70,7 +70,7 @@ We use monotonicity and idempotence of closure, and the fact that a maximal inde
 
 Loops can be discarded. Removing them from a resilient set preserves resilience, and their nonnegative weights cannot make this removal costly. If $r=0$, the empty set is optimal. Henceforth assume $r\geq1$ and work on the loop-free restriction. Set
 \begin{equation}\label{eq:parameters}
- q=(k+1)r,\qquad H=\binom{q-1}{r-1},\qquad t_h=(h-1)H+q\quad(1\leq h\leq r).
+ q=(k+1)r,\qquad H=\binom{r+k-1}{k},\qquad t_h=(h-1)H+q\quad(1\leq h\leq r).
 \end{equation}
 The same global values of $q,H$ are used in every recursive subproblem.
 
@@ -88,6 +88,23 @@ Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus 
 \end{proof}
 
 \section{A weight respecting exchange}
+We first sharpen the deficient-hyperplane count using the classical set-pairs inequality of Bollob\'as~\cite{Bollobas}. The short proof is included; no representation or bound on the size of $Y$ is needed.
+
+\begin{lemma}\label{lem:hyperplanes}
+For any $Y\subseteq E$, at most $\binom{r+k-1}{k}$ distinct hyperplanes can have the form $\cl(Y\setminus F)$ with $F\subseteq Y$ and $|F|\leq k$. This count is sharp.
+\end{lemma}
+\begin{proof}
+Index these hyperplanes by $P_i$. Choose a basis $A_i\subseteq Y\cap P_i$ of size $r-1$, and put $D_i=Y\setminus P_i$. Because $P_i=\cl(Y\setminus F)$ for some permitted $F$, we have $D_i\subseteq F$, so $|D_i|\leq k$. Also $A_i\cap D_i=\varnothing$. If $i\ne j$, then $A_i\cap D_j\ne\varnothing$: otherwise $A_i\subseteq P_j$ and hence $P_i=\cl(A_i)\subseteq P_j$, forcing equality of the two hyperplanes.
+
+In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $D_i$. Its probability is $\binom{r-1+|D_i|}{r-1}^{-1}$. These events are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap D_j$ and $b\in A_j\cap D_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively. Therefore
+\[
+ \sum_i\binom{r-1+|D_i|}{r-1}^{-1}\leq1.
+\]
+Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. The argument includes $r=1$ and $k=0$, when there can be at most one such hyperplane.
+
+For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. Thus equality holds even for the deficient hyperplanes needed below. This does not assert sharpness of the full core threshold $t_h$.
+\end{proof}
+
 Call $Z$ \emph{$h$-uniform} if $\rk(Z)=h$ and every $h$-element subset of $Z$ is independent. Such a set has at least $h$ elements, and every subset of size at most $h$ is independent. A set has a single failure status if it lies entirely in $V$ or entirely in $E\setminus V$.
 
 \begin{lemma}\label{lem:exchange}
@@ -98,7 +115,7 @@ Let $A\subseteq E$ have a single failure status and rank $h\geq1$. Let $Z\subset
 resilient, with $|B'|=|B|$ and $w(B')\leq w(B)$.
 \end{lemma}
 \begin{proof}
-Put $Y=B\setminus\{x\}$. Consider the permitted failures $F\subseteq Y\cap V$, $|F|\leq k$, for which $\rk(Y\setminus F)<r$. Resilience of $B$ implies that their surviving ranks equal $r-1$ and that $x\notin\cl(Y\setminus F)$. Each distinct hyperplane $\cl(Y\setminus F)$ has a basis of $r-1$ elements in $Y$. Hence there are at most $H$ such hyperplanes.
+Put $Y=B\setminus\{x\}$. Consider the permitted failures $F\subseteq Y\cap V$, $|F|\leq k$, for which $\rk(Y\setminus F)<r$. Resilience of $B$ implies that their surviving ranks equal $r-1$ and that $x\notin\cl(Y\setminus F)$. Lemma~\ref{lem:hyperplanes} bounds the number of these distinct hyperplanes by $H$. It applies also when $x$ is safe and some deficient failure sets have size less than $k$.
 
 Each of these hyperplanes contains at most $h-1$ elements of $Z$. Otherwise it contains an independent $h$-subset of $Z$, which spans $A$, and hence contains $x$, a contradiction. At most $q-1$ elements of $Z$ belong to $B$, because $x\notin Z$. The number of forbidden choices in $Z$ is at most $(h-1)H+q-1<t_h$. Choose a $y\in Z\setminus B$ outside all the deficient hyperplanes.
 
@@ -159,19 +176,15 @@ For a convenient explicit bound put $T=t_r$ and $N=2rT^{(r-1)^2}$. Each of the t
 
 Finally enumerate all $B\subseteq W$ with $|B|\leq q$, and for each enumerate all allowed failure sets and compute its surviving ranks greedily. There are at most $(NT+1)^q$ candidates and at most $2^q$ failures per candidate. Choose a feasible candidate of minimum total weight. If there is none, optimum preservation proves infeasibility. Exact weight sums and comparisons have polynomial bit cost in the original weight encoding.
 
-For $r\geq2$, $H\leq q^{r-1}$ and
-\[
- T\leq (r-1)q^{r-1}+q\leq rq^{r-1}\leq q^r.
-\]
-It follows that $NT=q^{O(r^3)}$ and that the complete algorithm has the bound in Theorem~\ref{thm:main}. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
+For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,L)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,L)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,L)$. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
 
 If $k=0$, ordinary minimum-weight-basis greedy is optimal. If $r=1$, an optimum consists of either one cheapest safe nonloop element or $k+1$ cheapest vulnerable nonloop elements, choosing the cheaper available option. These observations also handle large $k$ without a special feasibility assumption. Nonnegative rational weights can be handled by exact comparisons and sums with polynomial bit complexity; the accompanying implementation accepts integers and exposes a rank-oracle interface, which is simulated from an independence oracle by the greedy procedure described above.
 
 \section{Why simpler weighted reductions do not suffice}
 \subsection{Stopping at a large uniform set}
-Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=3$, and $t_2=7$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. Its robust optimum is $101$, whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
+Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=2$, and $t_2=6$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. Its robust optimum is $101$, whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
 
-A rank-three version consists of three parallel pairs of costs $(0,1)$ and $79$ singleton classes of costs $13,\ldots,91$. For $k=1$, $t_3=26$. The uniform-only output has robust optimum $13$, while the original optimum is $3$. The recursive core retains $29$ elements and preserves that optimum.
+A rank-three version consists of three parallel pairs of costs $(0,1)$ and $79$ singleton classes of costs $13,\ldots,91$. For $k=1$, $H=3$ and $t_3=12$. The uniform-only output has robust optimum $13$, while the original optimum is $3$. The recursive core retains $15$ elements and preserves that optimum. The earlier basis-subset count $\binom{q-1}{r-1}$ gave threshold $26$ and a $29$-element core on the same instance.
 
 \subsection{Preserving cheapest ordinary bases after failures}
 Dey and Kavitha~\cite{DK} study a preserver $S\subseteq E$ such that, for every $F\subseteq E$ with $|F|\leq k$, $M|(S\setminus F)$ contains a minimum-cost ordinary basis of $M|(E\setminus F)$. That property need not preserve the optimum total cost of a resilient purchased set.
@@ -196,7 +209,7 @@ If $d>0$, every surviving spanning set in $M$ is nonempty. Strong connectivity t
 For general state digraphs, additional source strongly connected component constraints are necessary. They are not guaranteed to be preserved by our same-status exchange lemma, so no such extension is claimed here.
 
 \section{Related work and scope}
-The unweighted core construction in~\cite{BFGL} is the starting point of this proof. In the proceedings numbering, Proposition~6 gives the disjoint-layer cardinality bound, Lemma~8 already uses the binomial hyperplane count and its exchange framework, and Lemma~9 gives the recursive uniform-set core. Those ingredients are not new here. The changes are the weight-order invariant, retaining closure recursion in both stopping cases, and restricting exchanges to the same failure status. That paper also provides polynomial-time weighted algorithms for rank at most two (Corollary~12) and for truncations of unit-capacity partition matroids (Proposition~5). Our contribution is the weighted optimum-preservation argument for arbitrary oracle matroids with parameter $r+k$, together with its safe/vulnerable selected-set version.
+The unweighted core construction in~\cite{BFGL} is the starting point of this proof. In the proceedings numbering, Proposition~6 gives the disjoint-layer cardinality bound, Lemma~8 already uses the basis-subset hyperplane count $\binom{q-1}{r-1}$ and its exchange framework, and Lemma~9 gives the recursive uniform-set core. Those ingredients are not new here. The changes are the weight-order invariant, retaining closure recursion in both stopping cases, and restricting exchanges to the same failure status. Lemma~\ref{lem:hyperplanes} additionally applies the classical inequality~\cite{Bollobas} to replace that count by $\binom{r+k-1}{k}$; we do not claim a new set-pairs theorem. That paper also provides polynomial-time weighted algorithms for rank at most two (Corollary~12) and for truncations of unit-capacity partition matroids (Proposition~5). Our contribution is the weighted optimum-preservation argument for arbitrary oracle matroids with parameter $r+k$, together with its safe/vulnerable selected-set version.
 
 Bulk-robust matroid optimization~\cite{ASZ} uses the purchase-cost objective and explicitly specified failure scenarios. Definition~1 corresponds to the special family of all at most $k$ vulnerable-element failures. Its exact size is $\sum_{i=0}^{\min(k,|V|)}\binom{|V|}{i}$, which is $\Theta(n^k)$ for fixed $k$ in the all-vulnerable case; a polynomial dependence on the list length alone does not give the parameterized bound proved here.
 
@@ -209,6 +222,10 @@ The accompanying standard-library Python implementation takes an arbitrary rank 
 
 \begin{thebibliography}{9}
 \small
+\bibitem{Bollobas} B. Bollob\'as.
+On generalized graphs.
+\emph{Acta Mathematica Academiae Scientiarum Hungaricae} 16, 447--452, 1965.
+\href{https://doi.org/10.1007/BF01904851}{doi:10.1007/BF01904851}.
 \bibitem{BFGL} M. Bentert, F. V. Fomin, P. A. Golovach, and L. Morelle.
 Fault-Tolerant Matroid Bases. In \emph{ESA 2025}, LIPIcs 351, 83:1--83:14, 2025.
 \href{https://doi.org/10.4230/LIPIcs.ESA.2025.83}{doi:10.4230/LIPIcs.ESA.2025.83}.
@@ -234,3 +251,4 @@ A Framework for Structural Input/Output and Control Configuration Selection in L
 \href{https://doi.org/10.1109/TAC.2015.2437525}{doi:10.1109/TAC.2015.2437525}.
 \end{thebibliography}
 \end{document}
+

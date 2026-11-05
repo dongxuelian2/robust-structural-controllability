@@ -30,7 +30,10 @@ def weighted_core(weights, rank_oracle, k, vulnerable=None):
     stats = dict(nodes=0, capped=0, rejected=0, parallel_pruned=0)
     if r == 0:
         return frozenset(), stats
-    hyperplanes = comb(q - 1, r - 1)
+    # A deficient hyperplane has an (r-1)-element basis disjoint from
+    # at most k deleted points. Distinct pairs cross-intersect, so the
+    # Bollobas set-pairs bound applies (see the accompanying proof).
+    hyperplanes = comb(r + k - 1, k)
 
     @lru_cache(None)
     def visit(a):
@@ -97,3 +100,4 @@ def solve(weights, rank_oracle, k, vulnerable=None):
                    for f in combinations(v, min(k, len(v)))):
                 best, witness = cost, b
     return best, witness, core, stats
+
