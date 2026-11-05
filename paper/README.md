@@ -31,3 +31,6 @@ python audit_weighted_independent.py
 ```
 
 The reference solver implements the general core-and-enumeration algorithm, not the optional polynomial-time shortcuts for rank one and zero failures described in the paper. Finite checks supplement the proofs.
+
+The 5 November refinement uses the classical Bollobas set-pairs inequality to sharpen the deficient-hyperplane bound to `binom(r+k-1,k)`. The 85-element example now retains 15 elements rather than 29, with the same exact optimum. The independent audit includes direct checks of the counting lemma, separate from the solver.
+

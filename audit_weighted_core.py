@@ -155,7 +155,7 @@ def exhaustive_suite(name,n,rankmask,oracle,weight_values,statuses,ks):
 
 def main():
     start = time.time()
-    # n=9 > rank-2,k-1 threshold 7. Exhaust all binary weights.
+    # n=9 > rank-2,k-1 threshold 6. Exhaust all binary weights.
     for label,labels in [
         ('uniform_rank2_n9',list(range(9))),
         ('cheap_parallel_rank2_n9',[0,0,1,2,3,4,5,6,7]),
@@ -206,7 +206,7 @@ def main():
                     core_property=True,iterables=True)
     assert result[3]['capped'] and result[3]['rejected']
     assert result[0]==2 and result[1]==frozenset({0,1,2,3})
-    old_uniform=frozenset({0,2,4,5,6,7,8})
+    old_uniform=frozenset({0,2,4,5,6,7})
     old_best=min(sum(weights[i] for i in members(9,b))
                  for b in feasible_masks(9,rm,1,(1<<9)-1)
                  if set(members(9,b)) <= old_uniform)
@@ -255,3 +255,4 @@ def main():
 
 if __name__=='__main__':
     main()
+
