@@ -37,30 +37,31 @@ def shared_backup_instance(vertices, edges, packed, triangles=(), strong=False):
             or not triangle_edges <= edges):
         raise ValueError('Use a matching and vertex-disjoint triangles from the source graph.')
     remaining = tuple(sorted(edges - triangle_edges - set(packed)))
-    edge_jobs = remaining + packed
-    guard = len(edge_jobs) + (len(triangles) if strong else 0)
+    return guarded_backup_assignment(vertices, remaining, packed, triangles, strong)
+
+
+def guarded_backup_assignment(vertices, private_jobs, packed_jobs, triangles=(), strong=False):
+    """Build the shared-backup and private guards for the given job neighborhoods."""
+    neighborhoods = private_jobs + packed_jobs + (triangles if strong else ())
+    guard = len(neighborhoods)
     options = [0] * vertices
-    for j, (u, v) in enumerate(edge_jobs):
-        options[u] |= 1 << j
-        options[v] |= 1 << j
-    if strong:
-        for j, triangle in enumerate(triangles, start=len(edge_jobs)):
-            for v in triangle:
-                options[v] |= 1 << j
+    for j, neighbors in enumerate(neighborhoods):
+        for v in neighbors:
+            options[v] |= 1 << j
     if not all(options):
         raise ValueError('Every vertex must serve at least one retained job.')
 
     # The guard forces both the shared backup and its guard-only partner.
-    backup = sum(1 << j for j in range(len(remaining), len(edge_jobs)))
+    backup = sum(1 << j for j in range(len(private_jobs), len(private_jobs) + len(packed_jobs)))
     options.extend((backup | (1 << guard), 1 << guard))
     if strong:
-        for j in range(len(remaining)):
+        for j in range(len(private_jobs)):
             private_guard = 1 << (guard + 1 + j)
             options.extend((private_guard | (1 << j), private_guard))
         groups = ()
-        jobs = guard + 1 + len(remaining)
+        jobs = guard + 1 + len(private_jobs)
     else:
-        options.extend(1 << j for j in range(len(remaining)))
+        options.extend(1 << j for j in range(len(private_jobs)))
         private = list(range(vertices + 2, len(options)))
         if len(private) % 2:
             private.append(vertices + 1)

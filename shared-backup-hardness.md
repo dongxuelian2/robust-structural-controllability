@@ -182,4 +182,5 @@ two padded control fixtures, and recovers covers after selecting
 additional auxiliary states. The two constants improve the earlier
 [general](source-scc-cover-hardness.md) and
 [strongly connected](hardness-degree-threshold.md) reductions.
-The $3/2-\epsilon$ target remains open.
+The [direct parity reduction](direct-lin2-hardness.md) improves both
+constants further. The $3/2-\epsilon$ target remains open.
