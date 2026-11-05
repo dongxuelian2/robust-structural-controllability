@@ -229,3 +229,50 @@ their dual ranks on fixed and random supports, every fundamental exchange,
 and the relaxed failure witnesses. It checks the base dual-presentation
 identity on all 8,192 subsets for k=1. These are finite certificates for
 the general argument above, not a hardness reduction.
+
+## Every basis can admit spurious minimum-size placements
+
+Choosing a better basis cannot in general make the whole robust feasible
+family exact. This stronger family-preservation assertion is false even
+for matroids that are both transversal and cotransversal. It is distinct
+from asking whether some basis preserves the minimum objective value.
+
+For r>=3 split 2r elements into disjoint sets A,D, each of size r. Give
+an assignment presentation with r-2 common jobs, one A-only job and one
+D-only job. Every A-resource serves all common jobs and the A-only job;
+every D-resource serves all common jobs and the D-only job. Call the
+resulting matroid M_r. Every r-subset meeting both groups is a basis;
+the only dependent r-subsets are A and D, each a circuit-hyperplane of
+rank r-1. All smaller subsets are independent. Complementing a basis
+preserves this description, so M_r is self-dual. It is simple, cosimple
+and connected, and is both transversal and cotransversal.
+
+Take any basis B and put s=|B intersect A|, with 1<=s<=r-1. Its
+fundamental assignment relaxation preserves the dependence of A exactly
+when s=r-1. Otherwise every A-resource outside B has all r basis jobs
+as neighbors, making A independent in N_B. The analogous assertion for
+D requires r-s=r-1. These two equalities cannot both hold for r>=3.
+
+Choose a group H whose dependence is lost, and any basis element b in
+the other group. Then H+b is a robust set of size r+1 in N_B. To see this
+directly, resources of H that lie in B have distinct singleton jobs,
+the remaining H-resources serve all jobs, and b supplies its singleton
+job after any H-resource fails. After b fails, H itself still matches
+all r jobs. In M_r, deleting b leaves the nonspanning hyperplane H, so
+the same selected set is not robust.
+
+The true optimum is nevertheless r+1: choose r+1 elements with at least
+two from each group. Every deletion leaves a mixed r-subset, hence a
+basis. Rank gives the matching lower bound, so every N_B also has
+optimum r+1. Thus every basis admits a spurious placement of optimum
+cardinality, while its optimum value is exact. For r=3 this already gives
+a six-element example and all 18 bases fail family preservation.
+
+The verifier checks the complete rank tables and every basis for
+r=3,4,5,6. A relaxation loses one circuit-hyperplane if B takes r-1
+elements from one group, and both otherwise. Consequently it has exactly
+r or 2r false robust subsets, all of size r+1; the verifier checks these
+counts as well. This prevents using a fixed-basis relaxation as an exact
+feasibility replacement under additional constraints without a separate
+reverse-map argument. It gives no approximation-hardness constant and
+does not answer the best-basis optimum-value question.

@@ -1,5 +1,5 @@
 """Independent exact check of the private-basis / hyperforest formula."""
-from itertools import combinations_with_replacement
+from itertools import combinations, combinations_with_replacement
 from functools import reduce
 from random import Random
 from hardness_gadgets import protect_coloops
@@ -121,6 +121,83 @@ def check(n, options):
     return True
 
 
+def partial_vertex_cover_basis():
+    from verify_gammoid_obstructions import dual_ranks, robust
+    rng = Random(20261105)
+    sources, forcing_sets, supports = 0, 0, 0
+    fixtures = []
+    for n in range(2, 5):
+        pairs = tuple(combinations(range(n), 2))
+        fixtures += [(n, tuple(e for j, e in enumerate(pairs) if mask >> j & 1))
+                     for mask in range(1, 1 << len(pairs))]
+    pairs = tuple(combinations(range(5), 2))
+    fixtures += [(5, tuple(e for e in pairs if rng.randrange(2))) for _ in range(35)]
+    for n, edges in fixtures:
+        if any(not any(v in edge for edge in edges) for v in range(n)):
+            continue
+        m, full = len(edges), (1 << len(edges)) - 1
+        options = tuple(sum(1 << e for e, edge in enumerate(edges) if v in edge)
+                        for v in range(n))
+        ranks = assignment_ranks(m, options)
+        rows = tuple((1 << (m + v)) | options[v] for v in range(n))
+        assert ranks == dual_ranks(rows, m + n)
+        best = [m + n + 1] * (1 << m)
+        for selected in range(1 << (m + n)):
+            if not robust(ranks, selected):
+                continue
+            best[selected & full] = min(best[selected & full], selected.bit_count())
+            cover = {v for v in range(n) if selected >> (m + v) & 1}
+            assert all(cover & set(edge) for edge in edges)
+            parent = list(range(n))
+
+            def root(v):
+                while parent[v] != v:
+                    v = parent[v]
+                return v
+
+            for e, (u, v) in enumerate(edges):
+                if selected >> e & 1:
+                    continue
+                assert u in cover and v in cover and root(u) != root(v)
+                parent[root(u)] = root(v)
+            supports += 1
+        for e in range(m):
+            for forced in range(1 << m):
+                if not forced >> e & 1:
+                    best[forced] = min(best[forced], best[forced | (1 << e)])
+        for forced in range(1 << m):
+            adjacency = [set() for _ in range(n)]
+            for e, (u, v) in enumerate(edges):
+                if not forced >> e & 1:
+                    adjacency[u].add((v, e))
+                    adjacency[v].add((u, e))
+            isolated = {v for v in range(n) if not adjacency[v]}
+            chosen, unseen, forest, components = set(range(n)) - isolated, set(range(n)) - isolated, set(), 0
+            while unseen:
+                start = min(unseen)
+                reached, queue = {start}, [start]
+                for u in queue:
+                    for v, e in adjacency[u]:
+                        if v not in reached:
+                            reached.add(v)
+                            queue.append(v)
+                            forest.add(e)
+                unseen.difference_update(reached)
+                components += 1
+            internal = [edge for edge in edges if set(edge) <= isolated]
+            cover = min(({v for v in isolated if mask >> v & 1} for mask in range(1 << n)
+                         if all(any(mask >> v & 1 for v in edge) for edge in internal)), key=len)
+            chosen |= cover
+            witness = (full ^ sum(1 << e for e in forest)) | sum(1 << (m + v) for v in chosen)
+            expected = m + components + len(cover)
+            assert robust(ranks, witness) and witness & forced == forced
+            assert witness.bit_count() == best[forced] == expected
+            forcing_sets += 1
+        sources += 1
+    print('Partial private basis:', sources, 'graphs;', forcing_sets, 'forcing sets;',
+          supports, 'independent-flat supports PASS')
+
+
 if __name__ == '__main__':
     count = 0
     for n in range(1, 5):
@@ -138,3 +215,4 @@ if __name__ == '__main__':
             random_count += check(n, options)
     print('Random instances:', random_count)
     print('PASS: direct robust matching = n + min_C (|C| - hyperforest rank).')
+    partial_vertex_cover_basis()

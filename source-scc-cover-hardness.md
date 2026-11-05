@@ -258,11 +258,17 @@ through matching. Here source SCCs instead force each private basis
 element once. This targeted comparison establishes the change from those
 constructions; priority beyond the sources reviewed is unconfirmed.
 
-This does not give 3/2 hardness. Even this smaller baseline still dilutes
-the source gap, and these graphs are not strongly connected. Merging
-their source SCCs would remove the constraints that force B, so the
-strongly connected realization theorem cannot simply be applied to
-retain this objective.
+This does not give 3/2 hardness. The source objective n+tau is exactly
+unit-threshold Activation Edge-Cover on its bipartite incidence graph.
+[Nutov--Kortsarz--Shalom, MFCS 2019, Theorem 4](https://drops.dagstuhl.de/storage/00lipics/lipics-vol138-mfcs2019/LIPIcs.MFCS.2019.20/LIPIcs.MFCS.2019.20.pdf)
+give a 1555/1347<1.155 approximation for that problem. Thus the present
+additive-cover architecture cannot approach 3/2 even after its mandatory
+locations are removed. The elementary harmonic proof and the stronger
+121/108 barrier for the old baseline are in `hardness-obstructions.md`.
+These are restrictions of these reductions, not approximation bounds for
+general control instances. Also, merging the source SCCs would remove
+the constraints used to complete B, so the strongly connected realization
+theorem cannot simply be applied to retain this objective.
 
 ## Exact certificates
 

@@ -108,25 +108,40 @@ def pad_cover(instance, length):
     source cycles must have at least three vertices. Apply once to a
     completed construction; choose the desired total subdivision length.
     """
-    if length < 1 or length % 2 == 0 or any(len(c) < 3 for c in instance.source_cycles):
+    rows, cycles, neighborhoods, projection, owner = pad_resource_network(
+        instance.rows, instance.source_cycles, instance.neighborhoods,
+        instance.projection, instance.owner, length)
+    return CoverInstance(rows, instance.sets, instance.jobs, instance.basis,
+                         instance.options, neighborhoods, owner, cycles, projection)
+
+
+def pad_resource_network(original, source_cycles, original_neighborhoods,
+                         original_projection, original_owner, length):
+    """Pad source cycles and private gate trees; return their exact metadata.
+
+    Every bidirected edge outside source cycles must be an internal gate
+    with one endpoint's only out-neighbor its partner. This shared local
+    construction also applies to partition-constrained assignment networks.
+    """
+    if length < 1 or length % 2 == 0 or any(len(c) < 3 for c in source_cycles):
         raise ValueError('Use a positive odd length and source cycles of size >=3.')
     if length == 1:
-        return instance
-    original = instance.rows
+        return (tuple(original), tuple(source_cycles), tuple(original_neighborhoods),
+                tuple(original_projection), dict(original_owner))
     rows = [0] * len(original)
-    neighborhoods, projection = list(instance.neighborhoods), list(instance.projection)
-    owner, row_image, cycle_arcs, cycles = dict(instance.owner), {}, set(), []
+    neighborhoods, projection = list(original_neighborhoods), list(original_projection)
+    owner, row_image, cycle_arcs, cycles = dict(original_owner), {}, set(), []
 
     def state(origin=None):
         v = len(rows)
         rows.append(0)
-        neighborhoods.append(0 if origin is None else instance.neighborhoods[origin])
-        projection.append(-1 if origin is None else instance.projection[origin])
-        if origin in instance.owner:
-            owner[v] = instance.owner[origin]
+        neighborhoods.append(0 if origin is None else original_neighborhoods[origin])
+        projection.append(-1 if origin is None else original_projection[origin])
+        if origin in original_owner:
+            owner[v] = original_owner[origin]
         return v
 
-    for cycle in instance.source_cycles:
+    for cycle in source_cycles:
         expanded = []
         for i, u in enumerate(cycle):
             v = cycle[(i + 1) % len(cycle)]
@@ -165,9 +180,7 @@ def pad_cover(instance, length):
                     parent = y
                 rows[parent] |= 1 << v
                 handled.add((u, v))
-    return CoverInstance(tuple(rows), instance.sets, instance.jobs, instance.basis,
-                         instance.options, tuple(neighborhoods), owner,
-                         tuple(cycles), tuple(projection))
+    return tuple(rows), tuple(cycles), tuple(neighborhoods), tuple(projection), owner
 
 
 def complete_basis(instance, selected):

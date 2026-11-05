@@ -1,4 +1,4 @@
-# Why two natural routes to 3/2 hardness fail
+# Covering and matroid obstructions to stronger hardness
 
 The model is the dedicated, unit-cost, single-selected-actuator-failure
 problem. These are obstructions to particular reduction architectures, not
@@ -145,6 +145,129 @@ It does not cover arbitrary non-forced-basis constructions, cost changes,
 or general accessibility interactions. A route to substantially stronger
 hardness must escape these assumptions rather than just shorten the
 existing private-leaf gadget.
+
+## Stronger barriers from the additive cover objective
+
+The preceding 5/4 bound is elementary but not the strongest available
+barrier. More generally, suppose a reduction has exact objective
+
+    a*q + tau,
+
+where tau is unit-cost Set Cover on q explicitly given requirements and
+all solution maps are polynomial. Classical greedy covering already gives
+73/60 for a=1 and 121/108 for a=2. These are bounds on these reduction
+architectures, not on general robust structural controllability.
+
+Here is a direct harmonic argument. Partition the universe among the
+sets of an optimum cover, assigning s_i>=1 elements to each of its tau
+sets, so sum_i s_i=q. Charge a greedy step's unit cost equally to its
+newly covered elements. While r assigned elements of one optimum set
+remain, the greedy set covers at least r elements. The charges on that
+assigned part therefore sum to at most H_(s_i). Consequently the number
+g of greedy sets is at most sum_i H_(s_i).
+
+For every integer s>=1,
+
+    H_s <= (13/60)*s + 73/60,
+    H_s <= (13/54)*s + 121/108.
+
+Both inequalities have equality at s=4: H_4=25/12. In each case the
+left side minus its linear term increases through s=4, since 1/4 is
+larger than the slope, and decreases thereafter, since 1/5 is smaller.
+Summing gives
+
+    q+g   <= (73/60)*(q+tau),
+    2q+g  <= (121/108)*(2q+tau).
+
+The second guarantee still holds for a forced baseline d>=2q:
+d+g <= (121/108)*(d+tau). Thus it strengthens the 5/4 obstruction above
+without changing any assumption of that result.
+
+For a=1 a stronger published barrier is available. On the covering
+incidence graph, make every universe element a required terminal, every
+option a nonterminal, and every edge's threshold one at both endpoints.
+Every terminal must be activated at cost one, so this unit-threshold
+Activation Edge-Cover instance has optimum exactly q+tau. [Nutov,
+Kortsarz and Shalom, *Approximating Activation Edge-Cover and Facility
+Location Problems*, MFCS 2019, Theorem 4](https://drops.dagstuhl.de/storage/00lipics/lipics-vol138-mfcs2019/LIPIcs.MFCS.2019.20/LIPIcs.MFCS.2019.20.pdf)
+give approximation 1555/1347<1.155 for this problem. The elementary 73/60
+bound is the older harmonic guarantee, also discussed there. Both
+harmonic constants above are also special cases of their Theorem 3,
+with slope parameters one and one half; the algorithmic bounds are
+not new here.
+
+In particular the new source-SCC construction in
+`source-scc-cover-hardness.md`, despite its smaller baseline and absence
+of mandatory locations after completion, still admits normalization to
+this additive covering objective. Its ratio is bounded by 1555/1347 on
+the explicitly supplied source instances. That route cannot prove
+3/2-epsilon hardness unless P=NP. Improving the numerical source gap
+may improve 250/249, but approaching 3/2 needs a construction with genuine
+basis choices, or another objective beyond additive Set Cover.
+
+## Partly forcing the Vertex Cover private basis
+
+There is an exact interpolation between the forced-basis Vertex Cover
+reduction and its unforced collapse. It rules out obtaining a new source
+objective merely by forcing a chosen proper subset of that basis.
+
+Let H=(W,E) be a simple graph without isolated vertices, with m>0 edges.
+Use m jobs, one per edge, private resources b_e, and one option q_v per
+vertex serving its incident edge jobs. Force the private resources for a
+prescribed F subset E; all other resources remain optional. Put
+
+    K = (W,E\F),
+    Z = {v : degree_K(v)=0},
+    a = number of components of K containing an edge.
+
+The minimum robust assignment containing those forced resources is
+
+    OPT_F = m + a + tau(H[Z]).
+
+This includes m+tau(H) for F=E, and m+c(H) for F empty. In particular
+the only remaining Vertex Cover instance is the subgraph on vertices
+whose every incident private basis resource was forced. The unforced
+edges do not produce a new, cheaper encoding of the original cover gap.
+
+For a proof, use the canonical dual presentation: row v contains q_v
+and every b_e incident with v. This is the bicircular matroid of H with
+one loop q_v at each vertex. Let I be an independent flat, the complement
+of a robust set. Every unicyclic component of I must contain the loop
+q_v for each of its vertices: otherwise adding that absent loop gives a
+second cycle and violates flatness. Independence then forces such a
+component to be a single vertex with its loop. All other components are
+trees without loops.
+
+Write C for the vertices whose q_v is selected. The unselected q_v are
+therefore isolated loop components. Two of these vertices cannot be
+adjacent in H, because adding their edge would join two unicyclic
+components. Thus C is a vertex cover of H. The unselected edge resources
+form a forest entirely inside K[C]. Conversely any such cover and forest
+give an independent flat: adding an outside edge creates at most one
+cycle, unless both endpoints were isolated loop components, which the
+cover excludes; adding a missing loop also creates just one cycle.
+
+For fixed C, take a maximum forest of K[C]. Its edge count is
+|C|-c(K[C]), so the selected resource count is
+
+    |C| + m - (|C|-c(K[C])) = m+c(K[C]).
+
+Every component of K containing an edge must meet C, as C covers K.
+Completing C to all vertices of each such component can only decrease
+its component count and preserve coverage. We may therefore take C to
+contain W\Z. These vertices contribute exactly a components. The only
+remaining requirements are to cover H[Z], and each selected vertex of
+Z contributes one isolated component of K[C]. Minimizing gives the
+formula. A spanning forest of each nontrivial K-component and a cover of
+H[Z] give the explicit optimum witness and solution maps.
+
+`verify_private_basis_spares.py` checks this identity for every forcing
+set on every simple graph without isolates through four vertices, and
+on additional five-vertex sources. It compares direct assignment ranks
+with the dual bicircular presentation, checks the independent-flat
+description on all robust supports, and constructs the stated witnesses.
+The current certificate set has 69 graph instances, 2,618 forcing sets
+and 4,309 robust supports.
 
 ## Reversing the bicircular construction also collapses
 

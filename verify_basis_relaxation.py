@@ -190,6 +190,41 @@ def degree_basis_family(k):
           'dual rows; true OPT', 2 * t, '; relaxed OPT', d + 1, 'PASS', flush=True)
 
 
+def feasible_family_obstruction(r):
+    n, full = 2 * r, (1 << (2 * r)) - 1
+    a, other = (1 << r) - 1, full ^ ((1 << r) - 1)
+    presentation = (full,) * (r - 2) + (a, other)
+    ranks = transversal_ranks(presentation, n)
+    assert dual_ranks(presentation, n) == ranks
+    assert all(rank == min(mask.bit_count(), r) - int(mask in (a, other))
+               for mask, rank in enumerate(ranks))
+    actual = [robust(ranks, mask) for mask in range(1 << n)]
+    assert min(mask.bit_count() for mask in range(1 << n) if actual[mask]) == r + 1
+    counts = Counter()
+    for part in combinations(range(n), r):
+        basis = sum(1 << v for v in part)
+        if ranks[basis] != r:
+            continue
+        rows = [(1 << b) | sum(1 << e for e in range(n) if not basis >> e & 1
+                               and ranks[(basis ^ (1 << b)) | (1 << e)] == r)
+                for b in part]
+        relaxed = transversal_ranks(rows, n)
+        kept = {group for group in (a, other) if (basis & group).bit_count() == r - 1}
+        assert all(rank == min(mask.bit_count(), r) - int(mask in kept)
+                   for mask, rank in enumerate(relaxed))
+        false = [mask for mask in range(1 << n) if robust(relaxed, mask) and not actual[mask]]
+        assert len(false) == r * (2 - len(kept))
+        assert all(mask.bit_count() == r + 1 for mask in false)
+        group = next(group for group in (a, other) if group not in kept)
+        b = next(v for v in part if not group >> v & 1)
+        witness = group | (1 << b)
+        assert robust(relaxed, witness) and not actual[witness]
+        counts[len(kept)] += 1
+    assert counts[1] == 2 * r * r
+    print('Feasible-family obstruction r =', r, ':', sum(counts.values()),
+          'bases; preserved-hyperplane counts', dict(counts), 'PASS', flush=True)
+
+
 if __name__ == '__main__':
     for k in range(1, 13):
         family(k)
@@ -198,3 +233,5 @@ if __name__ == '__main__':
     prototype()
     for k in range(1, 4):
         degree_basis_family(k)
+    for r in range(3, 7):
+        feasible_family_obstruction(r)
