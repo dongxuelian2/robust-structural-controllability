@@ -96,12 +96,67 @@ The exact cotransversal realization theorem applies separately to M and
 N_B, including leaf completion and girth padding. It preserves their
 values; it does not supply a map between these two different matroids.
 
+## The same limit with resources serving at most two jobs
+
+The large neighborhoods in the preceding construction are unnecessary.
+For every k>=3 there is a simple, cosimple fundamental transversal M with
+
+    rank(M)=4k,         rho(M)=6k,         rho(N_B)=4k+1,
+
+where each resource serves at most two jobs and each job has at most
+seven resource neighbors in the presentation of M. The ratio 6k/(4k+1)
+again tends to 3/2. The fundamental presentation of N_B has larger
+neighborhoods.
+
+Start with a cycle on k hub vertices, take three copies of every edge,
+and subdivide each copy once. Call the resulting simple bipartite graph
+H. It has k hubs of degree six and 3k intermediate vertices of degree
+two. Jobs are its 4k vertices. Original resources are its 6k edges, each
+serving its two endpoints; add one private resource per job.
+
+Every original edge resource is forced before adding the privates,
+because every intermediate job has precisely its two incident edges.
+The original full set is robust: after any one edge fails, H remains
+connected and contains a cycle, so its remaining edges match all vertices.
+The private-resource exchange therefore gives rho(M)=6k. Simplicity and
+cosimplicity follow as before. Alternatively, the path-cover formula in
+`variable-basis-path-cover.md` gives the same value: any path partition
+has at most 2k edges, since every edge touches a hub and each hub has
+path degree at most two. A partition into k three-vertex paths, each
+joining two intermediate vertices through their common hub, and k
+singleton intermediate vertices attains pc(H)=2k.
+
+For B take the 2k edges of one subdivided cycle and one incident edge for
+each of the other 2k intermediate vertices. It is a connected spanning
+unicycle, hence a basis of the vertex-assignment matroid. Its 2k cycle
+edges are the anchor jobs of N_B. Each outside edge or private resource
+at a noncycle intermediate vertex has precisely all anchors and its own
+branch edge as fundamental neighbors. Each private resource at a cycle
+vertex has all anchors as neighbors. To verify these assertions, add the
+resource to the unicycle: its unique bicircular circuit contains the full
+cycle, together with its branch edge when there is one. Removing a
+different branch edge would isolate that branch's job.
+
+Select both original edges at every noncycle intermediate vertex and
+one physical hub-private resource. This gives 4k+1 resources. In N_B each
+branch uses one resource for its local job. If the hub-private fails,
+the 2k branch surpluses cover all anchors; if a branch resource fails,
+its group uses its survivor locally and the hub-private supplies the
+missing anchor unit. This proves relaxed robustness, and rank gives the
+matching lower bound. The same set has true rank only 3k: its resources
+reach only the hubs and the noncycle intermediate vertices.
+
 ## Finite checks and the nontransversal prototype
 
 `python verify_basis_relaxation.py` checks every fundamental exchange in
 this family for k=1,...,12 by independent assignment matching, verifies
 the relaxed failure witnesses and the true rank deficit, and checks the
 full rank/robust-optimum tables for k=1. The latter gives OPT 8 versus 6.
+It also verifies all 15,480 fundamental exchanges of the arity-two family
+for k=3,...,12, its resource/job degrees, the explicit path partition,
+the true rank deficit and every failure of the relaxed witnesses. The
+smallest sparse case additionally checks every pair for simplicity and
+cosimplicity.
 
 It also examines all 513 bases of the connected rank-five nontransversal
 prototype from `cotransversal-hardness-transfer.md`. Its true optimum is
@@ -110,5 +165,67 @@ B={0,1,2,3,6}, and optimum seven for the other 117. For that displayed bad
 basis, selected mask 215 is relaxed-robust but loses true spanning after
 deletion of element 0. Thus merely knowing that the matroid is
 nontransversal does not determine the objective loss of a particular
-basis relaxation, and the finite count is not a universal statement about
-choosing a best basis.
+basis relaxation.
+
+More precisely, the 117 exact bases are precisely those containing
+element 5. Every robust set containing 5 has at least eight elements,
+whereas the optimum is seven. Consequently every basis contained in any
+optimal robust set has relaxed optimum six. Choosing a basis inside an
+optimal solution therefore does not justify equality of the two optima.
+The example still has other bases giving equality; it does not settle
+whether every cotransversal matroid admits some exact basis relaxation.
+
+## Maximizing column degrees does not select a reliable basis
+
+The dense family also refutes a concrete polynomial basis-selection rule,
+even when its dual presentation is maximal. Here maximal means that adding
+any missing row-column incidence changes the transversal matroid.
+
+For the dense family, a dual presentation has two identical rows
+
+    F_i = {a_i,b_i, private(v_i)} union {all hub privates}
+
+for each i. To see this, start with the usual private-basis dual rows
+{a_i} union privates(N(a_i)) and {b_i} union privates(N(b_i)). Enlarging
+each to F_i changes no independent set: within these two rows, any matched
+a_i or b_i can be reassigned to its original row, while private matches
+can use either row. Each F_i is a flat of M: it spans all hub jobs and
+v_i, and every element outside F_i can additionally reach a different
+local job.
+
+Parallel-extend every element of the bad basis B to a class of
+L=2t+1 copies; leave the other elements single. Write M' for this
+extension and C_e for the copy class of e. A dual transversal presentation
+of M' consists of the expanded old rows F_i and L-1 additional identical
+rows C_e for every expanded class. Indeed, a matching saturating all new
+rows consumes L-1 members of each class locally. At most one remains for
+the old rows. Complementing a full matching therefore gives exactly the
+bases consisting of one copy of each member of an old M-basis.
+
+Every expanded column has degree L+1=2t+2. Every other column has degree
+at most 2t. The d expanded classes are independent, so every basis
+maximizing the sum of column degrees consists of one copy of each member
+of B. This holds for every tie-breaking rule.
+
+This presentation is maximal. Its old expanded rows are flats of M',
+and each new class row is a rank-one flat, because M is simple. In
+general a row R that is a flat of the dual M' cannot be enlarged: for
+e outside R, put F=E(M')\R. Duality gives
+r_T(F-e)=r_T(F), and a maximum matching on F-e uses no row R. Adding
+the incidence (R,e) increases the matching rank on F by one.
+
+The parallel-extension lemma gives rho(M')=rho(M)=6k+2. For any of the
+maximum-degree bases, its fundamental assignment relaxation is N_B with
+additional duplicate resources. A copy of a basis element has a singleton
+neighborhood, and a copy of an outside element has the same fundamental
+neighbors as that element. The dominated-resource lemma, applied to this
+feasible assignment instance, preserves its optimum 4k+2. Thus even this
+optimal degree-based basis choice in a maximal presentation loses a ratio
+tending to 3/2. Parallel extension preserves cosimplicity and hence the
+absence of mandatory elements, although M' is no longer simple.
+
+The verifier checks these expanded presentations for k=1,2,3, including
+their dual ranks on fixed and random supports, every fundamental exchange,
+and the relaxed failure witnesses. It checks the base dual-presentation
+identity on all 8,192 subsets for k=1. These are finite certificates for
+the general argument above, not a hardness reduction.
