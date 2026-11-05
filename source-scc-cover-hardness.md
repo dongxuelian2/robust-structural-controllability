@@ -8,8 +8,10 @@ admits a Set Cover reduction with normalized cost |U|+tau, rather than
 
 All states remain selectable. For a frequency-two covering source, G is
 loopless and bipartite, with every underlying undirected degree in {2,3}
-and both maximum indegree and maximum outdegree at most three. It is weakly
-connected but has several source SCCs. This gives **250/249-epsilon**
+and both maximum indegree and maximum outdegree at most three. No actuator
+location is mandatory. For every fixed 0<delta<1 its undirected girth may
+additionally be at least N^(1-delta). It is weakly connected but has several
+source SCCs. This gives **250/249-epsilon**
 NP-hardness of approximation on this class. The previously proved
 **2238/2233-epsilon** bound still applies to the separate, strongly
 connected class in `hardness-degree-threshold.md`.
@@ -20,6 +22,9 @@ Consequently the forced-matching-basis obstruction in
 `hardness-obstructions.md` does not apply.
 
 ## Construction and both solution maps
+
+First build a version with mandatory source pairs; the next section
+removes mandatory locations without changing OPT.
 
 Let nonempty sets S_1,...,S_q cover a nonempty universe U of size n. Take
 two disjoint copies indexed by c=0,1. Introduce:
@@ -114,6 +119,102 @@ all other columns have at least two. Thus every pair of columns matches.
 No state is mandatory for robust matching alone. B is mandatory through
 accessibility, not through a two-element cocircuit.
 
+## Removing mandatory locations without changing the cost
+
+Expand each source two-cycle to a source four-cycle with two new M-loops.
+More explicitly, on a source-cycle arc u->v insert x,y and replace the
+outgoing rows by
+
+    old u-row R  ->  u-row {x}, x-row {y}, y-row R.
+
+All old outgoing tree/job ports of u move to y. As a transversal
+presentation this is the old row multiset plus the two singleton rows
+{x},{y}. No old row contains the new columns, so the new transversal
+matroid is T direct-sum a free matroid on x,y. The dual M gains two loops
+and its entire old rank function is unchanged. The source cycle becomes
+u->x->y->v, of length two greater. Degrees stay at most three. Its odd
+arc replacement and the moved ports preserve the displayed bipartition.
+
+Do this for every basis source pair and also for the option cycle if it
+has just two states. Every source SCC now has at least four states.
+An old placement still works, giving one optimum inequality. Conversely,
+if a robust placement uses filler loops in a basis source SCC, replace
+its selected members there by b_(0,j),b_(1,j). At least two were selected,
+so the cost does not increase. Only M-loops are removed, and missing basis
+elements are added; robust matching is preserved. All source quotas are
+preserved. If necessary, option-cycle fillers can likewise be replaced
+by old options until its quota is met. This returns a no-larger placement
+in the original construction. Equivalently complete B, then apply the
+cover extraction above. Thus OPT remains 2*(n+tau).
+
+T remains simple under direct sum with free elements. For any element e the full ground
+set minus e is therefore robust for matching: deleting e and any other
+element from M cannot lower its rank, as M has no cocircuit of size one
+or two. Every source SCC has at least three states after e is omitted,
+so it still satisfies the quota two. Consequently every state is
+individually avoidable in a feasible robust placement. This assertion
+does not say that every state is avoidable in an optimum.
+
+## Cost-free padding and N-dependent girth
+
+Fix an odd integer L. Expand the underlying graph by a factor L using
+three local operations. Source cycles here already have length at least
+four; their two-cycle case has been removed.
+
+1. On each source-cycle arc insert L-1 loop fillers as above and move its
+   old row's port to the last new predecessor of its old successor. All
+   new source elements are M-loops, and all old ranks are unchanged.
+2. Replace an internal gate's bidirected edge x--y by a bidirected path
+   of L edges, keeping x as the endpoint that originally had only y as
+   an outgoing neighbor. The alternating internal vertices add parallel
+   copies of x and M-loops.
+3. Replace every remaining one-way arc u->v by a path of L edges whose
+   internal vertices occur in directed two-cycles:
+   u->x_1, x_i<->y_i, y_i->x_(i+1), y_last->v. Each x_i is a parallel
+   copy of v in M and each y_i an M-loop.
+
+For item 3, the new y_i columns are free transversal summands, matched
+from their singleton x_i rows. Removing them leaves precisely repeated
+column splits v,x_i with rows {v,x_i}, the parallel-extension identity
+proved in `hardness-degree-threshold.md`. For item 2, peel the path's
+alternating singleton matches from the x end. The remaining rows form
+the same column-split chain for x; the alternating peeled columns are
+free summands. These arguments hold with every outside row and column
+present, so the simultaneous operations give an exact rank projection.
+
+No new parallel copy belongs to a basis source SCC. Only the source-cycle
+operation touches these SCCs, and it adds loops. Thus any robust padded
+placement can first complete B from its quota-two selections without
+increasing cost, just as above. Thereafter repeated copies outside B
+can be projected to single original elements: B already spans, failures
+outside B do not matter, and its deletion repairs depend only on the
+fundamental-neighborhood support. Ignore M-loops and extract the two
+covers. This proves the same cost-nonincreasing reverse map. Original
+cover witnesses remain feasible under the exact rank projection. The
+optimum and the approximation gap are unchanged.
+
+Every degree stays in {2,3}, every arc crosses the bipartition, both
+directed degree bounds stay at most three, and the graph stays loopless
+and weakly connected. The source cycle port movement has a useful
+topological description: regard each old cycle vertex as its relocated
+row position; consecutive such positions are exactly L edges apart.
+Thus the resulting underlying graph is isomorphic to the uniform
+L-subdivision of the old underlying graph. Its girth is multiplied by L,
+and its size is N=N_0+(L-1)E_0. Cosimplicity is preserved by parallel and
+loop extension of M, and all source SCCs remain large; no actuator is
+mandatory after padding either.
+
+For a Vertex Cover source with m edges and q nonisolated vertices, the
+completed base has N_0<=14m and E_0<=18m. (For q>=2 the exact counts are
+14m-2q and 18m-2q.) Therefore N<=18mL and girth>=4L. Given fixed
+0<delta<1, choose an integer a>=max(1,(1-delta)/delta), and let L be the
+smallest power of three at least (18m)^a. The size is polynomial in m and
+
+    N^(1-delta) <= (18mL)^(1-delta) <= L <= girth/4.
+
+This proves the asserted N-dependent girth restriction, with the same
+250/249-epsilon inapproximability constant.
+
 ## The numerical gap
 
 Use Vertex Cover on a 4-regular graph H with v vertices and m=2v edges.
@@ -166,7 +267,8 @@ retain this objective.
 ## Exact certificates
 
 `scc_cover.py` builds both the binary-tree construction and a direct-port
-version, and implements both cover maps. `verify_scc_cover.py` checks
+version, implements source-loop completion and odd padding, and implements
+both cover maps. `verify_scc_cover.py` checks
 the actual state-plus-input matching after failures of every forced
 actuator. It compares all placements containing B when there are at most
 12 other states, and fixed-seed placements otherwise, against the full
@@ -175,3 +277,11 @@ the exact source SCCs, deficiency, simplicity test, the OPT identity on
 the exhaustive instances, and the recovered cover maps. The K5, four-cycle
 and K4 Vertex Cover fixtures check the loopless, bipartite subcubic
 construction, both directed degree bounds, and explicit optimum witnesses.
+The optional-source checks certify the full row-multiset identity for
+completion and test placements omitting basis elements. For five source
+families and L=3,9, the padding audit checks exact size and girth scaling,
+all source SCCs, degree/parity properties, 34 full-state dual-rank
+projections per padded instance, witness failures and cover recovery.
+The K5 source additionally verifies the exact N_0,E_0 formulas and its
+470-state, girth-12 target. In total the padding audit checks 374 full-state
+rank projections on eleven padded instances.

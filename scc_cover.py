@@ -7,19 +7,23 @@ class CoverInstance:
     rows: tuple
     sets: tuple
     jobs: int
-    forced: frozenset
+    basis: frozenset
     options: tuple
     neighborhoods: tuple
     owner: dict
+    source_cycles: tuple
+    projection: tuple
 
 
-def cover_graph(n, sets, sparse=True):
+def cover_graph(n, sets, sparse=True, optional=True):
     """Return a loopless bipartite control instance and its cover maps.
 
     Two copies of the covering instance give OPT=2*(n+tau), without parity
     assumptions or a special case for tau=1. In the sparse version every
     underlying undirected degree is two or three, except jobs with source
     frequency greater than two. Its maximum directed outdegree is three.
+    The default adds matroid-loop states to source cycles, preserving OPT
+    while making every individual actuator position avoidable.
     """
     sets = tuple(sets)
     full = (1 << n) - 1
@@ -29,7 +33,7 @@ def cover_graph(n, sets, sparse=True):
     q = len(sets)
     count = 4 * n + 2 * q
     rows, neighborhoods, color = [0] * count, [0] * count, [0] * count
-    forced, owner = frozenset(range(2 * n)), {}
+    basis, owner = frozenset(range(2 * n)), {}
     options = tuple(tuple(2 * n + 2 * i + c for i in range(q)) for c in (0, 1))
 
     def job(c, j):
@@ -70,10 +74,123 @@ def cover_graph(n, sets, sparse=True):
             attach(parent, c, members, original)
         else:
             rows[parent] |= sum(1 << job(c, j) for j in members)
+    source_cycles = [(j, n + j) for j in range(n)] + [cycle]
+    projection = list(range(len(rows)))
+    if optional:
+        for group in range(len(source_cycles)):
+            if len(source_cycles[group]) >= 3:
+                continue
+            old = source_cycles[group]
+            u, v = old[-1], old[0]
+            x, y = len(rows), len(rows) + 1
+            # Relocate the old u-row, including its tree port, to y.
+            # The two new columns have singleton rows, so they are T-free.
+            rows.extend((1 << y, rows[u]))
+            rows[u] = 1 << x
+            neighborhoods.extend((0, 0))
+            color.extend((1 - color[u], color[u]))
+            projection.extend((-1, -1))
+            source_cycles[group] = old + (x, y)
     assert all(color[u] != color[v] for u, row in enumerate(rows)
                for v in range(len(rows)) if row >> v & 1)
-    return CoverInstance(tuple(rows), sets, n, forced, options,
-                         tuple(neighborhoods), owner)
+    return CoverInstance(tuple(rows), sets, n, basis, options,
+                         tuple(neighborhoods), owner, tuple(source_cycles),
+                         tuple(projection))
+
+
+def pad_cover(instance, length):
+    """Oddly subdivide the underlying graph, preserving the covering OPT.
+
+    Source-cycle ports move with their rows; new source states are M-loops.
+    A bidirected internal gate edge gets a bidirected path. Other arcs get
+    a directed path whose internal vertices occur in directed two-cycles.
+    These latter operations add parallel copies and M-loops. All original
+    source cycles must have at least three vertices. Apply once to a
+    completed construction; choose the desired total subdivision length.
+    """
+    if length < 1 or length % 2 == 0 or any(len(c) < 3 for c in instance.source_cycles):
+        raise ValueError('Use a positive odd length and source cycles of size >=3.')
+    if length == 1:
+        return instance
+    original = instance.rows
+    rows = [0] * len(original)
+    neighborhoods, projection = list(instance.neighborhoods), list(instance.projection)
+    owner, row_image, cycle_arcs, cycles = dict(instance.owner), {}, set(), []
+
+    def state(origin=None):
+        v = len(rows)
+        rows.append(0)
+        neighborhoods.append(0 if origin is None else instance.neighborhoods[origin])
+        projection.append(-1 if origin is None else instance.projection[origin])
+        if origin in instance.owner:
+            owner[v] = instance.owner[origin]
+        return v
+
+    for cycle in instance.source_cycles:
+        expanded = []
+        for i, u in enumerate(cycle):
+            v = cycle[(i + 1) % len(cycle)]
+            internal = [state() for _ in range(length - 1)]
+            path = [u] + internal + [v]
+            for a, b in zip(path, path[1:]):
+                rows[a] |= 1 << b
+            row_image[u] = internal[-1]
+            cycle_arcs.add((u, v))
+            expanded.extend(path[:-1])
+        cycles.append(tuple(expanded))
+    handled = set(cycle_arcs)
+    for u, row in enumerate(original):
+        for v in range(len(original)):
+            if not row >> v & 1 or (u, v) in handled:
+                continue
+            if original[v] >> u & 1:
+                # One endpoint of an internal gate has only its partner
+                # as out-neighbor. Even path positions copy that endpoint.
+                x, y = (u, v) if original[u] == 1 << v else (v, u)
+                assert original[x] == 1 << y
+                internal = [state(x if i % 2 == 0 else None)
+                            for i in range(1, length)]
+                path = [x] + internal + [y]
+                for a, b in zip(path, path[1:]):
+                    rows[a] |= 1 << b
+                    rows[b] |= 1 << a
+                handled.update(((u, v), (v, u)))
+            else:
+                parent = row_image.get(u, u)
+                for _ in range((length - 1) // 2):
+                    x, y = state(v), state()
+                    rows[parent] |= 1 << x
+                    rows[x] |= 1 << y
+                    rows[y] |= 1 << x
+                    parent = y
+                rows[parent] |= 1 << v
+                handled.add((u, v))
+    return CoverInstance(tuple(rows), instance.sets, instance.jobs, instance.basis,
+                         instance.options, tuple(neighborhoods), owner,
+                         tuple(cycles), tuple(projection))
+
+
+def complete_basis(instance, selected):
+    """Replace selected loop fillers in basis source cycles by the full basis.
+
+    Matching robustness is preserved because all removed elements are
+    matroid loops and all additions are old basis elements. Source-cycle
+    quotas imply that the replacement does not increase cardinality.
+    """
+    selected = set(selected)
+    if not selected <= set(range(len(instance.rows))):
+        raise ValueError('Invalid state index.')
+    original_size = len(selected)
+    for j, cycle in enumerate(instance.source_cycles[:-1]):
+        group = set(cycle)
+        if len(selected & group) < 2:
+            raise ValueError('A basis source-cycle quota is not satisfied.')
+        pair = {j, instance.jobs + j}
+        assert all(instance.neighborhoods[v] == 0 for v in group - pair)
+        selected.difference_update(group - pair)
+        selected.update(pair)
+    assert instance.basis <= selected and len(selected) <= original_size
+    return frozenset(selected)
 
 
 def lift_covers(instance, first, second=None):
@@ -86,20 +203,20 @@ def lift_covers(instance, first, second=None):
             union |= instance.sets[i]
         if union != full:
             raise ValueError('Both chosen option families must cover the universe.')
-    return instance.forced | {instance.options[c][i] for c in (0, 1) for i in covers[c]}
+    return instance.basis | {instance.options[c][i] for c in (0, 1) for i in covers[c]}
 
 
 def extract_covers(instance, selected):
     """Recover two covers with total size at most |selected|-2*|U|.
 
     The selected placement must be robust. The helper additionally checks
-    the forced states and the resulting coverage, not full controllability.
+    source-cycle quotas and resulting coverage, not full controllability.
     """
     selected = set(selected)
-    if not instance.forced <= selected or not selected <= set(range(len(instance.rows))):
-        raise ValueError('The placement omits forced states or has invalid indices.')
+    original_size = len(selected)
+    selected = complete_basis(instance, selected)
     covers = (set(), set())
-    for v in selected - instance.forced:
+    for v in selected - instance.basis:
         if v in instance.owner:
             c, i = instance.owner[v]
             covers[c].add(i)
@@ -108,6 +225,6 @@ def extract_covers(instance, selected):
         for i in chosen:
             union |= instance.sets[i]
         if union != (1 << instance.jobs) - 1:
-            raise ValueError('The placement cannot repair every forced-basis failure.')
-    assert sum(map(len, covers)) <= len(selected) - len(instance.forced)
+            raise ValueError('The placement cannot repair every completed-basis failure.')
+    assert sum(map(len, covers)) <= original_size - len(instance.basis)
     return tuple(map(frozenset, covers))
