@@ -1,9 +1,29 @@
-"""Direct shared-backup reduction from amplified Max-E3-Lin-2."""
+"""Shared-backup reductions from three-variable parity systems."""
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from itertools import product
 
 from shared_backup_cover import guarded_backup_assignment
+
+
+def parity_clause_jobs(equations):
+    """Return four literal neighborhoods for each equation."""
+    return tuple(tuple(2 * x + 1 - sign for x, sign in zip((u, v, w), signs))
+                 for u, v, w, rhs in equations for signs in product((0, 1), repeat=3)
+                 if sum(signs) % 2 != rhs)
+
+
+def parity_deletion_instance(variables, equations, strong=False):
+    """Transfer the minimum number of variables to delete for consistency."""
+    equations = tuple(equations)
+    if (variables < 1 or any(len(eq) != 4 or eq[3] not in (0, 1)
+                            or len(set(eq[:3])) != 3
+                            or any(not 0 <= x < variables for x in eq[:3])
+                            for eq in equations)):
+        raise ValueError('Use three distinct variables per equation.')
+    packed = tuple((2 * v, 2 * v + 1) for v in range(variables))
+    return guarded_backup_assignment(2 * variables, parity_clause_jobs(equations),
+                                     packed, strong=strong)
 
 
 @dataclass(frozen=True)
@@ -55,10 +75,7 @@ def lin2_instance(block_size, edges, contacts, equations, strong=False):
             neighbors[u].append(v)
             neighbors[v].append(u)
             private_jobs.extend(((2 * u, 2 * v + 1), (2 * u + 1, 2 * v)))
-    for u, v, w, rhs in local:
-        for signs in product((0, 1), repeat=3):
-            if sum(signs) % 2 != rhs:
-                private_jobs.append(tuple(2 * x + 1 - sign for x, sign in zip((u, v, w), signs)))
+    private_jobs.extend(parity_clause_jobs(local))
     packed_jobs = tuple((2 * v, 2 * v + 1) for v in range(size))
     source = guarded_backup_assignment(2 * size, tuple(private_jobs), packed_jobs, strong=strong)
     return Lin2Instance(block_size, tuple(tuple(row) for row in neighbors),
