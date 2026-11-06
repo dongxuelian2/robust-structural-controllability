@@ -34,3 +34,7 @@ The reference solver implements the general core-and-enumeration algorithm, not 
 
 The 5 November refinement uses the classical Bollobas set-pairs inequality to sharpen the deficient-hyperplane bound to `binom(r+k-1,k)`. The 85-element example now retains 15 elements rather than 29, with the same exact optimum. The independent audit includes direct checks of the counting lemma, separate from the solver.
 
+## Integrated control manuscript
+
+The [joint manuscript PDF](robust-dedicated-actuator-placement.pdf), [LaTeX source](robust-dedicated-actuator-placement.tex), and [guide](robust-dedicated-actuator-placement.md) combine the 3/2 approximation, weighted safe/vulnerable FPT, and new unit-cost quota FPT theorem. The latter gives an exact general-digraph control algorithm parameterized by matching deficiency plus failure budget, independently of the number of source SCCs. The guide links the separate 3/2 implementation in PR #4; it is not duplicated here.
+

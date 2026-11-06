@@ -1,0 +1,730 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem,microtype,needspace}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\DeclareMathOperator{\rk}{rank}
+\DeclareMathOperator{\cl}{cl}
+\DeclareMathOperator{\Core}{Core}
+\DeclareMathOperator{\OPT}{OPT}
+\newcommand{\setminusf}{\setminus}
+\title{Robust Dedicated Actuator Placement\newline via Matroid Spanning}
+\author{Qichao Wang$^1$ \quad Daoyu Dong$^2$\\[0.5em]
+\small $^1$Hebei University of Technology\\
+\small $^2$University of Electronic Science and Technology of China}
+\hypersetup{pdftitle={Robust Dedicated Actuator Placement via Matroid Spanning},pdfauthor={Qichao Wang and Daoyu Dong}}
+\date{6 November 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We study dedicated actuators installed at distinct states of a structured
+linear system, where failures remove actuators but leave all states and state
+edges intact. For unit costs and one failure, an exact source-quota
+relaxation followed by maximum matching in a common-repair graph gives a
+$3/2$-approximation on arbitrary directed state graphs in $O(n^3)$ graph
+operations. The proof applies the Tutte--Berge formula to disjoint unions of
+fundamental cocircuits. For multiple failures, we prove exact fixed-parameter
+tractability in the maximum-matching deficiency plus the failure budget,
+independently of the number of source strongly connected components. The
+underlying theorem optimizes robust matroid spanning with arbitrarily many
+disjoint unit-cost quotas. We also prove a weighted safe/vulnerable spanning
+theorem in the independence-oracle model. The latter extends to control on
+strongly connected graphs, but does not assert weighted optimization with
+arbitrary source quotas. Complete proofs and explicit algorithmic bounds are
+provided. Publication priority and the optimal polynomial-time approximation
+ratio remain unresolved.
+\end{abstract}
+
+\section{Introduction}
+A structurally controllable system can lose controllability when an actuator
+fails. Redundant placement must protect both the matching condition and
+accessibility from the installed inputs. These requirements have different
+combinatorial forms: robust spanning in a matroid and lower quotas on source
+strongly connected components. Keeping both requirements explicit permits
+approximation and exact parameterized algorithms within the same model.
+
+Our first result is a cubic-time $3/2$-approximation for one actuator failure
+and unit costs (Theorem~\ref{thm:three-halves}). Its repair argument is valid
+for arbitrary matroids. The exact graph relaxation, not a minimum ordinary
+controllability placement, provides the necessary lower bound. A three-state
+example attains the ratio for a permissible relaxation choice; this is not
+an inapproximability result.
+
+Our second result concerns arbitrary independence-oracle matroids with
+nonnegative purchase weights and safe or vulnerable elements
+(Theorem~\ref{thm:weighted}). Building on the uniform-set core method of
+Bentert et al.~\cite{BFGL}, a weight-ordered recursion preserves an optimum
+robust purchased set. The recursion continues into lower-rank closures even
+when a large uniform set has been found. A classical set-pairs inequality
+sharpens the deficient-hyperplane count. The parameter is rank plus failure
+budget, and the objective charges every purchased element.
+
+The third result is exact unit-cost optimization with arbitrarily many
+disjoint quota groups (Theorem~\ref{thm:quota-fpt}). A bounded robust core
+need not contain all elements needed for accessibility. We instead preserve
+its quota-completion cost by capping the number of representatives of each
+group. The resulting control algorithm is FPT in matching deficiency plus
+failure budget on arbitrary digraphs
+(Corollary~\ref{cor:general-control-fpt}); the number of source components is
+not a parameter. This quota theorem does not assert a weighted extension.
+
+Po\c{c}as, Pequito and Ramos~\cite{PPR} study the robust minimal structural
+controllability problem, establishing NP-hardness and reporting approximation
+factors $5/2$ for general digraphs and $2$ for strongly connected digraphs.
+We state every model convention below rather than identifying distinct input
+models solely by their problem names. Related robust-assignment algorithms
+and fault-tolerant matroid results are discussed in Section~\ref{sec:scope}.
+No first-result or best-known claim is made.
+
+\section{Model and the dual matching matroid}
+Let $G=(E,A)$ be a nonempty finite directed state graph with $n=|E|$;
+self-loops are allowed. Each prescribed nonzero entry of the state and input
+matrices is a separate free parameter. Structural controllability means that
+a controllable numerical realization exists, equivalently that almost every
+realization is controllable. It is not strong structural controllability.
+A placement $P\subseteq E$ installs one dedicated input at each selected
+state, at most one per state. Failure removes that input only. It does not
+remove its state vertex or any state edge. There are no unpurchased standby
+actuators available after a failure.
+
+Write $S_1,\ldots,S_s$ for the source strongly connected components (SCCs),
+those having no entering state edge from another SCC. Form the state
+bipartite graph with a left and right copy of $E$, and an edge $u_Lv_R$
+for each arc $u\to v$. Let $T$ be the transversal matroid on the right
+copies: its independent sets are precisely the state sets matchable using
+state edges. Put $M=T^*$ and $d=n-\rk_T(E)$, the maximum-matching deficiency.
+For $X\subseteq E$, duality gives
+\begin{equation}\label{eq:dual-rank}
+ \rk_M(X)=|X|+\rk_T(E\setminus X)-\rk_T(E).
+\end{equation}
+In particular, $X$ spans $M$ if and only if $E\setminus X$ is independent
+in $T$. A rank oracle for $M$ is computable by bipartite matching.
+
+The standard structural-controllability criterion combines accessibility
+with a matching saturating all state vertices~\cite{Lin,PKA}. With dedicated
+inputs it yields the following useful formulation.
+\begin{proposition}\label{prop:control}
+A placement $P$ tolerates every set of at most $k$ actuator failures if and
+only if
+\begin{equation}\label{eq:control}
+ \rk_M(P\setminus F)=d\quad(F\subseteq P,\ |F|\le k),
+ \qquad |P\cap S_i|\ge k+1\quad(1\le i\le s).
+\end{equation}
+\end{proposition}
+\begin{proof}
+For a fixed surviving placement $X$, matching every state in $E\setminus X$
+by state edges and every state in $X$ by its own input gives a matching
+saturating all states. Conversely, an input-augmented saturating matching
+matches every state in $E\setminus X$ using state edges. This proves the
+matching equivalence, and~\eqref{eq:dual-rank} gives spanning in $M$.
+Accessibility holds exactly when every source SCC contains an input: every
+component is reachable from a source component in the condensation DAG,
+and no input outside a source component can reach it. The source SCCs
+retain an input after every at most $k$ failures exactly when they initially
+contain at least $k+1$. Applying both criteria to every survivor proves the
+claim.
+\end{proof}
+
+We use standard finite-matroid notation. The closure of $X$ is
+$\cl(X)=\{e:\rk(X\cup\{e\})=\rk(X)\}$. A hyperplane is a flat of
+rank one below the matroid rank. A loop has rank zero; a coloop belongs to
+every basis. The coloops of a restriction $M|P$ are precisely the elements
+whose deletion lowers $\rk_M(P)$. A circuit is a minimal dependent set.
+For a basis $B$ and $e\notin B$, the unique circuit contained in $B\cup\{e\}$
+is its fundamental circuit, including the one-element circuit when $e$ is a
+loop. We use these elementary matroid properties~\cite{Oxley}.
+
+\section{A cubic time three halves approximation}
+Throughout this section $k=1$ and every actuator has unit cost.
+
+\subsection{An exact source quota relaxation}
+Minimize $|P|$ subject to $P$ spanning $M$ and $|P\cap S_i|\ge2$ for
+all $i$. Denote its optimum by $L$. Every robust placement is feasible for
+this relaxation, so $L\le\OPT$.
+
+It is solvable by an integral maximum flow. The complement $I=E\setminus P$
+must be matchable using state edges and must satisfy
+$|I\cap S_i|\le |S_i|-2$. Use a source, the two state copies, one group
+node per source SCC, and a sink. Source-to-left-state edges have capacity
+one; left-to-right state edges have capacity one. Each right state has a
+capacity-one outgoing edge, to its source group if it has one, and directly
+to the sink otherwise. The edge from group $i$ to the sink has capacity
+$|S_i|-2$. An integral maximum flow gives a maximum-cardinality admissible
+$I$, and therefore a minimum-cardinality $P$.
+
+A singleton source SCC makes robust placement impossible. Conversely, if
+all source SCCs have at least two vertices, every vertex has an incoming
+state edge: this is immediate within a nonsingleton SCC, and a singleton
+nonsource SCC has an entering edge. Thus $T$ has no loops and $M$ has no
+coloops. The full placement $E$ spans after every single deletion and
+satisfies all quotas. This proves that singleton source SCCs characterize
+infeasibility for this one-failure model.
+
+\subsection{Cocircuit unions and a global lower bound}
+The next two lemmas concern an arbitrary rank-$d$ matroid $M$ with a
+spanning set $P$. Let $D$ be the coloops of $M|P$. For $b\in D$ define
+\[
+ C_b=E\setminus\cl(P\setminus\{b\}).
+\]
+The set $C_b$ consists of the elements that restore spanning after deleting
+$b$. It meets $P$ exactly in $\{b\}$.
+
+\begin{lemma}\label{lem:union-rank}
+For every $R\subseteq D$,
+\[
+ \rk\left(E\setminus\bigcup_{b\in R}C_b\right)=d-|R|.
+\]
+\end{lemma}
+\begin{proof}
+Choose a basis $B\subseteq P$. Every $b\in D$ belongs to $B$, and
+$B\setminus\{b\}\subseteq P\setminus\{b\}$ are both of rank $d-1$.
+Their closures are consequently equal. For nonempty $R$ we claim
+\[
+ \bigcap_{b\in R}\cl(B\setminus\{b\})=\cl(B\setminus R).
+\]
+For $e\notin B$, membership in $\cl(B\setminus\{b\})$ means that its
+fundamental circuit omits $b$. Membership for every $b\in R$ therefore
+means that this circuit is contained in $(B\setminus R)\cup\{e\}$,
+which is precisely membership in $\cl(B\setminus R)$. Basis elements
+satisfy the equality directly. This also handles loops. Taking ranks
+proves the identity. For $R=\varnothing$ it is simply $\rk(E)=d$.
+\end{proof}
+
+Form a simple undirected graph $K$ on $D$. Put an edge $bc$ when some
+$e\in E\setminus P$ belongs to both $C_b$ and $C_c$, and retain one such
+witness for each edge. This graph is not necessarily bipartite. Let $\nu$
+be its maximum matching cardinality.
+
+\Needspace{6\baselineskip}
+\begin{lemma}\label{lem:packing}
+Every set $W$ spanning $M$ after any one deletion satisfies
+$|W|\ge2(|D|-\nu)$.
+\end{lemma}
+\begin{proof}
+Fix $U\subseteq D$ and let $R_1,\ldots,R_t$ be the nonempty connected
+components of $K-U$. Put $Q_i=\bigcup_{b\in R_i}C_b$. These sets are
+pairwise disjoint. An element of $P$ belongs to at most one $C_b$. A common
+external element of $Q_i,Q_j$ would witness an edge between their components.
+Lemma~\ref{lem:union-rank} gives $\rk(E\setminus Q_i)=d-|R_i|$.
+Since adding an element raises rank by at most one, $W$ must contain at
+least $|R_i|$ elements of $Q_i$ to span. Equality is impossible: deleting
+one of these elements would leave rank at most
+$(d-|R_i|)+(|R_i|-1)<d$. Thus
+\[
+ |W|\ge\sum_i(|R_i|+1)=|D|-|U|+t
+ \ge |D|-|U|+\operatorname{odd}(K-U),
+\]
+where $\operatorname{odd}$ counts odd-order components. The classical
+Tutte--Berge formula~\cite{LP} states
+\[
+ 2\nu=|D|-\max_{U\subseteq D}
+ \bigl(\operatorname{odd}(K-U)-|U|\bigr).
+\]
+Taking the maximum in the preceding inequality proves the result. The
+argument compares against every robust $W$, not just supersets of $P$.
+\end{proof}
+
+\subsection{Algorithm and guarantee}
+\begin{theorem}\label{thm:three-halves}
+For any nonempty directed state graph in the stated dedicated-actuator
+model, a robust placement of size at most $3\OPT/2$ can be found, or
+infeasibility reported, in $O(n^3)$ graph operations and $O(n^2)$ space.
+The guarantee is for unit costs and one actuator failure.
+\end{theorem}
+\begin{proof}
+Reject singleton source SCCs; otherwise compute an optimum relaxation $P$.
+Find $D$ and a maximum matching of $K$. For each matched pair install its
+external common-repair witness. For every unmatched $b\in D$, install any
+external element of $C_b$. Such an element exists because $M$ has no
+coloops, while $P\setminus\{b\}$ has rank $d-1$. Let $R$ be the set of
+installed witnesses, with repetitions removed. There are at most
+$\nu+(|D|-2\nu)=|D|-\nu$ witnesses.
+
+The set $P\cup R$ is robust. If a witness fails, $P$ still spans. If an
+original noncritical element fails, the surviving part of $P$ spans. If
+$b\in D$ fails, its witness repairs the deficiency. The source quotas
+persist under additions. By Lemma~\ref{lem:packing},
+\[
+ |P\cup R|\le L+|D|-\nu\le\OPT+\frac{\OPT}{2}.
+\]
+Witness reuse is legitimate and can only decrease the cardinality. When
+$D=\varnothing$, $P$ itself is robust.
+
+For the complexity, retain the state matching $J$ obtained from the quota
+flow. It covers $I=E\setminus P$. For each $b\in P$, explore alternating
+paths from unmatched right vertex $b$: traverse state edges to the left,
+then matched edges back to the right. A reachable free left vertex is
+exactly an augmenting path showing that $I\cup\{b\}$ is matchable, or
+that $b$ is noncritical. For a critical $b$, the reachable matched right
+vertices are exactly its external repairs. A path to right vertex $e$
+can be flipped to match $I\setminus\{e\}\cup\{b\}$. Conversely, the
+symmetric difference with any matching of that replacement set gives such
+a path, since a path to a free left vertex would contradict criticality.
+Hence these searches recover the complete repair supports.
+
+There are $O(n)$ vertices and $O(n^2)$ edges in the flow network. At most
+$n$ unit augmentations, each found in $O(n^2)$ operations, suffice. At most
+$n$ alternating searches also cost $O(n^3)$. For each external state,
+connect all pairs of critical states it repairs, storing a witness for each
+edge. This clique construction costs $O(n^3)$. A maximum general-graph
+matching is computable in $O(n^3)$ operations by a blossom algorithm
+\cite{LP}; a maximal matching is insufficient. All structures require
+$O(n^2)$ space. These are combinatorial operation bounds; the reference
+Python bitmask implementation has the usual additional integer bit costs.
+\end{proof}
+
+For the bidirected three-state star with center $a$ and leaves $b,c$, the
+relaxation can choose $P=\{a,c\}$. Its one critical state is $c$, and the
+only external repair is $b$. The algorithm returns all three states, while
+$\{b,c\}$ is robust. Thus the ratio $3/2$ is attained for this relaxation
+choice. Choosing the optimum robust pair already at the relaxation stage
+avoids the example. It does not rule out improved algorithms or establish
+$3/2$-hardness.
+
+\section{Weighted robust matroid spanning}
+We now leave the unit-cost control model and state an abstract theorem.
+Let $M=(E,\mathcal I)$ be a rank-$r$ matroid given by an independence
+oracle, let $V\subseteq E$ be its vulnerable elements, and let $k\ge0$.
+A set $B$ is \emph{resilient} if
+\begin{equation}\label{eq:resilience}
+ \rk_M(B\setminus F)=r
+ \quad\text{for every }F\subseteq B\cap V,\quad |F|\le k.
+\end{equation}
+Elements in $E\setminus V$ are safe. With nonnegative binary-encoded
+weights $w$, minimize $w(B)=\sum_{e\in B}w(e)$. Failures concern the
+selected set, not survival of the whole ambient matroid.
+
+\begin{theorem}\label{thm:weighted}\label{thm:main}
+An optimum resilient purchased set can be computed, or infeasibility
+reported, in
+$f(r,k)\operatorname{poly}(n,L)$ time and oracle calls, where $L$ is the
+input bit length and independence queries have unit cost. For $r\ge2$,
+writing $q=(k+1)r$, a bound is
+\[
+ 2^{O(qr^2(r+k))}\operatorname{poly}(n,L),
+\]
+hence $2^{O((r+k)^5)}\operatorname{poly}(n,L)$. The cases $r\le1$ or
+$k=0$ are polynomial-time solvable.
+\end{theorem}
+The retained ground set has parameter-bounded cardinality and keeps access
+to the original oracle; this is not a polynomial-size encoded-kernel claim.
+
+\subsection{Matroid preliminaries and a small optimum}
+Loops can be discarded. Removing them from a resilient set preserves resilience, and their nonnegative weights cannot make this removal costly. If $r=0$, the empty set is optimal. Henceforth assume $r\geq1$ and work on the loop-free restriction. Set
+\begin{equation}\label{eq:parameters}
+ q=(k+1)r,\qquad H=\binom{r+k-1}{k},\qquad t_h=(h-1)H+q\quad(1\leq h\leq r).
+\end{equation}
+The same global values of $q,H$ are used in every recursive subproblem.
+
+\begin{lemma}\label{lem:small}
+Every resilient set $B$ contains a resilient subset $B_0$ of cardinality at most $q$. Consequently, if a feasible solution exists, there is a minimum-weight solution of cardinality at most $q$.
+\end{lemma}
+\begin{proof}
+Successively choose a maximal independent subset $I_j$ of $B\setminus\bigcup_{i<j}I_i$, for $j=0,\ldots,k$, and put $B_0=\bigcup_{j=0}^{k}I_j$. Empty layers are allowed. Since $|I_j|\leq r$, we have $|B_0|\leq q$.
+
+Fix $F\subseteq B_0\cap V$ with $|F|\leq k$. The layers are disjoint, so some $I_j$ avoids $F$. Every element of $B\setminus B_0$ was available when $I_j$ was chosen and belongs to $\cl(I_j)$. Every element of $B_0\setminus F$ already lies in that surviving set. Therefore
+\[
+ B\setminus F\subseteq \cl(B_0\setminus F).
+\]
+Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus $B_0$ is resilient. Nonnegative weights give $w(B_0)\leq w(B)$, and applying this construction to an optimum proves the second assertion.
+\end{proof}
+
+\subsection{A weight respecting exchange}
+We first sharpen the deficient-hyperplane count using the classical set-pairs inequality of Bollob\'as~\cite{Bollobas}. The short proof is included; no representation or bound on the size of $Y$ is needed.
+
+\begin{lemma}\label{lem:hyperplanes}
+For any $Y\subseteq E$, at most $\binom{r+k-1}{k}$ distinct hyperplanes can have the form $\cl(Y\setminus F)$ with $F\subseteq Y$ and $|F|\leq k$. This count is sharp.
+\end{lemma}
+\begin{proof}
+Index these hyperplanes by $P_i$. Choose a basis $A_i\subseteq Y\cap P_i$ of size $r-1$, and put $D_i=Y\setminus P_i$. Because $P_i=\cl(Y\setminus F)$ for some permitted $F$, we have $D_i\subseteq F$, so $|D_i|\leq k$. Also $A_i\cap D_i=\varnothing$. If $i\ne j$, then $A_i\cap D_j\ne\varnothing$: otherwise $A_i\subseteq P_j$ and hence $P_i=\cl(A_i)\subseteq P_j$, forcing equality of the two hyperplanes.
+
+In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $D_i$. Its probability is $\binom{r-1+|D_i|}{r-1}^{-1}$. These events are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap D_j$ and $b\in A_j\cap D_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively. Therefore
+\[
+ \sum_i\binom{r-1+|D_i|}{r-1}^{-1}\leq1.
+\]
+Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. The argument includes $r=1$ and $k=0$, when there can be at most one such hyperplane.
+
+For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. Thus equality holds even for the deficient hyperplanes needed below. This does not assert sharpness of the full core threshold $t_h$.
+\end{proof}
+
+Call $Z$ \emph{$h$-uniform} if $\rk(Z)=h$ and every $h$-element subset of $Z$ is independent. Such a set has at least $h$ elements, and every subset of size at most $h$ is independent. A set has a single failure status if it lies entirely in $V$ or entirely in $E\setminus V$.
+
+\begin{lemma}\label{lem:exchange}
+Let $A\subseteq E$ have a single failure status and rank $h\geq1$. Let $Z\subseteq A$ be $h$-uniform with $|Z|\geq t_h$. Suppose $B$ is resilient, $|B|\leq q$, and $x\in(B\cap A)\setminus Z$ satisfies $w(z)\leq w(x)$ for every $z\in Z$. Then some $y\in Z\setminus B$ makes
+\[
+ B'=(B\setminus\{x\})\cup\{y\}
+\]
+resilient, with $|B'|=|B|$ and $w(B')\leq w(B)$.
+\end{lemma}
+\begin{proof}
+Put $Y=B\setminus\{x\}$. Consider the permitted failures $F\subseteq Y\cap V$, $|F|\leq k$, for which $\rk(Y\setminus F)<r$. Resilience of $B$ implies that their surviving ranks equal $r-1$ and that $x\notin\cl(Y\setminus F)$. Lemma~\ref{lem:hyperplanes} bounds the number of these distinct hyperplanes by $H$. It applies also when $x$ is safe and some deficient failure sets have size less than $k$.
+
+Each of these hyperplanes contains at most $h-1$ elements of $Z$. Otherwise it contains an independent $h$-subset of $Z$, which spans $A$, and hence contains $x$, a contradiction. At most $q-1$ elements of $Z$ belong to $B$, because $x\notin Z$. The number of forbidden choices in $Z$ is at most $(h-1)H+q-1<t_h$. Choose a $y\in Z\setminus B$ outside all the deficient hyperplanes.
+
+Let $F'\subseteq B'\cap V$ have size at most $k$. If $y\notin F'$, then $F'\subseteq Y$; either $Y\setminus F'$ already spans or $y$ repairs its rank deficiency by construction. If $y\in F'$, then $y$ is vulnerable, so $x$ is vulnerable as well. The set
+\[
+ (F'\setminus\{y\})\cup\{x\}
+\]
+is an allowed failure of $B$ of the same size as $F'$. Its survivor is exactly $B'\setminus F'$, which therefore spans. The cardinality and weight assertions follow from the choice of $y$.
+\end{proof}
+
+The argument includes $r=1$, when a deficient hyperplane has rank zero and its basis is empty. It does not assume distinct weights, positive weights, or representability.
+
+\subsection{Recursive construction of an optimum preserving core}
+For a loop-free set $A$ of a single failure status, define $\Core(A)$ by the following procedure. Every scan uses a fixed total ordering that refines nondecreasing weight.
+\begin{enumerate}[label=\arabic*.,leftmargin=*]
+\item If $A=\varnothing$, return $\varnothing$. Let $h=\rk(A)$. If $h=1$, return the $q$ cheapest elements of $A$, or all of $A$ if it has fewer. If $|A|\leq t_h$, return $A$.
+\item Scan the elements of $A$ in order, initially with $Z=\varnothing$. Accept an element $x$ precisely when every subset of $Z\cup\{x\}$ of size at most $h$ is independent. Stop when $|Z|=t_h$ or all elements have been scanned.
+\item For every $T\in\binom{Z}{h-1}$, put $A_T=A\cap\cl(T)$ and recursively compute $\Core(A_T)$. Return
+\[
+ Z\ \cup\!\!\bigcup_{T\in\binom{Z}{h-1}}\Core(A_T).
+\]
+\end{enumerate}
+In particular, step~3 is executed under \emph{both} stopping conditions. Recursive domains need not be flats of the original matroid.
+
+Until $Z$ has size $h$, the acceptance rule is ordinary greedy independence. The final $Z$ therefore has at least $h$ elements and is $h$-uniform. Each child has rank exactly $h-1$: it contains $T$ and is contained in $\cl(T)$.
+
+\begin{lemma}\label{lem:core}
+For every resilient $B$ with $|B|\leq q$ and every single-status loop-free set $A$, there is a resilient $B'$ such that
+\[
+ |B'|=|B|,\quad w(B')\leq w(B),\quad B'\setminus A=B\setminus A,
+ \quad B'\cap A\subseteq\Core(A).
+\]
+\end{lemma}
+\begin{proof}
+Induct on $h=\rk(A)$. Empty domains and a return of all of $A$ require no change. If $h=1$ and $|A|>q$, an element $x$ of $B\cap A$ outside the $q$ cheapest elements can be replaced by an unused retained element $y$ of no larger weight. Nonloop elements of a rank-one domain are parallel. When $y$ survives, substitution preserves rank; when $y$ fails, it and $x$ are both vulnerable, and the failure mapping in Lemma~\ref{lem:exchange} applies. Repeating gives the claim. Equivalently, use Lemma~\ref{lem:exchange} with $h=1$ and $|Z|=q$.
+
+Suppose $h>1$ and the scan is executed. Let $U=\bigcup_T A_T$. Every rejected scanned element $x$ belongs to $U$. Indeed, at rejection a dependent subset of $Z\cup\{x\}$ contains $x$ and at most $h-1$ retained elements. Those retained elements are independent, so they span $x$. Extend them to an $(h-1)$-subset of the final $Z$, obtaining a child containing $x$. Also $Z\subseteq U$, since $h>1$ and every element of $Z$ belongs to an $(h-1)$-subset of $Z$.
+
+If the scan is exhausted, $A=U$. Otherwise each element of $A\setminus U$ is unscanned and is at least as expensive as every element of $Z$. Apply Lemma~\ref{lem:exchange} successively to the elements of $B\cap(A\setminus U)$. Each replacement lies in $Z\subseteq U$ and removes one selected element outside $U$. The resulting resilient set has its intersection with $A$ inside $U$, unchanged cardinality and outside-$A$ part, and no larger weight.
+
+Fix the final output $W_A=\Core(A)$ and process the children $A_1,\ldots,A_m$ in any order. Apply the induction hypothesis to each child and the current solution. For the current solution define $D(B)=(B\cap A)\setminus W_A$. Processing $A_i$ changes only elements in $A_i$ and leaves its selected elements in $\Core(A_i)\subseteq W_A$. Consequently,
+\[
+ D(B_{\mathrm{new}})\subseteq D(B_{\mathrm{old}})\setminus A_i.
+\]
+Initially $D(B)\subseteq U$. After all children have been processed it is empty, regardless of overlaps between children. All operations preserve cardinality, hence the bound $q$, and preserve resilience without increasing weight. This establishes the induction.
+\end{proof}
+
+Apply the construction separately to the vulnerable and safe nonloop elements, and let $W$ be the union of the two outputs. Their domains are disjoint. Lemmas~\ref{lem:small} and~\ref{lem:core} imply that $W$ contains an optimum of cardinality at most $q$ whenever the instance is feasible.
+
+\subsection{Size and running time}
+Put $K_0=0$, $K_1=q$, and, for $2\leq h\leq r$, define
+\[
+ K_h=t_h+\binom{t_h}{h-1}K_{h-1}.
+\]
+By induction, a rank-$h$ call returns at most $K_h$ elements. The sequence is nondecreasing; in particular $|W|\leq2K_r$, or $|W|\leq K_r$ if all elements are vulnerable.
+
+For a convenient explicit bound put $T=t_r$ and $N=2rT^{(r-1)^2}$. Each of the two recursion trees has at most $r$ levels and branching at most $T^{r-1}$. Thus there are at most $N$ nodes and $|W|\leq NT$. At a node, before $h$ elements are accepted, one independence query tests a candidate. Subsequently it suffices to test the $h$-subsets containing the candidate. This uses at most $O(n(1+T^{r-1}))$ independence queries per node. Testing $x\in\cl(T')$ for a child-defining independent $(h-1)$-set $T'$ uses one independence query to $T'\cup\{x\}$, with the membership case $x\in T'$ handled directly. Computing a domain's rank requires at most $n$ queries. Sorting and set bookkeeping have polynomial input cost multiplied by a parameter-only factor.
+
+Finally enumerate all $B\subseteq W$ with $|B|\leq q$, and for each enumerate all allowed failure sets and compute its surviving ranks greedily. There are at most $(NT+1)^q$ candidates and at most $2^q$ failures per candidate. Choose a feasible candidate of minimum total weight. If there is none, optimum preservation proves infeasibility. Exact weight sums and comparisons have polynomial bit cost in the original weight encoding.
+
+For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,L)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,L)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,L)$. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
+
+If $k=0$, ordinary minimum-weight-basis greedy is optimal. If $r=1$, an optimum consists of either one cheapest safe nonloop element or $k+1$ cheapest vulnerable nonloop elements, choosing the cheaper available option. These observations also handle large $k$ without a special feasibility assumption. Nonnegative rational weights can be handled by exact comparisons and sums with polynomial bit complexity; the accompanying implementation accepts integers and exposes a rank-oracle interface, which is simulated from an independence oracle by the greedy procedure described above.
+
+\subsection{Why simpler weighted reductions do not suffice}
+\paragraph{Stopping at a large uniform set.}
+Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=2$, and $t_2=6$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. Its robust optimum is $101$, whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
+
+\paragraph{Preserving cheapest ordinary bases after failures.}
+Dey and Kavitha~\cite{DK} study a preserver $S\subseteq E$ such that, for every $F\subseteq E$ with $|F|\leq k$, $M|(S\setminus F)$ contains a minimum-cost ordinary basis of $M|(E\setminus F)$. That property need not preserve the optimum total cost of a resilient purchased set.
+
+For a five-element example, take a rank-two truncation with parallel classes $A,B$ of size two and a singleton class $C$. Give each element of $A\cup B$ weight $2$ and the element of $C$ weight $3$. For every zero or one ground-element failure, $A\cup B$ still contains an ordinary basis of cost $4$, which is minimum in the full surviving matroid. Yet the robust optimum inside $A\cup B$ is $8$, and the full instance has optimum $7$, using one element from each class. Two successive cheapest residual bases also produce $A\cup B$. Thus this preserver construction does not replace the optimum-preserving recursion above.
+
+\subsection{An application to dedicated input placement}
+Consider a nonempty strongly connected state digraph with nonnegative
+actuator costs and specified safe or vulnerable locations. Keep the
+single-actuator-per-state and actuator-only failure conventions of Section~2.
+Its dual state matching matroid has rank equal to the deficiency $d$;
+Proposition~\ref{prop:control} supplies the matching interpretation, also
+when only vulnerable actuators may fail.
+
+\begin{corollary}
+Minimum-cost robust dedicated-input placement on a strongly connected state digraph, under the actuator-failure model just specified, is FPT in $d+k$, with nonnegative binary-encoded costs and safe/vulnerable actuator locations.
+\end{corollary}
+\begin{proof}
+If $d>0$, every surviving spanning set in $M$ is nonempty. Strong connectivity then ensures accessibility, so Theorem~\ref{thm:main} applies. If $d=0$, matching is automatic and accessibility requires a nonempty survivor. Choose the cheaper of one cheapest safe actuator and $k+1$ cheapest vulnerable actuators, omitting unavailable options.
+\end{proof}
+For general state digraphs, additional source SCC constraints are necessary. They are not preserved by the weighted same-status exchange alone. Section~\ref{sec:quota-fpt} supplies a separate unit-cost quota theorem, not a general weighted extension.
+
+
+\Needspace{14\baselineskip}
+\section{Exact parameterized optimization with source quotas}
+\label{sec:quota-fpt}
+
+The spanning requirement alone does not enforce accessibility in a general
+state digraph. We now retain the source-SCC quotas without adding their number
+to the parameter. Throughout this section every selected element is vulnerable
+and costs one.
+
+\begin{theorem}\label{thm:quota-fpt}
+Let $M$ be a rank-$d$ matroid on $E$, given by an independence oracle, and let
+$S_1,\ldots,S_s$ be pairwise disjoint subsets of $E$. For $k\ge0$, a
+minimum-cardinality set $D$ satisfying
+\[
+ \rk_M(D\setminus F)=d\quad(F\subseteq D,\ |F|\le k),
+ \qquad |D\cap S_i|\ge k+1\quad(1\le i\le s)
+\]
+can be found, or infeasibility certified, in $f(d,k)$ times a polynomial
+in the input size and oracle cost. The parameter does not include $s$.
+\end{theorem}
+
+Set $b=k+1$, $G_0=E\setminus\bigcup_i S_i$, and $q=bd$. An undersized
+group makes the instance infeasible. If $d=0$, choosing $b$ elements from
+each group is optimal. Assume henceforth that $d\ge1$.
+
+By Lemma~\ref{lem:small}, every robust spanning set contains a robust spanning subset of size at most
+$q$: take $k+1$ successive maximal independent sets from its remaining
+elements. Every omitted element is spanned by every layer, and one layer
+avoids any $k$ failures. The union of the layers therefore remains spanning.
+This small core contains no loops, although loops remain available for
+quota completion. For a core $C$ define
+\[
+ \phi(C)=|C\cap G_0|+\sum_{i=1}^s\max\{0,|C\cap S_i|-b\}.
+\]
+Its cheapest quota completion has cardinality $bs+\phi(C)$ and remains
+robust. Conversely, a small core inside an optimum placement has completion
+cost no greater than that optimum. It suffices, therefore, to minimize
+$\phi$ over robust spanning sets of size at most $q$.
+
+The ordinary robust core alone need not preserve completion cost. In
+$U_{1,4}$ on $\{a,b,c,d\}$, with $k=1$ and the sole group
+$S_1=\{c,d\}$, the robust core $\{a,b\}$ completes to four elements,
+whereas the robust optimum $\{c,d\}$ has size two. The following color
+argument retains the necessary group choices.
+
+\paragraph{Exchange candidates.}
+For this section use the conservative count $H=\binom{q-1}{d-1}$, matching the quota implementation. Lemma~\ref{lem:hyperplanes} also permits the smaller count $\binom{d+k-1}{k}$, but that refinement is not needed for FPT. Let $A$ be a loopless rank-$h$ subset and let
+$Z\subseteq A$ be $h$-uniform: all of its subsets of size at most $h$ are
+independent. Assume $|Z|\ge h$. For a robust set $B$ of size at most $q$
+and $x\in(B\cap A)\setminus Z$, write $Y=B\setminus\{x\}$.
+Whenever $\rk_M(Y\setminus F)<d$ for $F\subseteq Y$, $|F|\le k$,
+the closure of $Y\setminus F$ is a hyperplane excluding $x$. There are
+at most $H$ such hyperplanes, since each has a $(d-1)$-element basis in
+$Y$. Each contains at most $h-1$ points of $Z$; otherwise it would contain
+$A$ and hence $x$.
+Thus at most $(h-1)H+q-1$ points of $Z$ lie either in a deficient
+hyperplane or in $Y$. Every other $y$ gives a robust exchange
+$Y\cup\{y\}$: failures avoiding $y$ are repaired by $y$, while a
+failure containing $y$ corresponds to the failure of $x$ in $B$.
+
+\paragraph{A color-capped core.} Start the recursion on the nonloop set $E^\circ=\{e\in E:\rk_M(\{e\})=1\}$. Keep all original elements, including loops, available for quota completion.
+Use $G_0,S_1,\ldots,S_s$ as colors and set
+\[
+ c_h=(h-1)H+q,\qquad T_h=(q+1)c_h.
+\]
+In a rank-$h$ set $A$, greedily scan its elements into an $h$-uniform
+set $Z$, allowing at most $c_h$ points of each color. Stop at $|Z|=T_h$
+or at exhaustion. For $h=1$ return $Z$. Otherwise return $Z$ together
+with recursively computed cores of
+\[
+ A\cap\operatorname{cl}_M(T),\qquad T\in\binom{Z}{h-1}.
+\]
+The recursion is performed in both stopping cases. The scan attains at
+least $h$ points: before that the color cap cannot bind because
+$c_h\ge q\ge d\ge h$, so the scan is ordinary greedy independence.
+Every child consequently has rank exactly $h-1$.
+
+We prove the following strong invariant by induction on $h$: every robust
+$B$ of size at most $q$ can be replaced, without changing its size or its
+part outside $A$, by a robust $B'$ whose $A$-part lies in the returned
+core and for which $\phi(B')\le\phi(B)$.
+Let $U=Z$ for $h=1$; otherwise let $U$ be the union of the child ground
+sets $A\cap\operatorname{cl}_M(T)$. Then $Z\subseteq U$. A scanned
+point rejected for dependence lies in $U$: its witnessing dependent set
+shows that it is spanned by at most $h-1$ retained points, which can be
+padded to one of the sets $T$.
+
+Consider $x\in(B\cap A)\setminus U$. If it was scanned, it was rejected
+by its color cap. The $c_h$ same-color points of $Z$ contain a valid
+exchange candidate, since at most $c_h-1$ are forbidden by the preceding
+count. The exchange preserves all color counts, and hence $\phi$.
+If $x$ was unscanned, the total threshold was reached. With
+$Y=B\setminus\{x\}$, forbid $G_0$ and all groups satisfying
+$|Y\cap S_i|\ge b$. There are at most $q$ forbidden colors, since
+$|Y|\le q-1$ and $b\ge1$. They contain at most $qc_h$ points of $Z$,
+leaving at least $c_h$ candidates. A valid exchange therefore exists in
+an unsaturated actual group. Its insertion has zero marginal $\phi$,
+while deletion of $x$ cannot increase $\phi$.
+
+These exchanges move the entire $A$-part into $U$. For $h=1$ this
+finishes the proof. For higher rank, apply induction successively to
+the children. If $W$ is the final returned core, a child operation cannot
+create a point of $(B\cap A)\setminus W$ and removes every such point
+in that child. All initially bad points lie in the union of the child
+ground sets, so none remain after all children are processed. This also
+justifies overlapping children and proves the invariant.
+
+\paragraph{Size and running time.}
+The output size is bounded by $L_d$, where
+\[
+ L_1=T_1,\qquad
+ L_h=T_h+\binom{T_h}{h-1}L_{h-1}\quad(2\le h\le d).
+\]
+All these quantities depend only on $d,k$. Recursion depth is at most
+$d$, branching is parameter bounded, and each node scans the input and
+constructs its children using parameter bounded sets in independence
+tests. Hence its oracle and bit cost is $f(d,k)\operatorname{poly}(|E|)$.
+Enumerate subsets of the output of size at most $q$, check all at most
+$2^q$ failures, minimize $\phi$, and complete the quotas using original
+elements. The invariant preserves an optimum, and the enumeration has
+parameter bounded size. This proves Theorem~\ref{thm:quota-fpt}.
+
+\Needspace{8\baselineskip}
+\begin{corollary}\label{cor:general-control-fpt}
+For arbitrary directed state graphs, minimum unit-cost dedicated-actuator
+placement tolerating at most $k$ actuator failures is fixed-parameter
+tractable in the maximum-matching deficiency $d$ plus $k$, with at most
+one actuator per state.
+\end{corollary}
+\begin{proof}
+Use the dual of the state matching transversal matroid, whose rank is $d$.
+Surviving matching feasibility is spanning in this dual, and surviving
+accessibility is equivalent to selecting at least $k+1$ states in each
+source SCC. The latter sets are disjoint, so Theorem~\ref{thm:quota-fpt}
+applies.
+\end{proof}
+
+The returned core need not contain a complete feasible actuator placement:
+quota completion may require many original elements. Thus the result is an
+FPT algorithm, not a claim of a bounded full-solution kernel. It does not
+resolve the best polynomial-time approximation ratio, and this quota
+extension makes no weighted or safe-element claim.
+
+\section{Relationship to earlier work and limits}\label{sec:scope}
+The robust purchased-set objective differs from choosing an ordinary basis
+after failures. Bentert et al.~\cite{BFGL} prove unweighted FPT in rank plus
+failure budget and explicitly pose the weighted question. Their proceedings
+Proposition~6 gives the layered cardinality bound, Lemma~8 the uniform-set
+exchange and basis-subset hyperplane count, and Lemma~9 the recursive core.
+These are inherited ingredients. Our weighted argument adds the ordered
+exchange invariant, recursion in both stopping cases, and separation of
+failure statuses. The sharper count is an application of Bollob\'as's
+classical set-pairs inequality~\cite{Bollobas}, not a new set-pairs theorem.
+The same predecessor already gives polynomial weighted algorithms for rank
+at most two and for truncations of unit-capacity partition matroids.
+
+The all-vulnerable case of Theorem~\ref{thm:weighted} matches the weighted
+problem defined in Section~1.1 of~\cite{BFGL}. Its Section~7 nonuniform
+question prints $\rk(M-F)=\rk(M)$; the selected-set formulation is
+$\rk_M(B\setminus F)=\rk(M)$. Lijun Cui reported in correspondence dated
+5 November 2026 that Bentert confirmed the latter was intended and the
+former was a typographical error. We identify this as a secondhand report
+of a definition clarification, not as verification of our proof. The two
+printed predicates are not equivalent: in $U_{1,2}$, failure destroys the
+selected singleton $B=\{a\}$ but does not lower the rank of the full
+matroid. All our statements use the explicit selected-set definition
+\eqref{eq:resilience}. This selected-object interpretation also appears in
+flexible fault-tolerant network design~\cite{AHMS}.
+
+Adjiashvili, Bindewald and Michaels~\cite{ABMnodes}, Theorem~7, give a
+$7/4$-approximation for uniform cardinality node-robust assignment. Their
+repair perspective is a predecessor of the present approach. Their
+ICALP 2016 Theorem~5~\cite{ABMedges} already gives $3/2$ for uniform
+\emph{edge}-robust assignment, buying assignment edges and tolerating an
+edge failure via ear decompositions. That is a different purchase/failure
+model. The proof in Section~3 instead uses fundamental cocircuit unions,
+maximum common-repair matching, and source quotas.
+
+Bulk-robust optimization~\cite{ASZ} charges purchased elements but supplies
+an explicit family of failure scenarios. Expanding all at most $k$ failures
+can require $n^{\Theta(k)}$ scenarios, so polynomial time in that expanded
+list does not establish the present FPT bound. Weighted representative
+families~\cite{FLPS} preserve independent extensions under their stated
+representation and matroid hypotheses; their predicate is not directly
+optimum preservation for a dependent purchased set under all failures.
+Likewise, the cheapest-surviving-basis preservers of Dey and Kavitha~\cite{DK}
+optimize a different object, as the example above shows. These distinctions
+do not rule out alternative proofs using those methods.
+
+The quota argument is separate from weighted spanning. An optimum robust
+core can be small although a feasible full placement is arbitrarily large.
+The completion objective and color caps preserve source choices without
+parameterizing their number. They make no weighted-quota or mixed
+safe/vulnerable quota claim. Conversely, the weighted theorem has no general
+source-quota guarantee. None of our results concerns repeated actuators at
+one state, arbitrary non-dedicated input columns, state or state-edge
+failures, or strong structural controllability.
+
+The best polynomial-time approximation factor remains open. The
+three-state equality example limits the particular relaxation choice, not
+the underlying problem's approximability. Separate sparse-hardness research
+is not needed by, and is not reproduced in, the present proof package.
+Targeted source checks through 6 November 2026 identified the comparisons
+above but do not certify priority or exhaust the literature.
+
+\paragraph{Reproducibility.}
+The accompanying repository provides dependency-free implementations and
+independent exhaustive, randomized, threshold, and nonrepresentable-matroid
+checks. The source records test commands and coverage. These finite audits
+validate implementations; they do not replace proofs. The code exposes rank
+oracles, which can be simulated from independence queries by greedy basis
+construction.
+
+\Needspace{5\baselineskip}
+\paragraph{AI assistance.}
+OpenAI tools assisted with developing and checking arguments, writing
+verification code, and preparing this manuscript. The proofs and code are
+provided for human review. Tool-assisted checking is not a substitute for
+independent mathematical peer review.
+
+\begin{thebibliography}{99}
+\small
+\setlength{\itemsep}{3pt}
+\raggedright
+\bibitem{ABMnodes} D. Adjiashvili, V. Bindewald, and D. Michaels.
+Robust Assignments with Vulnerable Nodes.
+\href{https://arxiv.org/abs/1703.06074}{\mbox{arXiv:1703.06074}}, 2017.
+\bibitem{ABMedges} D. Adjiashvili, V. Bindewald, and D. Michaels.
+Robust Assignments via Ear Decompositions and Randomized Rounding.
+In \emph{ICALP 2016}, LIPIcs 55, 71:1--71:14, 2016.
+\href{https://doi.org/10.4230/LIPIcs.ICALP.2016.71}{doi:10.4230/LIPIcs.ICALP.2016.71}.
+\bibitem{AHMS} D. Adjiashvili, F. Hommelsheim, M. M\"uhlenthaler, and O. Schaudt.
+Fault-Tolerant Edge-Disjoint $s$-$t$ \mbox{Paths} -- Beyond Uniform Faults.
+In \emph{SWAT 2022}, LIPIcs 227, 5:1--5:19, 2022.
+\href{https://doi.org/10.4230/LIPIcs.SWAT.2022.5}{doi:10.4230/LIPIcs.SWAT.2022.5}.
+\bibitem{ASZ} D. Adjiashvili, S. Stiller, and R. Zenklusen.
+Bulk-Robust Combinatorial Optimization.
+\emph{Mathematical Programming} 149, 361--390, 2015.
+\href{https://doi.org/10.1007/s10107-014-0760-6}{doi:10.1007/s10107-014-0760-6}.
+\bibitem{BFGL} M. Bentert, F. V. Fomin, P. A. Golovach, and L. Morelle.
+Fault-Tolerant Matroid Bases. In \emph{ESA 2025}, LIPIcs 351,
+83:1--83:14, 2025.
+\href{https://doi.org/10.4230/LIPIcs.ESA.2025.83}{doi:10.4230/LIPIcs.ESA.2025.83}.
+Full version: \href{https://arxiv.org/abs/2506.22010}{arXiv:2506.22010}.
+\bibitem{Bollobas} B. Bollob\'as. On generalized graphs.
+\emph{Acta Mathematica Academiae Scientiarum Hungaricae} 16,
+447--452, 1965.
+\href{https://doi.org/10.1007/BF01904851}{doi:10.1007/BF01904851}.
+\bibitem{DK} D. Dey and T. Kavitha.
+Low-Cost Arborescence Under Edge Faults.
+\href{https://arxiv.org/abs/2605.13800}{arXiv:2605.13800}, 2026.
+\bibitem{FLPS} F. V. Fomin, D. Lokshtanov, F. Panolan, and S. Saurabh.
+Efficient Computation of Representative Families with Applications in
+Parameterized and Exact Algorithms.
+\emph{Journal of the ACM} 63(4), Article 29, 2016.
+\href{https://doi.org/10.1145/2886094}{doi:10.1145/2886094}.
+\bibitem{Lin} C.-T. Lin. Structural controllability.
+\emph{IEEE Transactions on Automatic Control} 19(3), 201--208, 1974.
+\bibitem{LP} L. Lov\'asz and M. D. Plummer.
+\emph{Matching Theory}. North-Holland, 1986.
+\bibitem{Oxley} J. Oxley. \emph{Matroid Theory}, second edition.
+Oxford University Press, 2011.
+\bibitem{PKA} S. Pequito, S. Kar, and A. P. Aguiar.
+A Framework for Structural Input/Output and Control Configuration Selection
+in Large-Scale Systems.
+\emph{IEEE Transactions on Automatic Control} 61(2), 303--318, 2016.
+\href{https://doi.org/10.1109/TAC.2015.2437525}{doi:10.1109/TAC.2015.2437525}.
+\bibitem{PPR} D. Po\c{c}as, S. Pequito, and G. Ramos.
+On the NP-hardness of the robust minimal structural controllability problem.
+\emph{Automatica} 190, Article 113074, 2026.
+\href{https://doi.org/10.1016/j.automatica.2026.113074}{doi:10.1016/j.automatica.2026.113074}.
+\end{thebibliography}
+\end{document}
