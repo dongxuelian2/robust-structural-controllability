@@ -135,10 +135,10 @@ whose deletion lowers $\rk_M(P)$. A circuit is a minimal dependent set.
 For a basis $B$ and $e\notin B$, the unique circuit contained in $B\cup\{e\}$
 is its fundamental circuit~\cite{Oxley}.
 
-\section{A Cubic-Time 3/2-Approximation}
+\section{A cubic-time 3/2-approximation}
 Throughout this section $k=1$ and every actuator has unit cost.
 
-\subsection{An Exact Source-Quota Relaxation}
+\subsection{An exact source-quota relaxation}
 Minimize $|P|$ subject to $P$ spanning $M$ and $|P\cap S_i|\ge2$ for
 all $i$. Denote its optimum by $L$. Every robust placement is feasible for
 this relaxation, so $L\le\OPT$.
@@ -274,7 +274,7 @@ $\{b,c\}$ is robust. Thus the ratio $3/2$ is attained for this relaxation
 choice. Choosing the optimum robust pair at the relaxation stage avoids this
 worst case.
 
-\section{Weighted Robust Matroid Spanning}
+\section{Weighted robust matroid spanning}
 Let $M=(E,\mathcal I)$ be a rank-$r$ independence-oracle matroid,
 $V\subseteq E$ the vulnerable elements, $E\setminus V$ the safe elements,
 and $k\ge0$ the failure budget. A set $B$ is \emph{resilient} if
@@ -321,7 +321,7 @@ Fix $F\subseteq B_0\cap V$ with $|F|\leq k$. The layers are disjoint, so some $I
 Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus $B_0$ is resilient. Nonnegative weights give $w(B_0)\leq w(B)$, and applying this construction to an optimum proves the second assertion.
 \end{proof}
 
-\subsection{A Weight-Respecting Exchange}
+\subsection{A weight-respecting exchange}
 The classical set-pairs inequality of Bollob\'as~\cite{Bollobas}
 yields the following sharp deficient-hyperplane bound.
 
@@ -359,7 +359,7 @@ Let $F'\subseteq B'\cap V$ have size at most $k$. If $y\notin F'$, then $F'\subs
 is an allowed failure of $B$ of the same size as $F'$. Its survivor is exactly $B'\setminus F'$, which therefore spans. The cardinality and weight assertions follow from the choice of $y$.
 \end{proof}
 
-\subsection{Recursive Construction of an Optimum-Preserving Core}
+\subsection{Recursive construction of an optimum-preserving core}
 For a loop-free set $A$ of a single failure status, define $\Core(A)$ by the following procedure. Every scan uses a fixed total ordering that refines nondecreasing weight.
 \begin{enumerate}[label=\arabic*.,leftmargin=*]
 \item If $A=\varnothing$, return $\varnothing$. Set $h=\rk(A)$. If $|A|\leq t_h$, return $A$.
@@ -450,7 +450,7 @@ For general state digraphs, additional source SCC constraints are necessary. The
 
 
 \Needspace{14\baselineskip}
-\section{Exact Parameterized Optimization with Source Quotas}
+\section{Exact parameterized optimization with source quotas}
 \label{sec:quota-fpt}
 
 On a general state digraph, spanning must be combined with source-SCC
