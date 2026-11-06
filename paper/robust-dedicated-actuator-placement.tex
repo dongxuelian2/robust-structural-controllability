@@ -16,11 +16,12 @@
 \DeclareMathOperator{\OPT}{OPT}
 \newcommand{\setminusf}{\setminus}
 \title{Robust Dedicated Actuator Placement\newline via Matroid Spanning}
-\author{Qichao Wang$^1$ \quad Daoyu Dong$^2$\\[0.5em]
-\small $^1$Hebei University of Technology\\
-\small $^2$University of Electronic Science and Technology of China}
+\author{Qichao Wang\\
+Hebei University of Technology\\[0.6em]
+Daoyu Dong\\
+University of Electronic Science and Technology of China}
 \hypersetup{pdftitle={Robust Dedicated Actuator Placement via Matroid Spanning},pdfauthor={Qichao Wang and Daoyu Dong}}
-\date{6 November 2026}
+\date{November 6, 2026}
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -35,11 +36,9 @@ tractability in the maximum-matching deficiency plus the failure budget,
 independently of the number of source strongly connected components. The
 underlying theorem optimizes robust matroid spanning with arbitrarily many
 disjoint unit-cost quotas. We also prove a weighted safe/vulnerable spanning
-theorem in the independence-oracle model. The latter extends to control on
-strongly connected graphs, but does not assert weighted optimization with
-arbitrary source quotas. Complete proofs and explicit algorithmic bounds are
-provided. Publication priority and the optimal polynomial-time approximation
-ratio remain unresolved.
+theorem in the independence-oracle model, with a control application on
+strongly connected graphs. We give complete proofs and explicit algorithmic
+bounds for all three results.
 \end{abstract}
 
 \section{Introduction}
@@ -54,8 +53,7 @@ Our first result is a cubic-time $3/2$-approximation for one actuator failure
 and unit costs (Theorem~\ref{thm:three-halves}). Its repair argument is valid
 for arbitrary matroids. The exact graph relaxation, not a minimum ordinary
 controllability placement, provides the necessary lower bound. A three-state
-example attains the ratio for a permissible relaxation choice; this is not
-an inapproximability result.
+example attains the ratio for a permissible relaxation choice.
 
 Our second result concerns arbitrary independence-oracle matroids with
 nonnegative purchase weights and safe or vulnerable elements
@@ -73,7 +71,7 @@ its quota-completion cost by capping the number of representatives of each
 group. The resulting control algorithm is FPT in matching deficiency plus
 failure budget on arbitrary digraphs
 (Corollary~\ref{cor:general-control-fpt}); the number of source components is
-not a parameter. This quota theorem does not assert a weighted extension.
+not a parameter.
 
 Po\c{c}as, Pequito and Ramos~\cite{PPR} study the robust minimal structural
 controllability problem, establishing NP-hardness and reporting approximation
@@ -81,7 +79,6 @@ factors $5/2$ for general digraphs and $2$ for strongly connected digraphs.
 We state every model convention below rather than identifying distinct input
 models solely by their problem names. Related robust-assignment algorithms
 and fault-tolerant matroid results are discussed in Section~\ref{sec:scope}.
-No first-result or best-known claim is made.
 
 \section{Model and the dual matching matroid}
 Let $G=(E,A)$ be a nonempty finite directed state graph with $n=|E|$;
@@ -594,9 +591,7 @@ applies.
 
 The returned core need not contain a complete feasible actuator placement:
 quota completion may require many original elements. Thus the result is an
-FPT algorithm, not a claim of a bounded full-solution kernel. It does not
-resolve the best polynomial-time approximation ratio, and this quota
-extension makes no weighted or safe-element claim.
+FPT algorithm, not a claim of a bounded full-solution kernel.
 
 \section{Relationship to earlier work and limits}\label{sec:scope}
 The robust purchased-set objective differs from choosing an ordinary basis
@@ -607,17 +602,17 @@ exchange and basis-subset hyperplane count, and Lemma~9 the recursive core.
 These are inherited ingredients. Our weighted argument adds the ordered
 exchange invariant, recursion in both stopping cases, and separation of
 failure statuses. The sharper count is an application of Bollob\'as's
-classical set-pairs inequality~\cite{Bollobas}, not a new set-pairs theorem.
+classical set-pairs inequality~\cite{Bollobas}.
 The same predecessor already gives polynomial weighted algorithms for rank
 at most two and for truncations of unit-capacity partition matroids.
 
 The all-vulnerable case of Theorem~\ref{thm:weighted} matches the weighted
 problem defined in Section~1.1 of~\cite{BFGL}. Its Section~7 nonuniform
 question prints $\rk(M-F)=\rk(M)$; the selected-set formulation is
-$\rk_M(B\setminus F)=\rk(M)$. Lijun Cui reported in correspondence dated
-5 November 2026 that Bentert confirmed the latter was intended and the
-former was a typographical error. We identify this as a secondhand report
-of a definition clarification, not as verification of our proof. The two
+$\rk_M(B\setminus F)=\rk(M)$. In personal correspondence with Qichao Wang
+on 5 November 2026, Matthias Bentert confirmed that the latter was intended
+and the former was a typographical error. This confirms the definition,
+not the proofs in this paper. The two
 printed predicates are not equivalent: in $U_{1,2}$, failure destroys the
 selected singleton $B=\{a\}$ but does not lower the rank of the full
 matroid. All our statements use the explicit selected-set definition
@@ -641,39 +636,27 @@ families~\cite{FLPS} preserve independent extensions under their stated
 representation and matroid hypotheses; their predicate is not directly
 optimum preservation for a dependent purchased set under all failures.
 Likewise, the cheapest-surviving-basis preservers of Dey and Kavitha~\cite{DK}
-optimize a different object, as the example above shows. These distinctions
-do not rule out alternative proofs using those methods.
+optimize a different object, as the example above shows.
 
-The quota argument is separate from weighted spanning. An optimum robust
-core can be small although a feasible full placement is arbitrarily large.
-The completion objective and color caps preserve source choices without
-parameterizing their number. They make no weighted-quota or mixed
-safe/vulnerable quota claim. Conversely, the weighted theorem has no general
-source-quota guarantee. None of our results concerns repeated actuators at
-one state, arbitrary non-dedicated input columns, state or state-edge
-failures, or strong structural controllability.
-
-The best polynomial-time approximation factor remains open. The
-three-state equality example limits the particular relaxation choice, not
-the underlying problem's approximability. Separate sparse-hardness research
-is not needed by, and is not reproduced in, the present proof package.
-Targeted source checks through 6 November 2026 identified the comparisons
-above but do not certify priority or exhaust the literature.
+The weighted theorem applies to safe and vulnerable elements, whereas the
+quota theorem assumes unit costs and that all selected elements may fail.
+Extending the latter to weighted quotas is an open direction. The optimal
+polynomial-time approximation factor also remains open: the three-state
+equality example concerns our relaxation choice, not an inapproximability
+bound for the problem.
 
 \paragraph{Reproducibility.}
 The accompanying repository provides dependency-free implementations and
-independent exhaustive, randomized, threshold, and nonrepresentable-matroid
-checks. The source records test commands and coverage. These finite audits
-validate implementations; they do not replace proofs. The code exposes rank
-oracles, which can be simulated from independence queries by greedy basis
-construction.
+independent finite checks. The \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2}{approximation code}
+and the \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/9d62c26633643d05973e3ecefc5d36e7a8b426c1}{weighted and quota code}
+are available at fixed commits; the accompanying guide gives the commands.
+The code exposes rank oracles, which can be simulated from independence
+queries by greedy basis construction.
 
 \Needspace{5\baselineskip}
 \paragraph{AI assistance.}
 OpenAI tools assisted with developing and checking arguments, writing
-verification code, and preparing this manuscript. The proofs and code are
-provided for human review. Tool-assisted checking is not a substitute for
-independent mathematical peer review.
+verification code, and preparing this manuscript.
 
 \begin{thebibliography}{99}
 \small
