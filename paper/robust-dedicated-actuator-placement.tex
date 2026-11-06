@@ -462,17 +462,17 @@ and costs one.
 \begin{theorem}\label{thm:quota-fpt}
 Let $M$ be a rank-$d$ matroid on $E$, given by an independence oracle, and let
 $S_1,\ldots,S_s$ be pairwise disjoint subsets of $E$. For $k\ge0$, a
-minimum-cardinality set $D$ satisfying
+minimum-cardinality set $B$ satisfying
 \[
- \rk_M(D\setminus F)=d\quad(F\subseteq D,\ |F|\le k),
- \qquad |D\cap S_i|\ge k+1\quad(1\le i\le s)
+ \rk_M(B\setminus F)=d\quad(F\subseteq B,\ |F|\le k),
+ \qquad |B\cap S_i|\ge k+1\quad(1\le i\le s)
 \]
 can be found, or infeasibility certified, in $f(d,k)$ times a polynomial
 in the input size and oracle cost. The parameter does not include $s$.
 \end{theorem}
 
-Set $b=k+1$, $G_0=E\setminus\bigcup_i S_i$, and $q=bd$. An undersized
-group makes the instance infeasible. If $d=0$, choosing $b$ elements from
+Set $\beta=k+1$, $G_0=E\setminus\bigcup_i S_i$, and $q=\beta d$. An undersized
+group makes the instance infeasible. If $d=0$, choosing $\beta$ elements from
 each group is optimal. Assume henceforth that $d\ge1$.
 
 By Lemma~\ref{lem:small}, every robust spanning set contains a robust spanning subset of size at most
@@ -482,9 +482,9 @@ avoids any $k$ failures. The union of the layers therefore remains spanning.
 This small core contains no loops, although loops remain available for
 quota completion. For a core $C$ define
 \[
- \phi(C)=|C\cap G_0|+\sum_{i=1}^s\max\{0,|C\cap S_i|-b\}.
+ \phi(C)=|C\cap G_0|+\sum_{i=1}^s\max\{0,|C\cap S_i|-\beta\}.
 \]
-Its cheapest quota completion has cardinality $bs+\phi(C)$ and remains
+Its cheapest quota completion has cardinality $\beta s+\phi(C)$ and remains
 robust. Conversely, a small core inside an optimum placement has completion
 cost no greater than that optimum. It suffices, therefore, to minimize
 $\phi$ over robust spanning sets of size at most $q$.
@@ -496,7 +496,7 @@ whereas the robust optimum $\{c,d\}$ has size two. The following color
 argument retains the necessary group choices.
 
 \paragraph{Exchange candidates.}
-For this section use the conservative count $H=\binom{q-1}{d-1}$, matching the quota implementation. Lemma~\ref{lem:hyperplanes} also permits the smaller count $\binom{d+k-1}{k}$, but that refinement is not needed for FPT. Let $A$ be a loopless rank-$h$ subset and let
+Set $H=\binom{d+k-1}{k}$ as in Lemma~\ref{lem:hyperplanes}. Let $A$ be a loopless rank-$h$ subset and let
 $Z\subseteq A$ be $h$-uniform: all of its subsets of size at most $h$ are
 independent. Assume $|Z|\ge h$. For a robust set $B$ of size at most $q$
 and $x\in(B\cap A)\setminus Z$, write $Y=B\setminus\{x\}$.
@@ -543,7 +543,7 @@ exchange candidate, since at most $c_h-1$ are forbidden by the preceding
 count. The exchange preserves all color counts, and hence $\phi$.
 If $x$ was unscanned, the total threshold was reached. With
 $Y=B\setminus\{x\}$, forbid $G_0$ and all groups satisfying
-$|Y\cap S_i|\ge b$. There are at most $q$ forbidden colors, since
+$|Y\cap S_i|\ge\beta$. There are at most $q$ forbidden colors, since
 $|Y|\le q-1$ and $b\ge1$. They contain at most $qc_h$ points of $Z$,
 leaving at least $c_h$ candidates. A valid exchange therefore exists in
 an unsaturated actual group. Its insertion has zero marginal $\phi$,
