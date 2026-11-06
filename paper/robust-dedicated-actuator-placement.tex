@@ -13,7 +13,7 @@
 \DeclareMathOperator{\rk}{rank}
 \DeclareMathOperator{\cl}{cl}
 \DeclareMathOperator{\Core}{Core}
-\DeclareMathOperator{\OPT}{OPT}
+\newcommand{\OPT}{\mathrm{OPT}}
 \newcommand{\setminusf}{\setminus}
 \title{Robust Dedicated Actuator Placement\newline via Matroid Spanning}
 \author{Qichao Wang\\
@@ -37,8 +37,7 @@ independently of the number of source strongly connected components. The
 underlying theorem optimizes robust matroid spanning with arbitrarily many
 disjoint unit-cost quotas. We also prove a weighted safe/vulnerable spanning
 theorem in the independence-oracle model, with a control application on
-strongly connected graphs. We give complete proofs and explicit algorithmic
-bounds for all three results.
+strongly connected graphs. 
 \end{abstract}
 
 \section{Introduction}
@@ -76,20 +75,19 @@ not a parameter.
 Po\c{c}as, Pequito and Ramos~\cite{PPR} study the robust minimal structural
 controllability problem, establishing NP-hardness and reporting approximation
 factors $5/2$ for general digraphs and $2$ for strongly connected digraphs.
-We state every model convention below rather than identifying distinct input
-models solely by their problem names. Related robust-assignment algorithms
-and fault-tolerant matroid results are discussed in Section~\ref{sec:scope}.
+We specify the actuator-failure conventions in Section~2 and discuss
+related robust-assignment and fault-tolerant matroid algorithms in
+Section~\ref{sec:scope}.
 
 \section{Model and the dual matching matroid}
-Let $G=(E,A)$ be a nonempty finite directed state graph with $n=|E|$;
+Let $G=(E,\mathcal A)$ be a nonempty finite directed state graph with $n=|E|$;
 self-loops are allowed. Each prescribed nonzero entry of the state and input
 matrices is a separate free parameter. Structural controllability means that
 a controllable numerical realization exists, equivalently that almost every
-realization is controllable. It is not strong structural controllability.
-A placement $P\subseteq E$ installs one dedicated input at each selected
-state, at most one per state. Failure removes that input only. It does not
-remove its state vertex or any state edge. There are no unpurchased standby
-actuators available after a failure.
+realization is controllable. A placement $P\subseteq E$ installs one
+dedicated input at each selected state, at most one per state. An actuator
+failure removes the installed input while the state vertices and arcs
+remain intact; the placement is fixed before failures occur.
 
 Write $S_1,\ldots,S_s$ for the source strongly connected components (SCCs),
 those having no entering state edge from another SCC. Form the state
@@ -176,7 +174,7 @@ $b$. It meets $P$ exactly in $\{b\}$.
 \begin{lemma}\label{lem:union-rank}
 For every $R\subseteq D$,
 \[
- \rk\left(E\setminus\bigcup_{b\in R}C_b\right)=d-|R|.
+ \rk\Bigl(E\setminus\bigcup_{b\in R}C_b\Bigr)=d-|R|.
 \]
 \end{lemma}
 \begin{proof}
@@ -272,18 +270,15 @@ $n$ alternating searches also cost $O(n^3)$. For each external state,
 connect all pairs of critical states it repairs, storing a witness for each
 edge. This clique construction costs $O(n^3)$. A maximum general-graph
 matching is computable in $O(n^3)$ operations by a blossom algorithm
-\cite{LP}; a maximal matching is insufficient. All structures require
-$O(n^2)$ space. These are combinatorial operation bounds; the reference
-Python bitmask implementation has the usual additional integer bit costs.
+\cite{LP}; a maximal matching is insufficient. All structures require $O(n^2)$ space.
 \end{proof}
 
 For the bidirected three-state star with center $a$ and leaves $b,c$, the
 relaxation can choose $P=\{a,c\}$. Its one critical state is $c$, and the
 only external repair is $b$. The algorithm returns all three states, while
 $\{b,c\}$ is robust. Thus the ratio $3/2$ is attained for this relaxation
-choice. Choosing the optimum robust pair already at the relaxation stage
-avoids the example. It does not rule out improved algorithms or establish
-$3/2$-hardness.
+choice. Choosing the optimum robust pair at the relaxation stage avoids this
+worst case.
 
 \section{Weighted robust matroid spanning}
 We now leave the unit-cost control model and state an abstract theorem.
@@ -301,13 +296,13 @@ selected set, not survival of the whole ambient matroid.
 \begin{theorem}\label{thm:weighted}\label{thm:main}
 An optimum resilient purchased set can be computed, or infeasibility
 reported, in
-$f(r,k)\operatorname{poly}(n,L)$ time and oracle calls, where $L$ is the
+$f(r,k)\operatorname{poly}(n,\ell)$ time and oracle calls, where $\ell$ is the
 input bit length and independence queries have unit cost. For $r\ge2$,
 writing $q=(k+1)r$, a bound is
 \[
- 2^{O(qr^2(r+k))}\operatorname{poly}(n,L),
+ 2^{O(qr^2(r+k))}\operatorname{poly}(n,\ell),
 \]
-hence $2^{O((r+k)^5)}\operatorname{poly}(n,L)$. The cases $r\le1$ or
+hence $2^{O((r+k)^5)}\operatorname{poly}(n,\ell)$. The cases $r\le1$ or
 $k=0$ are polynomial-time solvable.
 \end{theorem}
 The retained ground set has parameter-bounded cardinality and keeps access
@@ -422,7 +417,7 @@ For a convenient explicit bound put $T=t_r$ and $N=2rT^{(r-1)^2}$. Each of the t
 
 Finally enumerate all $B\subseteq W$ with $|B|\leq q$, and for each enumerate all allowed failure sets and compute its surviving ranks greedily. There are at most $(NT+1)^q$ candidates and at most $2^q$ failures per candidate. Choose a feasible candidate of minimum total weight. If there is none, optimum preservation proves infeasibility. Exact weight sums and comparisons have polynomial bit cost in the original weight encoding.
 
-For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,L)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,L)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,L)$. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
+For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,\ell)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,\ell)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
 
 If $k=0$, ordinary minimum-weight-basis greedy is optimal. If $r=1$, an optimum consists of either one cheapest safe nonloop element or $k+1$ cheapest vulnerable nonloop elements, choosing the cheaper available option. These observations also handle large $k$ without a special feasibility assumption. Nonnegative rational weights can be handled by exact comparisons and sums with polynomial bit complexity; the accompanying implementation accepts integers and exposes a rank-oracle interface, which is simulated from an independence oracle by the greedy procedure described above.
 
