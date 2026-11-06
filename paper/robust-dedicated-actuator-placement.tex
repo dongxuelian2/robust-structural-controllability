@@ -501,9 +501,7 @@ $Z\subseteq A$ be $h$-uniform: all of its subsets of size at most $h$ are
 independent. Assume $|Z|\ge h$. For a robust set $B$ of size at most $q$
 and $x\in(B\cap A)\setminus Z$, write $Y=B\setminus\{x\}$.
 Whenever $\rk_M(Y\setminus F)<d$ for $F\subseteq Y$, $|F|\le k$,
-the closure of $Y\setminus F$ is a hyperplane excluding $x$. There are
-at most $H$ such hyperplanes, since each has a $(d-1)$-element basis in
-$Y$. Each contains at most $h-1$ points of $Z$; otherwise it would contain
+the closure of $Y\setminus F$ is a hyperplane excluding $x$. By Lemma~\ref{lem:hyperplanes}, there are at most $H$ such hyperplanes. Each contains at most $h-1$ points of $Z$; otherwise it would contain
 $A$ and hence $x$.
 Thus at most $(h-1)H+q-1$ points of $Z$ lie either in a deficient
 hyperplane or in $Y$. Every other $y$ gives a robust exchange
@@ -544,7 +542,7 @@ count. The exchange preserves all color counts, and hence $\phi$.
 If $x$ was unscanned, the total threshold was reached. With
 $Y=B\setminus\{x\}$, forbid $G_0$ and all groups satisfying
 $|Y\cap S_i|\ge\beta$. There are at most $q$ forbidden colors, since
-$|Y|\le q-1$ and $b\ge1$. They contain at most $qc_h$ points of $Z$,
+$|Y|\le q-1$ and $\beta\ge1$. They contain at most $qc_h$ points of $Z$,
 leaving at least $c_h$ candidates. A valid exchange therefore exists in
 an unsaturated actual group. Its insertion has zero marginal $\phi$,
 while deletion of $x$ cannot increase $\phi$.
