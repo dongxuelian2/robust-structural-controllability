@@ -305,11 +305,13 @@ writing $q=(k+1)r$, a bound is
 hence $2^{O((r+k)^5)}\operatorname{poly}(n,\ell)$. The cases $r\le1$ or
 $k=0$ are polynomial-time solvable.
 \end{theorem}
-The retained ground set has parameter-bounded cardinality and keeps access
-to the original oracle; this is not a polynomial-size encoded-kernel claim.
-
 \subsection{Matroid preliminaries and a small optimum}
-Loops can be discarded. Removing them from a resilient set preserves resilience, and their nonnegative weights cannot make this removal costly. If $r=0$, the empty set is optimal. Henceforth assume $r\geq1$ and work on the loop-free restriction. Set
+Loops can be discarded because their removal preserves resilience and
+cannot increase nonnegative purchase cost. If $r=0$, the empty set is
+optimal. If $k=0$, a minimum-weight basis is optimal by matroid greedy.
+For $r=1$, choose the cheaper feasible option between a cheapest safe
+nonloop and the $k+1$ cheapest vulnerable nonloops. Henceforth assume
+$r\geq2$ and $k\geq1$, and work on the loop-free restriction. Set
 \begin{equation}\label{eq:parameters}
  q=(k+1)r,\qquad H=\binom{r+k-1}{k},\qquad t_h=(h-1)H+q\quad(1\leq h\leq r).
 \end{equation}
@@ -329,7 +331,7 @@ Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus 
 \end{proof}
 
 \subsection{A weight respecting exchange}
-We first sharpen the deficient-hyperplane count using the classical set-pairs inequality of Bollob\'as~\cite{Bollobas}. The short proof is included; no representation or bound on the size of $Y$ is needed.
+We first sharpen the deficient-hyperplane count using the classical set-pairs inequality of Bollob\'as~\cite{Bollobas}. We use the following bound.
 
 \begin{lemma}\label{lem:hyperplanes}
 For any $Y\subseteq E$, at most $\binom{r+k-1}{k}$ distinct hyperplanes can have the form $\cl(Y\setminus F)$ with $F\subseteq Y$ and $|F|\leq k$. This count is sharp.
@@ -341,9 +343,7 @@ In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that e
 \[
  \sum_i\binom{r-1+|D_i|}{r-1}^{-1}\leq1.
 \]
-Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. The argument includes $r=1$ and $k=0$, when there can be at most one such hyperplane.
-
-For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. Thus equality holds even for the deficient hyperplanes needed below. This does not assert sharpness of the full core threshold $t_h$.
+Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. Thus equality holds even for the deficient hyperplanes needed below.
 \end{proof}
 
 Call $Z$ \emph{$h$-uniform} if $\rk(Z)=h$ and every $h$-element subset of $Z$ is independent. Such a set has at least $h$ elements, and every subset of size at most $h$ is independent. A set has a single failure status if it lies entirely in $V$ or entirely in $E\setminus V$.
@@ -367,12 +367,10 @@ Let $F'\subseteq B'\cap V$ have size at most $k$. If $y\notin F'$, then $F'\subs
 is an allowed failure of $B$ of the same size as $F'$. Its survivor is exactly $B'\setminus F'$, which therefore spans. The cardinality and weight assertions follow from the choice of $y$.
 \end{proof}
 
-The argument includes $r=1$, when a deficient hyperplane has rank zero and its basis is empty. It does not assume distinct weights, positive weights, or representability.
-
 \subsection{Recursive construction of an optimum preserving core}
 For a loop-free set $A$ of a single failure status, define $\Core(A)$ by the following procedure. Every scan uses a fixed total ordering that refines nondecreasing weight.
 \begin{enumerate}[label=\arabic*.,leftmargin=*]
-\item If $A=\varnothing$, return $\varnothing$. Let $h=\rk(A)$. If $h=1$, return the $q$ cheapest elements of $A$, or all of $A$ if it has fewer. If $|A|\leq t_h$, return $A$.
+\item If $A=\varnothing$, return $\varnothing$. Set $h=\rk(A)$. If $|A|\leq t_h$, return $A$.
 \item Scan the elements of $A$ in order, initially with $Z=\varnothing$. Accept an element $x$ precisely when every subset of $Z\cup\{x\}$ of size at most $h$ is independent. Stop when $|Z|=t_h$ or all elements have been scanned.
 \item For every $T\in\binom{Z}{h-1}$, put $A_T=A\cap\cl(T)$ and recursively compute $\Core(A_T)$. Return
 \[
@@ -391,7 +389,11 @@ For every resilient $B$ with $|B|\leq q$ and every single-status loop-free set $
 \]
 \end{lemma}
 \begin{proof}
-Induct on $h=\rk(A)$. Empty domains and a return of all of $A$ require no change. If $h=1$ and $|A|>q$, an element $x$ of $B\cap A$ outside the $q$ cheapest elements can be replaced by an unused retained element $y$ of no larger weight. Nonloop elements of a rank-one domain are parallel. When $y$ survives, substitution preserves rank; when $y$ fails, it and $x$ are both vulnerable, and the failure mapping in Lemma~\ref{lem:exchange} applies. Repeating gives the claim. Equivalently, use Lemma~\ref{lem:exchange} with $h=1$ and $|Z|=q$.
+Induct on $h=\rk(A)$. Empty domains and a return of all of $A$ require no change. For $h=1$, every scanned nonloop is accepted, so the threshold scan
+retains the $q$ lightest elements. Lemma~\ref{lem:exchange} replaces any
+selected element outside $Z$ by a retained element of no greater weight;
+the sole child domain is $A\cap\cl(\varnothing)=\varnothing$.
+This establishes the base case.
 
 Suppose $h>1$ and the scan is executed. Let $U=\bigcup_T A_T$. Every rejected scanned element $x$ belongs to $U$. Indeed, at rejection a dependent subset of $Z\cup\{x\}$ contains $x$ and at most $h-1$ retained elements. Those retained elements are independent, so they span $x$. Extend them to an $(h-1)$-subset of the final $Z$, obtaining a child containing $x$. Also $Z\subseteq U$, since $h>1$ and every element of $Z$ belongs to an $(h-1)$-subset of $Z$.
 
@@ -417,9 +419,10 @@ For a convenient explicit bound put $T=t_r$ and $N=2rT^{(r-1)^2}$. Each of the t
 
 Finally enumerate all $B\subseteq W$ with $|B|\leq q$, and for each enumerate all allowed failure sets and compute its surviving ranks greedily. There are at most $(NT+1)^q$ candidates and at most $2^q$ failures per candidate. Choose a feasible candidate of minimum total weight. If there is none, optimum preservation proves infeasibility. Exact weight sums and comparisons have polynomial bit cost in the original weight encoding.
 
-For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,\ell)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,\ell)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$. There is no enumeration with exponent $r$ on $n$, and no pseudopolynomial dependence on weight values.
+For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2 T=O(p)$. Hence $NT=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,\ell)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,\ell)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $T=O_k(r^{k+1})$, $NT=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$.
 
-If $k=0$, ordinary minimum-weight-basis greedy is optimal. If $r=1$, an optimum consists of either one cheapest safe nonloop element or $k+1$ cheapest vulnerable nonloop elements, choosing the cheaper available option. These observations also handle large $k$ without a special feasibility assumption. Nonnegative rational weights can be handled by exact comparisons and sums with polynomial bit complexity; the accompanying implementation accepts integers and exposes a rank-oracle interface, which is simulated from an independence oracle by the greedy procedure described above.
+Nonnegative rational weights can also be handled by exact comparisons
+and sums of polynomial bit complexity.
 
 \subsection{Why simpler weighted reductions do not suffice}
 \paragraph{Stopping at a large uniform set.}
