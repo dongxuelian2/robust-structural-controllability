@@ -11,9 +11,12 @@ can be found in f(d,k) times a polynomial in the input and oracle cost. The para
 
 Check first that |S_i|>=k+1 for every i; otherwise the instance is infeasible. When d=0, taking any k+1 elements of each S_i is optimal. Henceforth d>=1. Set b=k+1, q=bd, and
 
-    H=binom(q-1,d-1).
+    H=binom(d+k-1,k).
 
-The sharper critical-hyperplane bound, if established separately, may replace H; it is unnecessary here.
+This follows from the Bollobas set-pairs inequality. For each deficient
+hyperplane P_i=cl(Y-F_i), choose a (d-1)-element basis A_i in Y intersect P_i,
+and let D_i=Y minus P_i, where |D_i|<=k. Distinct hyperplanes yield
+cross-intersecting pairs (A_i,D_i), giving at most binom(d+k-1,k) choices.
 
 ## Robust cores and the completion objective
 
