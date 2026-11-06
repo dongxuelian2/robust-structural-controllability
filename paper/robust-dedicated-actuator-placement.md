@@ -1,6 +1,6 @@
 # Robust dedicated actuator placement manuscript
 
-**Editorial revision:** The LaTeX source includes the latest prose, notation, and proof edits. The checked-in PDF predates those edits; rebuild it with the two commands below before submission.
+**Final manuscript:** The LaTeX source and checked-in PDF reflect the latest reviewed editorial revision.
 
 [PDF](robust-dedicated-actuator-placement.pdf) · [LaTeX](robust-dedicated-actuator-placement.tex)
 
