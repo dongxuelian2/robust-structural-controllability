@@ -609,12 +609,10 @@ problem defined in Section~1.1 of~\cite{BFGL}. Its Section~7 nonuniform
 question prints $\rk(M-F)=\rk(M)$; the selected-set formulation is
 $\rk_M(B\setminus F)=\rk(M)$. In personal correspondence with Qichao Wang
 on 5 November 2026, Matthias Bentert confirmed that the latter was intended
-and the former was a typographical error. This confirms the definition,
-not the proofs in this paper. The two
-printed predicates are not equivalent: in $U_{1,2}$, failure destroys the
-selected singleton $B=\{a\}$ but does not lower the rank of the full
-matroid. All our statements use the explicit selected-set definition
-\eqref{eq:resilience}. This selected-object interpretation also appears in
+and the former was a typographical error. The distinction matters:
+in $U_{1,2}$, failure of the selected singleton $B=\{a\}$ leaves
+the ambient matroid rank unchanged while destroying the span of $B$.
+We use the selected-set formulation \eqref{eq:resilience} throughout. This selected-object interpretation also appears in
 flexible fault-tolerant network design~\cite{AHMS}.
 
 Adjiashvili, Bindewald and Michaels~\cite{ABMnodes}, Theorem~7, give a
@@ -646,10 +644,11 @@ bound for the problem.
 \paragraph{Reproducibility.}
 The accompanying repository provides dependency-free implementations and
 independent finite checks. The \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2}{approximation code}
-and the \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/9d62c26633643d05973e3ecefc5d36e7a8b426c1}{weighted and quota code}
+and the \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/674847455110de8eaa49674b26ab0f89838fee9f}{weighted and quota code}
 are available at fixed commits; the accompanying guide gives the commands.
-The code exposes rank oracles, which can be simulated from independence
-queries by greedy basis construction.
+Rank oracles can be obtained from independence queries by greedy basis
+construction. Python bit-mask operations incur their usual integer
+bit-complexity costs.
 
 \Needspace{5\baselineskip}
 \paragraph{AI assistance.}
