@@ -46,7 +46,7 @@ def quota_core(n, rank_oracle, groups, k, b=None, shortcut=True):
     stats = dict(nodes=0, threshold=0, color_rejected=0, rank_rejected=0)
     if d == 0:
         return frozenset(), stats
-    H = comb(q - 1, d - 1)
+    H = comb(d + k - 1, k)
 
     @lru_cache(None)
     def visit(a):
