@@ -1,6 +1,6 @@
 # Robust dedicated actuator placement manuscript
 
-**Final manuscript:** The LaTeX source and checked-in PDF reflect the latest reviewed editorial revision.
+**Preprint manuscript:** The LaTeX source and checked-in PDF reflect the current editorial revision. The preprint has not been submitted to a journal.
 
 [PDF](robust-dedicated-actuator-placement.pdf) · [LaTeX](robust-dedicated-actuator-placement.tex)
 
