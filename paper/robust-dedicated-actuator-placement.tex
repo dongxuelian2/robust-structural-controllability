@@ -121,7 +121,7 @@ Theorem~5 of their ICALP 2016 paper~\cite{ABMedges} gives $3/2$
 for uniform
 \emph{edge}-robust assignment, buying assignment edges and tolerating an
 edge failure via ear decompositions. That is a different purchase/failure
-model. The proof in Section~3 instead uses fundamental cocircuit unions,
+model. The proof in Section~\ref{sec:approx} instead uses fundamental cocircuit unions,
 maximum common-repair matching, and source quotas.
 
 Bulk-robust optimization~\cite{ASZ} charges purchased elements but supplies
@@ -452,7 +452,10 @@ For any $Y\subseteq E$, at most $\binom{r+k-1}{k}$ distinct hyperplanes can have
 \begin{proof}
 Write $\Pi_1,\ldots,\Pi_m$ for these distinct hyperplanes. Choose a basis $A_i\subseteq Y\cap \Pi_i$ of size $r-1$, and put $\Delta_i=Y\setminus \Pi_i$. Because $\Pi_i=\cl(Y\setminus F)$ for some permitted $F$, we have $\Delta_i\subseteq F$, so $|\Delta_i|\leq k$. Also $A_i\cap \Delta_i=\varnothing$. If $i\ne j$, then $A_i\cap \Delta_j\ne\varnothing$: otherwise $A_i\subseteq \Pi_j$ and hence $\Pi_i=\cl(A_i)\subseteq \Pi_j$, forcing equality of the two hyperplanes.
 
-In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $\Delta_i$. Its probability is $\binom{r-1+|\Delta_i|}{r-1}^{-1}$. These events are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap \Delta_j$ and $b\in A_j\cap \Delta_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively. Therefore
+In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $\Delta_i$. Its probability is $\binom{r-1+|\Delta_i|}{r-1}^{-1}$. These events
+are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap \Delta_j$ and $b\in A_j\cap \Delta_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively.
+Therefore
+\Needspace{5\baselineskip}
 \[
  \sum_i\binom{r-1+|\Delta_i|}{r-1}^{-1}\leq1.
 \]
@@ -525,7 +528,19 @@ Fix the final output $W_A=\Core(A)$ and process the children $A_1,\ldots,A_m$ in
 Initially $D(B)\subseteq U$. After all children have been processed it is empty, regardless of overlaps between children. All operations preserve cardinality, hence the bound $q$, and preserve resilience without increasing weight. This establishes the induction.
 \end{proof}
 
-Apply the construction separately to the vulnerable and safe nonloop elements, and let $W$ be the union of the two outputs. Their domains are disjoint. Lemmas~\ref{lem:small} and~\ref{lem:core} imply that $W$ contains an optimum of cardinality at most $q$ whenever the instance is feasible.
+Apply Algorithm~\ref{alg:weighted-core} separately to the vulnerable
+and safe nonloop elements, and let $W$ be the union of its outputs.
+
+\begin{proposition}\label{prop:optimum-core}
+Whenever the weighted resilient-spanning instance is feasible, $W$
+contains an optimum selected set of cardinality at most $q$.
+\end{proposition}
+\begin{proof}
+The two core domains are disjoint. Lemma~\ref{lem:small} gives an
+optimum of size at most $q$, and applying Lemma~\ref{lem:core} to
+each domain preserves resilience and total weight while moving every
+selected element into the corresponding output.
+\end{proof}
 
 \subsection{Size and running time}
 Put $N_0=0$, $N_1=q$, and, for $2\leq h\leq r$, define
@@ -554,7 +569,7 @@ $N\tau=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$
 The cases $r=0$, $r=1$, and $k=0$ follow from the preliminary algorithms.
 For $r\ge2$ and $k\ge1$, Lemma~\ref{lem:small} bounds the size of
 an optimum, Lemma~\ref{lem:exchange} permits weight-respecting
-replacements, and Lemma~\ref{lem:core} ensures that the output of
+replacements, and Proposition~\ref{prop:optimum-core} ensures that the output of
 Algorithm~\ref{alg:weighted-core} preserves an optimum. The enumeration
 just described therefore finds a minimum-weight resilient set, or
 certifies infeasibility. The derived bound gives the claimed
@@ -563,7 +578,8 @@ fixed-parameter running time and polynomial bit complexity.
 
 \subsection{Why simpler weighted reductions do not suffice}
 \begin{example}[Premature uniform-scan termination]\label{ex:uniform-stop}
-Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=2$, and $t_2=6$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. Its robust optimum is $101$, whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
+Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=2$, and $t_2=6$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. The minimum resilient cost within the retained uniform set is $101$,
+whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
 \end{example}
 
 \begin{example}[Ordinary-basis preservers]\label{ex:basis-preserver}
@@ -583,7 +599,7 @@ replace the optimum-preserving recursion above.
 \subsection{An application to dedicated-actuator placement}
 Consider a nonempty strongly connected state digraph with nonnegative
 actuator costs and specified safe or vulnerable locations. Keep the
-single-actuator-per-state and actuator-only failure conventions of Section~2.
+single-actuator-per-state and actuator-only failure conventions of Section~\ref{sec:model}.
 Its dual state matching matroid has rank equal to the deficiency $d$;
 Proposition~\ref{prop:control} supplies the matching interpretation.
 When only vulnerable actuators may fail, its rank condition is applied
@@ -659,10 +675,12 @@ Lemma~\ref{lem:exchange}, specialized to unit weights and all elements
 vulnerable, supplies a resilience-preserving same-cardinality exchange from any
 $h$-uniform candidate set of size at least $c_h$.
 Start with the nonloops $E^\circ=\{e:\rk_M(\{e\})=1\}$, regarding
-$G_0,S_1,\ldots,S_s$ as colors. On a rank-$h$ domain $A$, scan the domain, accepting elements into an
-$h$-uniform set $Z$ with at most $c_h$ accepted elements per color,
-stopping at $|Z|=\theta_h$ or exhaustion. If $h=1$, return $Z$; otherwise return $Z$ together with the
-recursively computed cores of
+$G_0,S_1,\ldots,S_s$ as colors. On a rank-$h$ domain $A$,
+scan its elements, accepting them into an $h$-uniform set $Z$
+with at most $c_h$ elements per color. Stop at
+$|Z|=\theta_h$ or when the scan is exhausted. If $h=1$,
+return $Z$; otherwise return $Z$ together with the recursively
+computed cores of
 \[
  A\cap\cl_M(Q),\qquad Q\in\tbinom{Z}{h-1}.
 \]
