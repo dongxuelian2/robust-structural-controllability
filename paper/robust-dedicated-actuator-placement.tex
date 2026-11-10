@@ -265,8 +265,8 @@ For every $R\subseteq D$,
 \]
 \end{lemma}
 \begin{proof}
-Choose a basis $B\subseteq P$. Every $b\in D$ belongs to $B$, and
-$B\setminus\{b\}\subseteq P\setminus\{b\}$ and both sets have
+Choose a basis $B\subseteq P$. Every $b\in D$ belongs to $B$.
+Since $B\setminus\{b\}\subseteq P\setminus\{b\}$ and both sets have
 rank $d-1$, their closures coincide. For nonempty $R$ we claim
 \[
  \bigcap_{b\in R}\cl(B\setminus\{b\})=\cl(B\setminus R).
@@ -411,11 +411,12 @@ An optimum resilient set can be computed, or infeasibility
 certified, in $f(r,k)\operatorname{poly}(n,\ell)$ time and
 independence-oracle calls, where $n=|E|$, $\ell$ is the input bit length,
 and each independence query has unit cost. For $r\ge2$,
-writing $q=(k+1)r$, one may take $f(r,k)$ to be bounded by
+writing $q=(k+1)r$, one may take
 \[
- 2^{O(qr^2(r+k))}\operatorname{poly}(n,\ell),
+ f(r,k)=2^{O(qr^2(r+k))},
 \]
-hence $2^{O((r+k)^5)}\operatorname{poly}(n,\ell)$. The cases $r\le1$ or
+hence the running time is at most
+$2^{O((r+k)^5)}\operatorname{poly}(n,\ell)$. The cases $r\le1$ or
 $k=0$ are polynomial-time solvable.
 \end{theorem}
 \subsection{Matroid preliminaries and a small optimum}
@@ -521,11 +522,14 @@ Suppose $h>1$ and the scan is executed. Let $U=\bigcup_J A_J$. Every rejected sc
 
 If the scan is exhausted, $A=U$. Otherwise each element of $A\setminus U$ is unscanned and is at least as expensive as every element of $Z$. Apply Lemma~\ref{lem:exchange} successively to the elements of $B\cap(A\setminus U)$. Each replacement lies in $Z\subseteq U$ and removes one selected element outside $U$. The resulting resilient set has its intersection with $A$ inside $U$, unchanged cardinality and outside-$A$ part, and no larger weight.
 
-Fix the final output $W_A=\Core(A)$ and process the children $A_1,\ldots,A_m$ in any order. Apply the induction hypothesis to each child and the current solution. For the current solution define $D(B)=(B\cap A)\setminus W_A$. Processing $A_i$ changes only elements in $A_i$ and leaves its selected elements in $\Core(A_i)\subseteq W_A$. Consequently,
+Fix the final output $W_A=\Core(A)$ and process the children $A_1,\ldots,A_m$ in any order. Apply the induction hypothesis to each child and the current solution. For the current solution define
+$\Psi(B)=(B\cap A)\setminus W_A$.
+Processing $A_i$ changes only elements in $A_i$ and leaves its
+selected elements in $\Core(A_i)\subseteq W_A$. Consequently,
 \[
- D(B_{\mathrm{new}})\subseteq D(B_{\mathrm{old}})\setminus A_i.
+ \Psi(B_{\mathrm{new}})\subseteq\Psi(B_{\mathrm{old}})\setminus A_i.
 \]
-Initially $D(B)\subseteq U$. After all children have been processed it is empty, regardless of overlaps between children. All operations preserve cardinality, hence the bound $q$, and preserve resilience without increasing weight. This establishes the induction.
+Initially $\Psi(B)\subseteq U$. After all children have been processed it is empty, regardless of overlaps between children. All operations preserve cardinality, hence the bound $q$, and preserve resilience without increasing weight. This establishes the induction.
 \end{proof}
 
 Apply Algorithm~\ref{alg:weighted-core} separately to the vulnerable
