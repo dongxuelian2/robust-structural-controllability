@@ -93,6 +93,47 @@ Section~\ref{sec:approx} gives the approximation algorithm;
 Sections~\ref{sec:weighted} and~\ref{sec:quota-fpt} develop the two exact
 parameterized algorithms; and Section~\ref{sec:conclusion} concludes.
 
+\section{Related work and model distinctions}\label{sec:scope}
+The robust purchased-set objective differs from choosing an ordinary basis
+after failures. Bentert et al.~\cite{BFGL} prove unweighted FPT in rank plus
+failure budget and explicitly pose the weighted question. In the ESA 2025 proceedings version of~\cite{BFGL},
+Proposition~6 gives the layered cardinality bound, Lemma~8 the uniform-set
+exchange and basis-subset hyperplane count, and Lemma~9 the recursive core.
+These are inherited ingredients. Our weighted argument adds the ordered
+exchange invariant, recursion in both stopping cases, and separation of
+failure statuses. The sharper count is an application of Bollob\'as's
+classical set-pairs inequality~\cite{Bollobas}.
+The same paper also gives polynomial weighted algorithms for rank
+at most two and for truncations of unit-capacity partition matroids.
+
+The all-vulnerable case of Theorem~\ref{thm:weighted} addresses the
+weighted selected-set problem posed in Section~1.1 of~\cite{BFGL}.
+Section~7 of its ESA proceedings version prints the condition
+$\rk(M-F)=\rk(M)$ in a separate formulation; that condition should
+be distinguished from $\rk_M(B\setminus F)=\rk(M)$, the selected-set
+condition used here and in related fault-tolerant design~\cite{AHMS}.
+We make no claim about the intended interpretation of the printed text.
+
+Theorem~7 of Adjiashvili, Bindewald, and Michaels~\cite{ABMnodes}
+gives a $7/4$-approximation for uniform-cardinality node-robust
+assignment. Their repair perspective anticipates the approach here.
+Theorem~5 of their ICALP 2016 paper~\cite{ABMedges} gives $3/2$
+for uniform
+\emph{edge}-robust assignment, buying assignment edges and tolerating an
+edge failure via ear decompositions. That is a different purchase/failure
+model. The proof in Section~3 instead uses fundamental cocircuit unions,
+maximum common-repair matching, and source quotas.
+
+Bulk-robust optimization~\cite{ASZ} charges purchased elements but supplies
+an explicit family of failure scenarios. Expanding all at most $k$ failures
+can require $n^{\Theta(k)}$ scenarios, so polynomial time in that expanded
+list does not establish the present FPT bound. Weighted representative
+families~\cite{FLPS} preserve independent extensions under their stated
+representation and matroid hypotheses; their predicate is not directly
+optimum preservation for a dependent purchased set under all failures.
+Likewise, the cheapest-surviving-basis preservers of Dey and Kavitha~\cite{DK}
+optimize a different object, as Example~\ref{ex:basis-preserver} shows.
+
 \section{Model and the dual matching matroid}\label{sec:model}
 Let $G=(E,\mathcal A)$ be a nonempty finite directed state graph with $n=|E|$;
 self-loops are allowed. Each prescribed nonzero entry of the state and input
@@ -683,75 +724,58 @@ source SCC. The latter sets are disjoint, so Theorem~\ref{thm:quota-fpt}
 applies.
 \end{proof}
 
-\section{Relationship to earlier work and limits}\label{sec:scope}
-The robust purchased-set objective differs from choosing an ordinary basis
-after failures. Bentert et al.~\cite{BFGL} prove unweighted FPT in rank plus
-failure budget and explicitly pose the weighted question. Their proceedings
-Proposition~6 gives the layered cardinality bound, Lemma~8 the uniform-set
-exchange and basis-subset hyperplane count, and Lemma~9 the recursive core.
-These are inherited ingredients. Our weighted argument adds the ordered
-exchange invariant, recursion in both stopping cases, and separation of
-failure statuses. The sharper count is an application of Bollob\'as's
-classical set-pairs inequality~\cite{Bollobas}.
-The same predecessor already gives polynomial weighted algorithms for rank
-at most two and for truncations of unit-capacity partition matroids.
+\section{Conclusion and open problems}\label{sec:conclusion}
+The one-failure unit-cost problem admits a cubic-time
+$3/2$-approximation on arbitrary state digraphs, while two independent
+core constructions give exact fixed-parameter algorithms: one for
+weighted resilient spanning with safe and vulnerable elements, and the
+other for unit-cost resilient spanning with an arbitrary number of
+disjoint source quotas. Proposition~\ref{prop:control} transfers the
+matroid results to dedicated-actuator placement under the specified
+failure semantics.
 
-The all-vulnerable case of Theorem~\ref{thm:weighted} addresses the
-weighted problem in Section~1.1 of~\cite{BFGL}. In personal
-correspondence with Qichao Wang (5 November 2026), Matthias Bentert
-confirmed that the condition $\rk(M-F)=\rk(M)$ printed in its Section~7
-was intended as $\rk_M(B\setminus F)=\rk(M)$, the selected-set
-formulation used here and in related fault-tolerant design~\cite{AHMS}.
+The weighted result permits mixed failure statuses but does not
+incorporate arbitrary source quotas; the quota result permits any
+number of groups but assumes unit costs and failures of all selected
+elements. Combining nonnegative weights, mixed failure statuses,
+and source quotas is open. The optimal polynomial-time approximation
+guarantee for general state digraphs also remains unresolved.
+Example~\ref{ex:star} demonstrates equality for one relaxation choice,
+without implying a hardness-of-approximation threshold.
 
-Adjiashvili, Bindewald and Michaels~\cite{ABMnodes}, Theorem~7, give a
-$7/4$-approximation for uniform cardinality node-robust assignment. Their
-repair perspective is a predecessor of the present approach. Their
-ICALP 2016 Theorem~5~\cite{ABMedges} already gives $3/2$ for uniform
-\emph{edge}-robust assignment, buying assignment edges and tolerating an
-edge failure via ear decompositions. That is a different purchase/failure
-model. The proof in Section~3 instead uses fundamental cocircuit unions,
-maximum common-repair matching, and source quotas.
-
-Bulk-robust optimization~\cite{ASZ} charges purchased elements but supplies
-an explicit family of failure scenarios. Expanding all at most $k$ failures
-can require $n^{\Theta(k)}$ scenarios, so polynomial time in that expanded
-list does not establish the present FPT bound. Weighted representative
-families~\cite{FLPS} preserve independent extensions under their stated
-representation and matroid hypotheses; their predicate is not directly
-optimum preservation for a dependent purchased set under all failures.
-Likewise, the cheapest-surviving-basis preservers of Dey and Kavitha~\cite{DK}
-optimize a different object, as the example above shows.
-
-The weighted theorem applies to safe and vulnerable elements, whereas the
-quota theorem assumes unit costs and that all selected elements may fail.
-Extending the latter to weighted quotas is an open direction. The optimal
-polynomial-time approximation factor also remains open: the three-state
-equality example concerns our relaxation choice, not an inapproximability
-bound for the problem.
-
+\Needspace{9\baselineskip}
 \paragraph{Code availability.}
-Implementations and verification scripts are available at
+Source code and verification scripts are publicly available at
 \url{https://github.com/dongxuelian2/robust-structural-controllability}.
-The \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2}{approximation}
-and \href{https://github.com/dongxuelian2/robust-structural-controllability/tree/674847455110de8eaa49674b26ab0f89838fee9f}{parameterized}
-implementations are linked to fixed source revisions.
+Reproducible versions of the
+\href{https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2}{approximation implementation}
+and the
+\href{https://github.com/dongxuelian2/robust-structural-controllability/tree/674847455110de8eaa49674b26ab0f89838fee9f}{parameterized implementation}
+are identified by the linked Git commit revisions. Licensing terms,
+if any, are those stated in the repository; no archival DOI is claimed.
 
-\Needspace{5\baselineskip}
-\paragraph{AI assistance.}
-OpenAI tools assisted with developing and checking arguments, writing
-verification code, and preparing this manuscript.
+\paragraph{Data availability.}
+No external empirical dataset is required for the mathematical results.
+Computational verification inputs are generated or documented by the
+publicly available scripts and source files cited above.
+
+\paragraph{AI assistance and author responsibility.}
+OpenAI-based language-model tools were used for editorial assistance,
+argument exploration and checking, and the preparation of verification
+code. The authors retain responsibility for the mathematical statements,
+the reproducibility of the code, and the final manuscript.
 
 \begin{thebibliography}{99}
 \footnotesize
 \setlength{\itemsep}{1pt}
 \raggedright
-\bibitem{ABMnodes} D. Adjiashvili, V. Bindewald, and D. Michaels.
-Robust Assignments with Vulnerable Nodes.
-\href{https://arxiv.org/abs/1703.06074}{\mbox{arXiv:1703.06074}}, 2017.
 \bibitem{ABMedges} D. Adjiashvili, V. Bindewald, and D. Michaels.
 Robust Assignments via Ear Decompositions and Randomized Rounding.
 In \emph{ICALP 2016}, LIPIcs 55, 71:1--71:14, 2016.
 \href{https://doi.org/10.4230/LIPIcs.ICALP.2016.71}{doi:10.4230/LIPIcs.ICALP.2016.71}.
+\bibitem{ABMnodes} D. Adjiashvili, V. Bindewald, and D. Michaels.
+Robust Assignments with Vulnerable Nodes.
+\href{https://arxiv.org/abs/1703.06074}{\mbox{arXiv:1703.06074}}, 2017.
 \bibitem{AHMS} D. Adjiashvili, F. Hommelsheim, M. M\"uhlenthaler, and O. Schaudt.
 Fault-Tolerant Edge-Disjoint $s$-$t$ \mbox{Paths} -- Beyond Uniform Faults.
 In \emph{SWAT 2022}, LIPIcs 227, 5:1--5:19, 2022.
@@ -777,8 +801,13 @@ Efficient Computation of Representative Families with Applications in
 Parameterized and Exact Algorithms.
 \emph{Journal of the ACM} 63(4), Article 29, 2016.
 \href{https://doi.org/10.1145/2886094}{doi:10.1145/2886094}.
+\bibitem{Gabow} H. N. Gabow.
+An Efficient Implementation of Edmonds' Algorithm for Maximum Matching
+on Graphs. \emph{Journal of the ACM} 23(2), 221--234, 1976.
+\href{https://doi.org/10.1145/321941.321942}{doi:10.1145/321941.321942}.
 \bibitem{Lin} C.-T. Lin. Structural controllability.
 \emph{IEEE Transactions on Automatic Control} 19(3), 201--208, 1974.
+\href{https://doi.org/10.1109/TAC.1974.1100557}{doi:10.1109/TAC.1974.1100557}.
 \bibitem{LP} L. Lov\'asz and M. D. Plummer.
 \emph{Matching Theory}. North-Holland, 1986.
 \bibitem{Oxley} J. Oxley. \emph{Matroid Theory}, second edition.
