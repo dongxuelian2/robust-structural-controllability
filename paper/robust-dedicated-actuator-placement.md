@@ -1,4 +1,4 @@
-# Robust dedicated actuator placement manuscript
+# Algorithms for Robust Dedicated Actuator Placement
 
 **Preprint manuscript:** The LaTeX source and checked-in PDF reflect the current editorial revision. The preprint has not been submitted to a journal.
 
