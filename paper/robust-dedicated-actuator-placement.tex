@@ -347,7 +347,7 @@ solution. Selecting the robust pair directly in the relaxation avoids
 this case.
 \end{example}
 
-\section{Weighted robust matroid spanning}
+\section{Weighted resilient matroid spanning}\label{sec:weighted}
 Let $M=(E,\mathcal I)$ be a rank-$r$ independence-oracle matroid,
 $V\subseteq E$ the vulnerable elements, $E\setminus V$ the safe elements,
 and $k\ge0$ the failure budget. A set $B$ is \emph{resilient} if
@@ -356,14 +356,21 @@ and $k\ge0$ the failure budget. A set $B$ is \emph{resilient} if
  \quad\text{for every }F\subseteq B\cap V,\quad |F|\le k.
 \end{equation}
 For nonnegative binary-encoded weights $w$, the objective is to
-minimize $w(B)=\sum_{e\in B}w(e)$.
+minimize $w(B)=\sum_{e\in B}w(e)$. Here resilience concerns the
+selected set $B$, including when some elements of $E$ remain unselected.
+
+\begin{problem}[Weighted resilient spanning]\label{prob:weighted}
+Given an independence-oracle matroid $M$, weights $w\ge0$, a vulnerable
+subset $V$, and budget $k$, find a minimum-weight resilient set or
+certify infeasibility.
+\end{problem}
 
 \begin{theorem}\label{thm:weighted}\label{thm:main}
-An optimum resilient purchased set can be computed, or infeasibility
-reported, in
-$f(r,k)\operatorname{poly}(n,\ell)$ time and oracle calls, where $\ell$ is the
-input bit length and independence queries have unit cost. For $r\ge2$,
-writing $q=(k+1)r$, a bound is
+An optimum resilient set can be computed, or infeasibility
+certified, in $f(r,k)\operatorname{poly}(n,\ell)$ time and
+independence-oracle calls, where $n=|E|$, $\ell$ is the input bit length,
+and each independence query has unit cost. For $r\ge2$,
+writing $q=(k+1)r$, one may take $f(r,k)$ to be bounded by
 \[
  2^{O(qr^2(r+k))}\operatorname{poly}(n,\ell),
 \]
@@ -373,7 +380,7 @@ $k=0$ are polynomial-time solvable.
 \subsection{Matroid preliminaries and a small optimum}
 Loops can be discarded because their removal preserves resilience and
 cannot increase nonnegative purchase cost. If $r=0$, the empty set is
-optimal. If $k=0$, a minimum-weight basis is optimal by matroid greedy.
+optimal. If $k=0$, a minimum-weight basis is optimal by the matroid greedy algorithm.
 For $r=1$, choose the cheaper feasible option between a cheapest safe
 nonloop and the $k+1$ cheapest vulnerable nonloops. Henceforth assume
 $r\geq2$ and $k\geq1$, and work on the loop-free restriction. Set
@@ -395,20 +402,20 @@ Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus 
 \end{proof}
 
 \subsection{A weight-respecting exchange}
-The classical set-pairs inequality of Bollob\'as~\cite{Bollobas}
-yields the following sharp deficient-hyperplane bound.
+The set-pairs inequality of Bollob\'as~\cite{Bollobas}
+yields the following sharp bound for deficient hyperplanes.
 
 \begin{lemma}\label{lem:hyperplanes}
 For any $Y\subseteq E$, at most $\binom{r+k-1}{k}$ distinct hyperplanes can have the form $\cl(Y\setminus F)$ with $F\subseteq Y$ and $|F|\leq k$. This count is sharp.
 \end{lemma}
 \begin{proof}
-Index these hyperplanes by $P_i$. Choose a basis $A_i\subseteq Y\cap P_i$ of size $r-1$, and put $D_i=Y\setminus P_i$. Because $P_i=\cl(Y\setminus F)$ for some permitted $F$, we have $D_i\subseteq F$, so $|D_i|\leq k$. Also $A_i\cap D_i=\varnothing$. If $i\ne j$, then $A_i\cap D_j\ne\varnothing$: otherwise $A_i\subseteq P_j$ and hence $P_i=\cl(A_i)\subseteq P_j$, forcing equality of the two hyperplanes.
+Write $\Pi_1,\ldots,\Pi_m$ for these distinct hyperplanes. Choose a basis $A_i\subseteq Y\cap \Pi_i$ of size $r-1$, and put $\Delta_i=Y\setminus \Pi_i$. Because $\Pi_i=\cl(Y\setminus F)$ for some permitted $F$, we have $\Delta_i\subseteq F$, so $|\Delta_i|\leq k$. Also $A_i\cap \Delta_i=\varnothing$. If $i\ne j$, then $A_i\cap \Delta_j\ne\varnothing$: otherwise $A_i\subseteq \Pi_j$ and hence $\Pi_i=\cl(A_i)\subseteq \Pi_j$, forcing equality of the two hyperplanes.
 
-In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $D_i$. Its probability is $\binom{r-1+|D_i|}{r-1}^{-1}$. These events are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap D_j$ and $b\in A_j\cap D_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively. Therefore
+In a uniformly random permutation of $Y$, let $\mathcal E_i$ be the event that every element of $A_i$ precedes every element of $\Delta_i$. Its probability is $\binom{r-1+|\Delta_i|}{r-1}^{-1}$. These events are pairwise disjoint. Indeed, for $i\ne j$ choose $a\in A_i\cap \Delta_j$ and $b\in A_j\cap \Delta_i$. The two events require $a$ before $b$ and $b$ before $a$, respectively. Therefore
 \[
- \sum_i\binom{r-1+|D_i|}{r-1}^{-1}\leq1.
+ \sum_i\binom{r-1+|\Delta_i|}{r-1}^{-1}\leq1.
 \]
-Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. Thus equality holds even for the deficient hyperplanes needed below.
+Each summand is at least $\binom{r+k-1}{r-1}^{-1}$, proving the bound. For sharpness take $M=U_{r,r+k}$, $B=E$, all elements vulnerable, and $Y=B\setminus\{x\}$. The set $B$ is resilient, and each $k$-subset of $Y$ leaves a distinct $(r-1)$-element hyperplane. This gives exactly $\binom{r+k-1}{k}$ distinct hyperplanes of the required form.
 \end{proof}
 
 Call $Z$ \emph{$h$-uniform} if $\rk(Z)=h$ and every $h$-element subset of $Z$ is independent. Such a set has at least $h$ elements, and every subset of size at most $h$ is independent. A set has a single failure status if it lies entirely in $V$ or entirely in $E\setminus V$.
@@ -433,17 +440,21 @@ is an allowed failure of $B$ of the same size as $F'$. Its survivor is exactly $
 \end{proof}
 
 \subsection{Recursive construction of an optimum-preserving core}
-For a loop-free set $A$ of a single failure status, define $\Core(A)$ by the following procedure. Every scan uses a fixed total ordering that refines nondecreasing weight.
+For a loop-free set $A$ of a single failure status, construct
+$\Core(A)$ by the following procedure. Every scan uses a fixed total
+ordering refining nondecreasing weight.
+\begin{algorithm}[Weight-ordered core $\Core(A)$]\label{alg:weighted-core}
 \begin{enumerate}[label=\arabic*.,leftmargin=*]
 \item If $A=\varnothing$, return $\varnothing$. Set $h=\rk(A)$. If $|A|\leq t_h$, return $A$.
 \item Scan the elements of $A$ in order, initially with $Z=\varnothing$. Accept an element $x$ precisely when every subset of $Z\cup\{x\}$ of size at most $h$ is independent. Stop when $|Z|=t_h$ or all elements have been scanned.
 \item If $h=1$, return $Z$. Otherwise, for every
-$T\in\tbinom{Z}{h-1}$, put $A_T=A\cap\cl(T)$ and recursively
-compute $\Core(A_T)$. Return
+$J\in\tbinom{Z}{h-1}$, put $A_J=A\cap\cl(J)$ and recursively
+compute $\Core(A_J)$. Return
 \[
- Z\ \cup\!\!\bigcup_{T\in\binom{Z}{h-1}}\Core(A_T).
+ Z\ \cup\!\!\bigcup_{J\in\binom{Z}{h-1}}\Core(A_J).
 \]
 \end{enumerate}
+\end{algorithm}
 The recursive step applies whether the scan reaches its threshold or
 exhausts $A$. The parameters $q,H$ remain fixed across recursive calls.
 
@@ -462,7 +473,7 @@ retains the $q$ lightest elements. Lemma~\ref{lem:exchange}
 replaces every selected element outside $Z$ at no greater weight,
 proving the base case.
 
-Suppose $h>1$ and the scan is executed. Let $U=\bigcup_T A_T$. Every rejected scanned element $x$ belongs to $U$. Indeed, at rejection a dependent subset of $Z\cup\{x\}$ contains $x$ and at most $h-1$ retained elements. Those retained elements are independent, so they span $x$. Extend them to an $(h-1)$-subset of the final $Z$, obtaining a child containing $x$. Also $Z\subseteq U$, since $h>1$ and every element of $Z$ belongs to an $(h-1)$-subset of $Z$.
+Suppose $h>1$ and the scan is executed. Let $U=\bigcup_J A_J$. Every rejected scanned element $x$ belongs to $U$. Indeed, at rejection a dependent subset of $Z\cup\{x\}$ contains $x$ and at most $h-1$ retained elements. Those retained elements are independent, so they span $x$. Extend them to an $(h-1)$-subset of the final $Z$, obtaining a child containing $x$. Also $Z\subseteq U$, since $h>1$ and every element of $Z$ belongs to an $(h-1)$-subset of $Z$.
 
 If the scan is exhausted, $A=U$. Otherwise each element of $A\setminus U$ is unscanned and is at least as expensive as every element of $Z$. Apply Lemma~\ref{lem:exchange} successively to the elements of $B\cap(A\setminus U)$. Each replacement lies in $Z\subseteq U$ and removes one selected element outside $U$. The resulting resilient set has its intersection with $A$ inside $U$, unchanged cardinality and outside-$A$ part, and no larger weight.
 
@@ -476,25 +487,38 @@ Initially $D(B)\subseteq U$. After all children have been processed it is empty,
 Apply the construction separately to the vulnerable and safe nonloop elements, and let $W$ be the union of the two outputs. Their domains are disjoint. Lemmas~\ref{lem:small} and~\ref{lem:core} imply that $W$ contains an optimum of cardinality at most $q$ whenever the instance is feasible.
 
 \subsection{Size and running time}
-Put $K_0=0$, $K_1=q$, and, for $2\leq h\leq r$, define
+Put $N_0=0$, $N_1=q$, and, for $2\leq h\leq r$, define
 \[
- K_h=t_h+\binom{t_h}{h-1}K_{h-1}.
+ N_h=t_h+\binom{t_h}{h-1}N_{h-1}.
 \]
-By induction, a rank-$h$ call returns at most $K_h$ elements. The sequence is nondecreasing; in particular $|W|\leq2K_r$, or $|W|\leq K_r$ if all elements are vulnerable.
+By induction, a rank-$h$ call returns at most $N_h$ elements. The sequence is nondecreasing; in particular $|W|\leq2N_r$, or $|W|\leq N_r$ if all elements are vulnerable.
 
 For an explicit bound put $\tau=t_r$ and $N=2r\tau^{(r-1)^2}$.
 Each of the two recursion trees has at most $r$ levels and branching
 at most $\tau^{r-1}$, giving at most $N$ nodes and $|W|\leq N\tau$.
 Each node uses $O(n(1+\tau^{r-1}))$ independence queries for the
 uniformity scan and $O(n\tau^{r-1})$ queries for its lower-rank
-closures. Rank computation, sorting, and bookkeeping incur polynomial
-input cost times a parameter-only factor.
+closures. Rank computation and sorting require polynomial input time at each
+node, with factors depending only on $r$ and $k$.
 
-Finally enumerate all $B\subseteq W$ with $|B|\leq q$, and for each enumerate all allowed failure sets and compute its surviving ranks greedily. There are at most $(N\tau+1)^q$ candidates and at most $2^q$
+The algorithm enumerates all $B\subseteq W$ with $|B|\leq q$; for
+each candidate it checks all allowed failures and computes the
+surviving ranks using the independence oracle. There are at most $(N\tau+1)^q$ candidates and at most $2^q$
 failures per candidate. Choose a feasible candidate of minimum total weight. If there is none, optimum preservation proves infeasibility. Exact weight sums and comparisons have polynomial bit cost in the original weight encoding.
 
 For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2\tau=O(p)$. Hence $N\tau=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,\ell)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,\ell)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $\tau=O_k(r^{k+1})$,
 $N\tau=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$.
+
+\begin{proof}[Proof of Theorem~\ref{thm:weighted}]
+The cases $r=0$, $r=1$, and $k=0$ follow from the preliminary algorithms.
+For $r\ge2$ and $k\ge1$, Lemma~\ref{lem:small} bounds the size of
+an optimum, Lemma~\ref{lem:exchange} permits weight-respecting
+replacements, and Lemma~\ref{lem:core} ensures that the output of
+Algorithm~\ref{alg:weighted-core} preserves an optimum. The enumeration
+just described therefore finds a minimum-weight resilient set, or
+certifies infeasibility. The derived bound gives the claimed
+fixed-parameter running time and polynomial bit complexity.
+\end{proof}
 
 \subsection{Why simpler weighted reductions do not suffice}
 \paragraph{Stopping at a large uniform set.}
