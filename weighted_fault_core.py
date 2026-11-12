@@ -86,6 +86,20 @@ def solve(weights, rank_oracle, k, vulnerable=None):
     vulnerable = ground if vulnerable is None else frozenset(vulnerable)
     r = rank_oracle(ground)
     q = (k + 1) * r
+    if r == 1:
+        # A rank-one set survives iff it contains a safe nonloop or at
+        # least k+1 vulnerable nonloops. The core already discards loops
+        # and retains the cheapest q elements of each status class.
+        safe = sorted(core - vulnerable, key=lambda e: (weights[e], e))
+        exposed = sorted(core & vulnerable, key=lambda e: (weights[e], e))
+        candidates = [frozenset(safe[:1])] if safe else []
+        if len(exposed) >= q:
+            candidates.append(frozenset(exposed[:q]))
+        if not candidates:
+            return None, None, core, stats
+        witness = min(candidates, key=lambda s: (
+            sum(weights[e] for e in s), len(s), tuple(sorted(s))))
+        return sum(weights[e] for e in witness), witness, core, stats
     best = None
     witness = None
     for size in range(min(q, len(core)) + 1):

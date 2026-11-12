@@ -235,6 +235,35 @@ def check_hyperplane_bound():
                 inspect(rank, n, selected, k)
 
 
+
+def check_rank_one_shortcut():
+    # Compare against the independent deletion-DP on loops, zero weights,
+    # safe/vulnerable mixtures, ties and infeasible failure budgets.
+    for columns in ((1, 1, 1, 1), (0, 1, 0, 1)):
+        for weights in ((0, 0, 0, 0), (1, 2, 3, 4), (4, 3, 2, 1)):
+            for k in range(5):
+                for mask in range(16):
+                    vulnerable = {e for e in range(4) if mask >> e & 1}
+                    check_small(columns, weights, k, vulnerable)
+    # Enumeration previously visited 2**80 candidates before finding this
+    # unique feasible set. Keep this a regression for the direct formula.
+    calls = 0
+    def rank(s):
+        nonlocal calls
+        calls += 1
+        return int(bool(s - {80}))  # element 80 is a zero-cost loop
+    weights = [1] * 80 + [0]
+    result = solve(weights, rank, 79)
+    assert result[:2] == (80, frozenset(range(80)))
+    assert calls <= 100
+    # A safe nonloop can win or lose against the vulnerable alternative.
+    for safe_cost, expected in ((79, 79), (81, 80)):
+        result = solve([1] * 80 + [safe_cost], lambda s: int(bool(s)),
+                       79, range(80))
+        assert result[0] == expected
+    assert solve([1] * 80, lambda s: int(bool(s)), 80)[0] is None
+
+
 def main():
     rng = Random(202611041236)
     count = reduced = feasible = 0
@@ -252,12 +281,14 @@ def main():
             feasible += exists
     core_size = check_threshold()
     check_edges()
+    check_rank_one_shortcut()
     check_preserver_distinction()
     check_hyperplane_bound()
     print(f'PASS: {count} seeded instances; {feasible} feasible; '
           f'{reduced} strictly reduced cores.')
     print(f'PASS: 85-element threshold instance; core={core_size}; '
           'original/core optimum=3; uniform-only optimum=13.')
+    print('PASS: rank-one shortcut, 480 exhaustive fixtures and large failure budget.')
     print('PASS: iterator inputs, rank zero, infeasibility, and validation.')
     print('PASS: minimum-basis preserver costs remain 4; robust optima differ (7 vs 8).')
     print('PASS: sharp set-pairs hyperplane bound, uniform equality, and '
