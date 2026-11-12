@@ -30,7 +30,7 @@ python audit_weighted_core.py
 python audit_weighted_independent.py
 ```
 
-The reference solver implements the general core-and-enumeration algorithm, not the optional polynomial-time shortcuts for rank one and zero failures described in the paper. Finite checks supplement the proofs.
+The reference solver uses the direct rank-one formula from the paper: compare the cheapest safe nonloop with the `k+1` cheapest vulnerable nonloops. Higher ranks use the general core-and-enumeration algorithm; the optional zero-failure shortcut is not implemented. Finite checks supplement the proofs.
 
 The 5 November refinement uses the classical Bollobas set-pairs inequality to sharpen the deficient-hyperplane bound to `binom(r+k-1,k)`. The 85-element example now retains 15 elements rather than 29, with the same exact optimum. The independent audit includes direct checks of the counting lemma, separate from the solver.
 
