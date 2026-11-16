@@ -103,7 +103,7 @@ O\left(\sum_{t=1}^K p Q_t\log(Q_t+1)\right)
 \]
 integer arithmetic operations, still with \(O(n^2)\) oracle queries and polynomial bit complexity. This is a genuine reduction in the polynomial exponent **within the promised subclass**. It leaves the arbitrary-matroid oracle FPT exponent unchanged.
 
-The file **truncated_partition_fast.py** implements this acceleration independently of the simpler **truncated_partition_fault.py**. Running **python audit_fast.py** checks 1,185 additional seeded fixtures against the baseline DP, including survivor ranks for every admissible failure of each returned witness.
+The file **truncated_partition_fast.py** implements this acceleration independently of the simpler **truncated_partition_fault.py**. Running **python audit_fast.py** checks 1,185 additional seeded fixtures against the baseline DP, including survivor ranks for every admissible failure of each returned witness. Running **python audit_monge_transition.py** exhaustively checks another 271,040 small convex-prefix transition matrices, verifying monotonicity of the leftmost row minimizers and equality of divide-and-conquer minima with full row search.
 
 ## Example
 
