@@ -13,7 +13,7 @@ Let a rank-\(r\) matroid \(M=(E,\mathcal I)\) be accessed by an independence ora
 
 Bentert--Fomin--Golovach--Morelle (ESA 2025, Proposition 5) proved an \(O(n^2)\) algorithm on this class in the **all-vulnerable** weighted setting. Kundu--Nandi--Saurabh (arXiv:2611.16333v1, 2026, Theorem 1.1) proved a \(2^{O((r+k)^4)}n^{O(1)}\) general **mixed-status** independence-oracle bound. Neither earlier result is claimed here.
 
-**Theorem (polynomial-time mixed-status extension).** For matroids satisfying the promise, weighted fault-tolerant spanning with arbitrary safe/vulnerable element types and arbitrary failure budget \(k\) is solvable exactly in \(O(n^2)\) independence-oracle queries plus \(O(n^5)\) integer arithmetic operations, with polynomial bit complexity. The algorithm reports infeasibility or returns an optimum and a witness. The result is specific to this class; it does not improve the quartic general-oracle exponent.
+**Theorem (polynomial-time mixed-status extension).** For matroids satisfying the promise, weighted fault-tolerant spanning with arbitrary safe/vulnerable element types and arbitrary failure budget \(k\) is solvable exactly in \(O(n^2)\) independence-oracle queries plus \(O(n^4\log(n+1))\) integer arithmetic operations, with polynomial bit complexity. A simpler reference dynamic program takes \(O(n^5)\) operations. The algorithm reports infeasibility or returns an optimum and a witness. The result is specific to this class; it does not improve the quartic general-oracle exponent.
 
 ## Normalization and failure threshold
 
@@ -66,6 +66,44 @@ O\left(\sum_{t=1}^{K}pQ_t(t+2)\right)
  =O\bigl(p(r+1)K^3\bigr)\subseteq O(n^5).
 \]
 Singleton and representative-pair tests take \(O(n^2)\) oracle calls and rank determination takes \(O(n)\) more. The numeric value of \(k\) can exceed \(n\) without increasing the bound because \(k'\le n\). Costs are sums of at most \(n\) input weights and have polynomial encoding length. Reconstructing one threshold run uses \(O(p\max_tQ_t)\) memory; value-only runs use \(O(\max_tQ_t)\).
+
+## Monge acceleration to O(n^4 log n)
+
+The preceding DP is intentionally simple. We can improve its time bound without changing its optimal solutions. Fix a threshold \(t\) and write \(\widehat D_i[z]\) for the minimum cost, using the first \(i\) classes, of attaining **at least** \(z\) units of threshold coverage. Initialize \(\widehat D_0[0]=0\) and \(\widehat D_0[z>0]=+\infty\). This is equivalent to the capped-coverage DP for purposes of the final minimum \(\widehat D_p[Q_t]\).
+
+For class \(i\), let \(m_i=\min(t,|C_i\cap V|)\). Write its vulnerable prefix costs as \(P_i(j)=\sum_{\ell=1}^j w(v_{i,\ell})\) for \(0\le j\le m_i\), with \(P_i(0)=0\). Because the individual vulnerable weights are sorted in nondecreasing order, \(P_i\) is *discrete convex*: \(P_i(j-1)+P_i(j+1)\ge2P_i(j)\). The vulnerable-only transition is
+\[
+U_i[z]=\min_{0\le j\le\min(z,m_i)}
+      \left(\widehat D_{i-1}[z-j]+P_i(j)\right).\tag{4}
+\]
+Choices with \(j>z\) are no cheaper than \(j=z\) because the prefix costs are nondecreasing. Let \(u=z-j\); the transition matrix is
+\[
+A(z,u)=\widehat D_{i-1}[u]+P_i(z-u),
+\qquad \max(0,z-m_i)\le u\le z.
+\]
+For \(z_1<z_2\) and \(u_1<u_2\), whenever the four entries are defined, discrete convexity gives
+\[
+A(z_1,u_1)+A(z_2,u_2)\le
+A(z_1,u_2)+A(z_2,u_1).\tag{5}
+\]
+Thus the matrix is Monge. Its permissible column intervals have nondecreasing endpoints as the row \(z\) increases. If two row minimizers inverted their column order, their cross entries would both be permissible; inequality (5) would contradict one of the minima, choosing the leftmost minimizer in case of equality. Hence the **leftmost minimizing column is nondecreasing** across rows.
+
+The standard divide-and-conquer monotone-row-minima search evaluates each of the \(Q_t+1\) rows using \(O(Q_t\log(Q_t+1))\) total matrix evaluations; unlike plain \(O(Q_t m_i)\) convolution, this bound does not depend multiplicatively on \(m_i\). The optional safe-element branch adds a single comparison per row:
+\[
+\widehat D_i[z]=\min\left\{U_i[z],\
+ w(s_i)+\widehat D_{i-1}[\max(0,z-t)]\right\}.
+\]
+Omit the second branch if no safe element exists. Use a finite sentinel larger than the sum of all input weights to implement \(+\infty\), keeping the Monge ordering valid even for unreachable states. Store minimizing columns and class choices for witness reconstruction.
+
+The accelerated algorithm uses
+\[
+O\left(\sum_{t=1}^K p Q_t\log(Q_t+1)\right)
+=O\bigl(p(r+1)K^2\log(n+1)\bigr)
+\subseteq O(n^4\log(n+1))
+\]
+integer arithmetic operations, still with \(O(n^2)\) oracle queries and polynomial bit complexity. This is a genuine reduction in the polynomial exponent **within the promised subclass**. It leaves the arbitrary-matroid oracle FPT exponent unchanged.
+
+The file **truncated_partition_fast.py** implements this acceleration independently of the simpler **truncated_partition_fault.py**. Running **python audit_fast.py** checks 1,185 additional seeded fixtures against the baseline DP, including survivor ranks for every admissible failure of each returned witness.
 
 ## Example
 
