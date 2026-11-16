@@ -105,6 +105,23 @@ integer arithmetic operations, still with \(O(n^2)\) oracle queries and polynomi
 
 The file **truncated_partition_fast.py** implements this acceleration independently of the simpler **truncated_partition_fault.py**. Running **python audit_fast.py** checks 1,185 additional seeded fixtures against the baseline DP, including survivor ranks for every admissible failure of each returned witness. Running **python audit_monge_transition.py** exhaustively checks another 271,040 small convex-prefix transition matrices, verifying monotonicity of the leftmost row minimizers and equality of divide-and-conquer minima with full row search.
 
+## Direct-sum closure: a larger polynomial-time class
+
+The same theorem extends to all matroids whose **connected components** are rank truncations of unit-capacity partition matroids, with no decomposition supplied as an input. Such a direct sum need not be a truncation of one unit partition: \(U_{2,3}\oplus U_{2,3}\), of rank four, already provides a counterexample (it disallows selecting all three elements of the first summand, whereas a single rank-four truncation on six singleton classes would permit them).
+
+**Corollary.** Suppose each connected component \(M_i\) of an independence-oracle matroid \(M=\bigoplus_i M_i\) satisfies the truncation promise. With nonnegative binary-encoded weights, arbitrary safe/vulnerable labels and unbounded \(k\), optimal resilient spanning for \(M\) is computable in \(O(n^2)\) independence queries and \(O(n^4\log(n+1))\) arithmetic operations.
+
+**Proof.** A basis \(B\) of \(M\) can be found by a greedy oracle scan. Build its *fundamental graph* on the whole ground set: for every nonloop \(e\notin B\) and every \(b\in B\), add the edge \(eb\) precisely when \((B-\{b\})\cup\{e\}\) is independent. Loops remain isolated. This requires \(O(nr)\le O(n^2)\) oracle tests. The connected components of the fundamental graph are exactly the connected components of the matroid (a standard theorem, e.g. Oxley, *Matroid Theory*, 2nd ed., Proposition 4.3.2). Their subsets therefore define the direct-sum factors without extra representation assumptions.
+
+For selected elements \(X\) and failures \(F\), direct-sum additivity gives
+\[
+\operatorname{rank}_M(X\setminus F)
+=\sum_i \operatorname{rank}_{M_i}((X\cap E_i)\setminus(F\cap E_i)).
+\]
+Each summand is at most \(r_i=\operatorname{rank}(M_i)\), so the total equals \(\sum_i r_i\) after *every* global failure of size at most \(k\) if and only if every component's chosen set withstands *every* failure of size at most \(k\) restricted to that component. Necessity follows by concentrating the allowed failures in one component; sufficiency follows termwise. Costs add across components, hence the global optimum is the union of the independent component optima. Invoke the accelerated truncated-partition solver with the restricted oracle on each component; the sum of its oracle costs is \(O(\sum_i n_i^2)\le O(n^2)\), and the arithmetic cost \(O(\sum_i n_i^4\log(n_i+1))\le O(n^4\log(n+1))\). Rank-zero loop components contribute empty selections. QED.
+
+**direct_sum_partition_fault.py** implements both fundamental-graph recovery and component optimization. **python audit_direct_sum.py** independently tests 575 seeded small direct-sum matroids with mixed statuses, loops and all allowed failures, comparing each answer with exhaustive selected-set optimization. This adds a genuinely larger tractable class but still does not improve the arbitrary-matroid oracle exponential bound.
+
 ## Example
 
 For rank \(r=2\), failure budget \(k=2\), consider three classes. \(C_1\) has a safe element of cost 3 and a vulnerable element of cost 1; \(C_2\) has three vulnerable elements of cost 1 each; \(C_3\) has three vulnerable elements of cost 2 each. Selecting the safe element of \(C_1\) and all three vulnerable elements of \(C_2\) costs 6 and remains spanning after any two allowed failures. Without selecting the safe element, the cheapest feasible choice uses one vulnerable from \(C_1\), two from \(C_2\), and two from \(C_3\), costing 7. Hence the mixed-status optimum is 6.
