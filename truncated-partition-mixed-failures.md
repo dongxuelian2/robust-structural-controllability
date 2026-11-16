@@ -75,7 +75,7 @@ For rank \(r=2\), failure budget \(k=2\), consider three classes. \(C_1\) has a 
 
 Run **python audit_truncated_partition.py** (Python 3.10+, standard library only). Its independent brute-force oracle enumerates every selected subset and every allowed failure for 462 seeded small fixtures, also checking the order-statistic identity; **303,728** selected subsets and all corresponding optimum values matched. Cases cover loops, zero weights, safe/vulnerable mixtures, all ranks from zero, and failure budgets exceeding the number of elements.
 
-Finite computation supports but does not establish the theorem. Publication priority of this particular mixed-status extension requires additional literature review. The general-oracle \(2^{O((r+k)^4)}\) bound is **not** improved by this result. An explicit representation or the class promise is not required for the standard oracle inputs beyond the stated class promise.
+Finite computation supports but does not establish the theorem. Publication priority of this particular mixed-status extension requires additional literature review. The general-oracle \(2^{O((r+k)^4)}\) bound is **not** improved by this result. The solver uses only an independence oracle; its correctness requires the stated class promise, which is not verified for arbitrary oracle inputs.
 
 ## References
 
