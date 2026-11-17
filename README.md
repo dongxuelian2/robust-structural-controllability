@@ -42,10 +42,10 @@ Python 3.10 or newer and the standard library are sufficient. From the
 repository root:
 
 ```sh
-python verify_core_theorem.py
-python check_two_approx.py
-python audit_weighted_core.py
-python audit_weighted_independent.py
+python scripts/verify_core_theorem.py
+python scripts/check_two_approx.py
+python scripts/audit_weighted_core.py
+python scripts/audit_weighted_independent.py
 ```
 
 The checks compare algorithms with exhaustive or independent finite-instance

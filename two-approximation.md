@@ -66,9 +66,9 @@ There are O(n) network vertices and O(n²) edges, integral maximum-flow value at
 
 ## Files and verification
 
-`two_approx_solver.py` is the self-contained algorithm, apart from reusing `source_components` from `bounded_core_solver.py`. Its output includes the relaxation placement, relaxation value, critical states, repair states, and a matching certificate.
+`scripts/two_approx_solver.py` is the self-contained algorithm, apart from reusing `source_components` from `scripts/bounded_core_solver.py`. Its output includes the relaxation placement, relaxation value, critical states, repair states, and a matching certificate.
 
-`check_two_approx.py` brute-forces all actuator sets on each tested graph, independently verifying exact relaxation optimality, robust feasibility of the returned witness, |D|≤d, and the approximation inequalities. The stated proof is independent of finite testing. Running `python check_two_approx.py` passed all 66,066 directed graphs with self-loops on one through four vertices and 600 fixed-seed random graphs on five through eight vertices: 66,666 total, 38,951 feasible. The largest observed ratio was 1.5, which is only an experimental observation and not a proved approximation factor. Run `python audit_cubic_solver.py` for the independent implementation and oracle audit, which separately passed 66,066 exhaustive and 400 random instances.
+`scripts/check_two_approx.py` brute-forces all actuator sets on each tested graph, independently verifying exact relaxation optimality, robust feasibility of the returned witness, |D|≤d, and the approximation inequalities. The stated proof is independent of finite testing. Running `python scripts/check_two_approx.py` passed all 66,066 directed graphs with self-loops on one through four vertices and 600 fixed-seed random graphs on five through eight vertices: 66,666 total, 38,951 feasible. The largest observed ratio was 1.5, which is only an experimental observation and not a proved approximation factor. Run `python scripts/audit_cubic_solver.py` for the independent implementation and oracle audit, which separately passed 66,066 exhaustive and 400 random instances.
 
 ## Limitations
 
@@ -84,4 +84,4 @@ The set W={e_0,...,e_{d−1},g} is robust: after deleting g, match f_i via c_i f
 
 The maximum-flow relaxation may return F above, whose unmatched set is P={f_1,...,f_{d−1},g}, with |P|=d; this is optimal for the relaxation. It is a basis of M, so every one of its d elements is fragile. Choosing incoming c_i→f_i repairs f_i with e_i for i≥1; choosing h→g repairs g with f_0. These repairs are distinct, so the returned set has 2d elements, and its approximation ratio is 2d/(d+1), tending to two.
 
-Thus no uniform guarantee strictly below two holds for the strategy with arbitrary optimum-relaxation and independent-repair choices. This is not an inapproximability result for the original problem, and does not preclude better tie-breaking, joint repair, or postprocessing. `check_two_approx_tightness.py` verifies the displayed optimal witness and the actual reference implementation's 2d output for d=2,...,25.
+Thus no uniform guarantee strictly below two holds for the strategy with arbitrary optimum-relaxation and independent-repair choices. This is not an inapproximability result for the original problem, and does not preclude better tie-breaking, joint repair, or postprocessing. `scripts/check_two_approx_tightness.py` verifies the displayed optimal witness and the actual reference implementation's 2d output for d=2,...,25.

@@ -2,7 +2,7 @@
 
 Checks 1,200 seeded binary-matroid instances using exhaustive subset costs
 and a worst-case-deletion DP, plus an exact 85-element threshold example.
-Run: python3 audit_weighted_independent.py
+Run: python3 scripts/audit_weighted_independent.py
 """
 from functools import lru_cache
 from fractions import Fraction

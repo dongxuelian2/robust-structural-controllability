@@ -1,6 +1,6 @@
 """Independent finite audit. No representation assumption; uses bitmask ranks.
 
-Run: python audit_weighted_core.py
+Run: python scripts/audit_weighted_core.py
 The exhaustive checker enumerates all ground subsets and all allowed failures,
 independently of the implementation's core, cardinality bound, or max-failure
 shortcut. Weight enumeration is exhaustive only in the suites labeled so.
