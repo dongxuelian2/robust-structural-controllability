@@ -1,31 +1,54 @@
 # Robust Structural Controllability under Actuator Failures
 
-Mathematical research on fault-tolerant actuator placement in structured linear systems. The focus is on approximation algorithms, exact algorithms for restricted digraph classes, and verifiable combinatorial bounds.
+Research on dedicated actuator placement under failures, including
+approximation algorithms, exact algorithms, and fault-tolerant matroid
+spanning. The state graph defines a transversal matroid; its dual translates
+matching feasibility into a spanning condition. Source strongly connected
+components impose additional accessibility quotas.
 
-## Research target
+## Results and models
 
-For the one-input-failure robust minimal structural controllability problem (1-RMSCP), study whether the known **5/2-approximation** for general directed graphs can be improved to **2**. The 2026 reference already provides a **2-approximation for strongly connected digraphs**.
+- [Factor-two approximation](two-approximation.md): for a nonempty directed
+  state graph, unit-cost dedicated actuators at distinct states, and one
+  actuator failure, a quota-first algorithm gives a factor-two guarantee and
+  runs in cubic graph operations. The note also gives a family where the
+  independent-repair strategy approaches factor two.
+- [Bounded-core algorithm](bounded-core-theorem.md): the same one-failure
+  placement model has an exact algorithm polynomial for each fixed matching
+  deficiency `d`, obtained by enumerating robust cores of at most `2d` states.
+- [Disjoint-quota theorem](quota-core-proof.md): unit-cost robust matroid
+  spanning with disjoint quotas is fixed-parameter tractable in matroid rank
+  and failure budget. Applied to dedicated actuators, the parameters are
+  matching deficiency and the number of failures.
+- [Weighted fault-tolerant spanning](paper/weighted-fault-tolerant-spanning.pdf)
+  ([LaTeX source](paper/weighted-fault-tolerant-spanning.tex),
+  [proof note](weighted-fault-tolerant-fpt.md)): weighted selected-set
+  spanning in oracle matroids is fixed-parameter tractable in rank and
+  failure budget, including the stated safe/vulnerable extension.
 
-Secondary questions:
+The dedicated placement results use one actuator per selected state and unit
+costs. The weighted matroid theorem concerns selected-set spanning; the exact
+models, assumptions, and literature comparisons appear in their proof notes.
+Publication novelty remains a research question.
 
-- Exact algorithms or structural characterizations for restricted classes, including bounded-treewidth and planar digraphs.
-- Tightness examples and improved lower bounds for existing approximation schemes.
-- Extensions to multiple input failures when supported by new mathematical results.
+The starting reference for robust structural controllability is Diogo Poças,
+Sérgio Pequito, and Guilherme Ramos, [*On the NP-hardness of the robust
+minimal structural controllability problem*](https://doi.org/10.1016/j.automatica.2026.113074),
+*Automatica* 190 (2026), 113074.
 
-Distinguish the dedicated-input and unrestricted-input models, including whether multiple inputs may actuate the same state. All claims should use the precise model and cost measure from the cited paper.
+## Verification
 
-## Starting reference
+Python 3.10 or newer and the standard library are sufficient. From the
+repository root:
 
-Diogo Poças, Sérgio Pequito, and Guilherme Ramos, **On the NP-hardness of the robust minimal structural controllability problem**, *Automatica*, 190 (2026), article 113074.
+```sh
+python verify_core_theorem.py
+python check_two_approx.py
+python audit_weighted_core.py
+python audit_weighted_independent.py
+```
 
-DOI: https://doi.org/10.1016/j.automatica.2026.113074
-
-The reference establishes NP-hardness even for one input failure and approximation guarantees of 5/2 in general digraphs and 2 in strongly connected digraphs.
-
-## Research outputs
-
-Keep proved theorems, precise counterexamples, and minimal exact computational checks in this repository. A self-contained theorem for a restricted graph class is useful even if the main approximation target is not attained.
-
-## Weighted fault tolerant spanning manuscript
-
-The [paper PDF](paper/weighted-fault-tolerant-spanning.pdf) and [editable LaTeX source](paper/weighted-fault-tolerant-spanning.tex) give an exact FPT result for weighted selected-set spanning in oracle matroids, parameterized by rank and failure budget, with a safe/vulnerable extension. See the [paper guide](paper/README.md) for model boundaries, compilation, and the existing verification scripts.
+The checks compare algorithms with exhaustive or independent finite-instance
+oracles. Each proof note specifies its test domain and corresponding solver.
+The [paper guide](paper/README.md) gives manuscript build instructions and
+links to the integrated control manuscript.
