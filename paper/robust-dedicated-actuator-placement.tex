@@ -607,7 +607,8 @@ the bound $H$. For $s>1$ we additionally forbid the hyperplane
 $\cl(I_\nu\setminus\{x\})$ if $x\in I_\nu$. At most one designated
 basis contains $x$. A same-status element outside $B$ and outside
 the forbidden hyperplanes replaces $x$ while preserving resilience by
-Lemma~\ref{lem:exchange}. For $s>1$ the substitution also preserves
+the failure argument in the proof of Lemma~\ref{lem:exchange}.
+For $s>1$ the substitution also preserves
 the designated packing. For $s=1$, resilience ensures a basis.
 
 Use the flat-saturation rule of Kundu et al.~\cite[Lemma~5]{KNS}
@@ -654,6 +655,22 @@ since $\log(t+1)=O((1+(k+1)/s)\log(p+1))$. Each restricted optimum
 also solves the unrestricted problem whenever an unrestricted
 optimum meets the corresponding restriction.
 
+\Needspace{12\baselineskip}
+The two restrictions can both fail in a connected matroid. For $a\ge3$,
+truncate $U_{a,3a-2}\oplus U_{1,a}^{\oplus a}$ to rank $2a-1$, let
+$k=2a-1$, and give all elements unit cost and vulnerable status.
+With the whole ground set selected, a failure of size at most $k$
+can lower the pre-truncation rank by at most one. Losing one rank
+in the uniform block takes $2a-1$ deletions, and losing one in a
+rank-one block takes $a$ deletions. To show that each element is
+essential, omit it and use the failure budget to empty its rank-one
+block and one other block, or to leave at most $a-2$ elements in the
+uniform block if the omission was there. Thus the unique resilient
+set has size $\Theta(a^2)$, and every basis uses at least $a-1$ of the
+$3a-2$ uniform elements, so at most three bases are disjoint.
+Connectedness follows because any two elements in different blocks
+lie in a circuit obtained by truncating a basis of the direct sum.
+
 \Needspace{10\baselineskip}
 \subsection{Examples for weighted core construction}
 \begin{example}[Premature uniform-scan termination]\label{ex:uniform-stop}
@@ -694,10 +711,9 @@ assignments of safe and vulnerable actuator locations.
 \begin{proof}
 If $d>0$, every surviving spanning set in $M$ is nonempty. Strong connectivity then ensures accessibility, so Theorem~\ref{thm:main} applies. If $d=0$, matching is automatic and accessibility requires a nonempty survivor. Choose the cheaper of one cheapest safe actuator and $k+1$ cheapest vulnerable actuators, omitting unavailable options.
 \end{proof}
-For general state digraphs, source-SCC constraints are also necessary.
-The weighted same-status exchange alone does not preserve them.
-Section~\ref{sec:quota-fpt} gives a unit-cost quota theorem; no
-weighted-quota extension is claimed.
+For general state digraphs, surviving accessibility imposes source-SCC
+constraints. Section~\ref{sec:quota-fpt} develops the unit-cost quota
+theorem.
 
 
 \Needspace{14\baselineskip}

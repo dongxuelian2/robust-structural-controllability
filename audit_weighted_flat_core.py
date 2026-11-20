@@ -5,7 +5,7 @@ from random import Random
 
 from audit_weighted_core import feasible_masks, make_rank, members
 from audit_weighted_independent import binary_ranks
-from weighted_flat_core import flat_core, obstruction_bound, solve
+from weighted_flat_core import flat_core, obstruction_bound, solve, solve_independence
 
 
 def check_instance(weights, rank_mask, k, vulnerable_mask):
@@ -70,6 +70,14 @@ def check_packed_bound():
     assert obstruction_bound(r, k, count * r, count) == 1 + count * r
     assert 1 + count * r < comb(r + k - 1, k)
 
+    r, k, count = 4, 4, 5
+    labels = list(range(r)) * count
+    ground = frozenset(range(len(labels)))
+    _, partition_rank = make_rank('classes', len(labels), labels=labels, trunc=r)
+    assert obstruction_bound(r, k, len(labels), count) == 21 < comb(r + k - 1, k)
+    assert solve((1,) * len(labels), partition_rank, k,
+                 packed_bases=count)[:2] == (len(labels), ground)
+
     # The full ground has two disjoint bases, but its cheapest resilient
     # subset uses three classes once each and cannot pack the second base.
     labels = [0, 0, 1, 1, 2]
@@ -77,6 +85,12 @@ def check_packed_bound():
     _, rank = make_rank('classes', len(labels), labels=labels, trunc=2)
     assert solve(weights, rank, 1)[0] == 3
     assert solve(weights, rank, 1, packed_bases=2)[0] == 11
+
+    def independent(elements):
+        assert isinstance(elements, frozenset)
+        return rank(elements) == len(elements)
+
+    assert solve_independence(weights, independent, 1, packed_bases=2)[0] == 11
 
 
 def check_query_cache():

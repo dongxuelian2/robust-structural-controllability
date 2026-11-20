@@ -169,3 +169,18 @@ def solve(weights, rank_oracle, k, vulnerable=None, *, size_limit=None, packed_b
                 continue
             best, witness = cost, candidate
     return result(witness, core)
+
+
+def solve_independence(weights, independent, k, vulnerable=None, *,
+                       size_limit=None, packed_bases=1):
+    """Solve with a Boolean independence oracle on frozensets of element IDs."""
+    def rank(elements):
+        basis = frozenset()
+        for element in sorted(elements):
+            extension = basis | {element}
+            if independent(extension):
+                basis = extension
+        return len(basis)
+
+    return solve(weights, rank, k, vulnerable,
+                 size_limit=size_limit, packed_bases=packed_bases)

@@ -10,7 +10,7 @@ The manuscript gives complete proofs of three results:
 - Weighted selected-set fault-tolerant spanning in an independence-oracle matroid with safe and vulnerable elements. Flat saturation gives a quartic exponent in total time and a cubic exponent in independence queries. Proposition 5.9 gives subquartic regimes under a cardinality cap or a disjoint-base packing requirement.
 - Exact unit-cost spanning with arbitrarily many disjoint quota-(k+1) groups, FPT in rank plus failure budget. The control corollary applies to arbitrary digraphs independently of the source-SCC count.
 
-The quota algorithm completes its small robust core using original elements, including loops. It is not a bounded full-solution kernel. Weighted quotas and the optimal polynomial-time approximation factor remain open.
+The quota algorithm completes its small robust core using original elements, including loops. Weighted purchase quotas and a parameterized extension to mixed-status source survival are developed in [PR #12](https://github.com/dongxuelian2/robust-structural-controllability/pull/12). The optimal polynomial-time approximation factor remains open.
 
 ## Compile
 

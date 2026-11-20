@@ -159,4 +159,5 @@ independence-oracle instances.
 arXiv:2611.16333v1, 12 November 2026.
 
 The reference implementation is [weighted_flat_core.py](weighted_flat_core.py).
+Its `solve_independence` entry point takes a Boolean independence oracle.
 Run `python audit_weighted_flat_core.py` to reproduce the finite checks.
