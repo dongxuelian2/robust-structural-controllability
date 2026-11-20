@@ -10,7 +10,7 @@ from itertools import combinations
 from math import comb
 
 
-def weighted_core(weights, rank_oracle, k, vulnerable=None):
+def weighted_input(weights, k, vulnerable):
     weights = tuple(weights)
     if type(k) is not int or k < 0:
         raise ValueError("k must be a nonnegative integer")
@@ -20,6 +20,11 @@ def weighted_core(weights, rank_oracle, k, vulnerable=None):
     vulnerable = ground if vulnerable is None else frozenset(vulnerable)
     if not vulnerable <= ground:
         raise ValueError("vulnerable elements must belong to the ground set")
+    return weights, ground, vulnerable
+
+
+def weighted_core(weights, rank_oracle, k, vulnerable=None):
+    weights, ground, vulnerable = weighted_input(weights, k, vulnerable)
 
     @lru_cache(None)
     def rank(a):

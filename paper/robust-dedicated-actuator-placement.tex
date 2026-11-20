@@ -42,9 +42,11 @@ exact algorithm fixed-parameter tractable in the maximum-matching deficiency
 and failure budget, independently of the number of source strongly
 connected components. The underlying result solves resilient matroid
 spanning with an arbitrary number of disjoint unit-cost quota constraints.
-We also establish an exact weighted spanning algorithm for safe and
-vulnerable elements in the independence-oracle model, with an application
-to strongly connected state graphs.
+For weighted spanning with safe and vulnerable elements, we record a
+quartic-exponent time bound via flat saturation and a cubic-exponent
+independence-query bound. We obtain subquartic time under a small
+cardinality cap or a disjoint-base packing requirement. The weighted
+spanning results apply to strongly connected state graphs.
 \end{abstract}
 \noindent\textbf{Keywords:} structural controllability; dedicated actuators;
 fault tolerance; matroid spanning; approximation algorithms;
@@ -105,6 +107,13 @@ failure statuses. The sharper count is an application of Bollob\'as's
 classical set-pairs inequality~\cite{Bollobas}.
 The same paper also gives polynomial weighted algorithms for rank
 at most two and for truncations of unit-capacity partition matroids.
+
+Kundu, Nandi, and Saurabh~\cite[Theorem~3.1]{KNS} give a
+$2^{O((r+k)^4)}\operatorname{poly}(n,\ell)$ algorithm for the same
+weighted independence-oracle problem. We use their flat-saturation
+rule, bound the oracle queries in the exhaustive search by caching,
+and derive a smaller obstruction count when the selected set packs
+disjoint bases.
 
 The all-vulnerable case of Theorem~\ref{thm:weighted} addresses the
 weighted selected-set problem posed in Section~1.1 of~\cite{BFGL}.
@@ -407,17 +416,12 @@ certify infeasibility.
 \end{problem}
 
 \begin{theorem}\label{thm:weighted}\label{thm:main}
-An optimum resilient set can be computed, or infeasibility
-certified, in $f(r,k)\operatorname{poly}(n,\ell)$ time and
-independence-oracle calls, where $n=|E|$, $\ell$ is the input bit length,
-and each independence query has unit cost. For $r\ge2$,
-writing $q=(k+1)r$, one may take
-\[
- f(r,k)=2^{O(qr^2(r+k))},
-\]
-hence the running time is at most
-$2^{O((r+k)^5)}\operatorname{poly}(n,\ell)$. The cases $r\le1$ or
-$k=0$ are polynomial-time solvable.
+For weighted resilient spanning, an optimum can be computed or
+infeasibility reported in $2^{O((r+k)^4)}\operatorname{poly}(n,\ell)$
+time and $2^{O((r+k)^3)}\operatorname{poly}(n)$ independence queries,
+where $n=|E|$, $\ell$ is the input bit length, and each independence
+query has unit cost. The cases $r\le1$ or $k=0$ admit polynomial-time
+algorithms.
 \end{theorem}
 \subsection{Matroid preliminaries and a small optimum}
 Loops can be discarded because their removal preserves resilience and
@@ -546,7 +550,7 @@ each domain preserves resilience and total weight while moving every
 selected element into the corresponding output.
 \end{proof}
 
-\subsection{Size and running time}
+\subsection{Running time of the uniform-set construction}
 Put $N_0=0$, $N_1=q$, and, for $2\leq h\leq r$, define
 \[
  N_h=t_h+\binom{t_h}{h-1}N_{h-1}.
@@ -569,18 +573,106 @@ failures per candidate. Choose a feasible candidate of minimum total weight. If 
 For $r\geq2$, put $p=r+k$. Since $H\leq2^{p-1}$ and $q\leq(p+1)^2$, we have $\log_2\tau=O(p)$. Hence $N\tau=2^{O(r^2p)}$, and enumerating the candidates and failures gives $2^{O(qr^2p)}\operatorname{poly}(n,\ell)$. As $q=O(p^2)$, this is at most $2^{O(p^5)}\operatorname{poly}(n,\ell)$. For fixed $k\geq1$, the sharper estimate $H=O_k(r^k)$ gives $\tau=O_k(r^{k+1})$,
 $N\tau=r^{O_k(r^2)}$, and running time $r^{O_k(r^3)}\operatorname{poly}(n,\ell)$.
 
-\begin{proof}[Proof of Theorem~\ref{thm:weighted}]
-The cases $r=0$, $r=1$, and $k=0$ follow from the preliminary algorithms.
-For $r\ge2$ and $k\ge1$, Lemma~\ref{lem:small} bounds the size of
-an optimum, Lemma~\ref{lem:exchange} permits weight-respecting
-replacements, and Proposition~\ref{prop:optimum-core} ensures that the output of
-Algorithm~\ref{alg:weighted-core} preserves an optimum. The enumeration
-just described therefore finds a minimum-weight resilient set, or
-certifies infeasibility. The derived bound gives the claimed
-fixed-parameter running time and polynomial bit complexity.
+\subsection{Flat saturation and disjoint bases}
+Consider the minimum-cost resilient set of size at most $m\le q$
+containing $s$ pairwise disjoint bases, with $1\le s\le k+1$ and $sr\le m$.
+The case $s=1,m=q$ contains an unrestricted optimum by
+Lemma~\ref{lem:small}. A feasible set with $s$ disjoint bases can also
+be reduced to size at most $q$ while keeping the bases: use them as the
+first $s$ independent layers in the proof of that lemma.
+
+\begin{proposition}\label{prop:packed-bases}
+Let $j=\min\{r,\lfloor(k+1)/s\rfloor\}$ and set $t=H$ for $s=1$.
+For $s>1$, put
+\[
+ t=1+\min\left\{H,\ s\sum_{i=1}^j
+           \binom{r}{i}\binom{m-r}{i-1}\right\}.
+\]
+Writing $D=\log(m+1)+r\log(t+1)$, the restricted problem takes
+$2^{O(mD)}\operatorname{poly}(n,\ell)$ time and
+$2^{O(rD)}\operatorname{poly}(n)$ independence queries.
+\end{proposition}
+\begin{proof}
+Fix a feasible selection $B$ with designated disjoint bases
+$I_1,\ldots,I_s$ and an element $x\in B$. As in
+Lemma~\ref{lem:exchange}, each deficient survivor of $B\setminus\{x\}$
+spans a hyperplane $P$ that avoids $x$. The hyperplane is spanned by
+$B\cap P$ and satisfies $|B\setminus P|\le k+1$.
+Some $I_\nu$ has $i$ elements outside $P$, with $1\le i\le j$.
+Extend $I_\nu\cap P$ to a basis of $P$ using $i-1$ elements from
+$(B\setminus I_\nu)\cap P$. Counting the choices of the designated
+basis, its omitted elements, and these additional elements gives the
+sum in the definition of $t$. Lemma~\ref{lem:hyperplanes} also gives
+the bound $H$. For $s>1$ we additionally forbid the hyperplane
+$\cl(I_\nu\setminus\{x\})$ if $x\in I_\nu$. At most one designated
+basis contains $x$. A same-status element outside $B$ and outside
+the forbidden hyperplanes replaces $x$ while preserving resilience by
+the failure argument in the proof of Lemma~\ref{lem:exchange}.
+For $s>1$ the substitution also preserves
+the designated packing. For $s=1$, resilience ensures a basis.
+
+Use the flat-saturation rule of Kundu et al.~\cite[Lemma~5]{KNS}
+separately on each failure status. Set $L_0=0$ and $L_h=t L_{h-1}+m$.
+Scan elements by nondecreasing weight, discarding $x$ if a flat $Q$
+containing it already holds $L_{\rk(Q)}$ retained elements. The rule
+maintains the cap in every flat. For a discarded $x\in B$, each
+forbidden hyperplane intersects its rank-$h$ discard witness $Q$
+in a flat of rank at most $h-1$. At least
+$L_h-tL_{h-1}=m$ retained elements of $Q$ avoid the whole family and
+cost at most $w(x)$. At most $m-1$ already lie in $B$, so an unused
+element gives the required exchange. Repeating places an optimum
+inside the union of the two cores with the same cardinality and packing.
+
+Every saturated flat is spanned by its retained elements. Otherwise,
+their closure has smaller rank and the same count, violating its
+smaller cap. Enumerating independent subsets of the retained set
+therefore suffices to implement the flat tests. The union core has
+size $N\le 2m\sum_{i=0}^{r-1}t^i$, with $\log(N+1)=O(D)$. Its
+construction uses $n(N+1)^{O(r)}$ operations and queries up to
+polynomial factors. Enumerate core subsets of size at most $m$ and
+test all permitted failures. To check packing for $s>1$, recursively
+remove a basis and cache the result by the remaining set and number
+of bases requested. This takes $2^{O(m)}$ time per candidate,
+including the resilience test. All ranks in these checks are
+computed by greedy independence queries on sets of size at most
+$r$. Caching each queried core subset gives at most $(N+1)^r$ new
+queries across the entire search. These bounds yield the stated time
+and query costs.
 \end{proof}
 
-\subsection{Why simpler weighted reductions do not suffice}
+\begin{proof}[Proof of Theorem~\ref{thm:weighted}]
+The preliminary algorithms solve $r\le1$ and $k=0$. For $r,k\ge1$,
+apply Proposition~\ref{prop:packed-bases} with $s=1$ and $m=q$.
+Since $\log(H+1)=O(r+k)$ and $q=O((r+k)^2)$, the respective
+exponents are $O((r+k)^4)$ and $O((r+k)^3)$.
+\end{proof}
+
+For $p=r+k$, a supplied cap $m=O(p^{3/2})$ gives time
+$2^{O(p^{7/2})}\operatorname{poly}(n,\ell)$ with $s=1$. A supplied
+packing requirement $s\ge\sqrt p$ gives time
+$2^{O(p^{7/2}\log(p+1))}\operatorname{poly}(n,\ell)$ with $m=q$,
+since $\log(t+1)=O((1+(k+1)/s)\log(p+1))$. Each restricted optimum
+also solves the unrestricted problem whenever an unrestricted
+optimum meets the corresponding restriction.
+
+\Needspace{12\baselineskip}
+The two restrictions can both fail in a connected matroid. For $a\ge3$,
+truncate $U_{a,3a-2}\oplus U_{1,a}^{\oplus a}$ to rank $2a-1$, let
+$k=2a-1$, and give all elements unit cost and vulnerable status.
+With the whole ground set selected, a failure of size at most $k$
+can lower the pre-truncation rank by at most one. Losing one rank
+in the uniform block takes $2a-1$ deletions, and losing one in a
+rank-one block takes $a$ deletions. To show that each element is
+essential, omit it and use the failure budget to empty its rank-one
+block and one other block, or to leave at most $a-2$ elements in the
+uniform block if the omission was there. Thus the unique resilient
+set has size $\Theta(a^2)$, and every basis uses at least $a-1$ of the
+$3a-2$ uniform elements, so at most three bases are disjoint.
+Connectedness follows because any two elements in different blocks
+lie in a circuit obtained by truncating a basis of the direct sum.
+
+\Needspace{10\baselineskip}
+\subsection{Examples for weighted core construction}
 \begin{example}[Premature uniform-scan termination]\label{ex:uniform-stop}
 Consider a rank-two truncation of a partition matroid with two parallel classes of size two having weights $(0,0)$ and $(1,1)$, and five further singleton classes each of weight $100$. Let $k=1$. Then $q=4$, $H=2$, and $t_2=6$. The weight-ordered uniform scan reaches the threshold while retaining only one element from each cheap parallel class. The minimum resilient cost within the retained uniform set is $101$,
 whereas the full instance has optimum $2$, attained by the two cheap pairs. Thus sorting the scan is insufficient if a successful threshold causes the recursion to stop. Our construction retains the cheap rejected elements through the lower-rank children.
@@ -619,10 +711,9 @@ assignments of safe and vulnerable actuator locations.
 \begin{proof}
 If $d>0$, every surviving spanning set in $M$ is nonempty. Strong connectivity then ensures accessibility, so Theorem~\ref{thm:main} applies. If $d=0$, matching is automatic and accessibility requires a nonempty survivor. Choose the cheaper of one cheapest safe actuator and $k+1$ cheapest vulnerable actuators, omitting unavailable options.
 \end{proof}
-For general state digraphs, source-SCC constraints are also necessary.
-The weighted same-status exchange alone does not preserve them.
-Section~\ref{sec:quota-fpt} gives a unit-cost quota theorem; no
-weighted-quota extension is claimed.
+For general state digraphs, surviving accessibility imposes source-SCC
+constraints. Section~\ref{sec:quota-fpt} develops the unit-cost quota
+theorem.
 
 
 \Needspace{14\baselineskip}
@@ -760,7 +851,9 @@ The weighted result permits mixed failure statuses but does not
 incorporate arbitrary source quotas; the quota result permits any
 number of groups but assumes unit costs and failures of all selected
 elements. Combining nonnegative weights, mixed failure statuses,
-and source quotas is open. The optimal polynomial-time approximation
+and source quotas is open. In the weighted independence-oracle problem,
+a subquartic exponent in total time for arbitrary selected-set size and
+packing remains open. The optimal polynomial-time approximation
 guarantee for general state digraphs also remains unresolved.
 Example~\ref{ex:star} demonstrates equality for one relaxation choice,
 without implying a hardness-of-approximation threshold.
@@ -827,6 +920,9 @@ Parameterized and Exact Algorithms.
 An Efficient Implementation of Edmonds' Algorithm for Maximum Matching
 on Graphs. \emph{Journal of the ACM} 23(2), 221--234, 1976.
 \href{https://doi.org/10.1145/321941.321942}{doi:10.1145/321941.321942}.
+\bibitem{KNS} M. Kundu, S. Nandi, and S. Saurabh.
+When Elements Fail: Weighted Fault-Tolerant Matroid Bases.
+\href{https://arxiv.org/abs/2611.16333v1}{arXiv:2611.16333v1}, 2026.
 \bibitem{Lin} C.-T. Lin. Structural controllability.
 \emph{IEEE Transactions on Automatic Control} 19(3), 201--208, 1974.
 \href{https://doi.org/10.1109/TAC.1974.1100557}{doi:10.1109/TAC.1974.1100557}.

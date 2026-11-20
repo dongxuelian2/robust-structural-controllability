@@ -36,5 +36,5 @@ The 5 November refinement uses the classical Bollobas set-pairs inequality to sh
 
 ## Integrated control manuscript
 
-The [joint manuscript PDF](robust-dedicated-actuator-placement.pdf), [LaTeX source](robust-dedicated-actuator-placement.tex), and [guide](robust-dedicated-actuator-placement.md) combine the 3/2 approximation, weighted safe/vulnerable FPT, and new unit-cost quota FPT theorem. The latter gives an exact general-digraph control algorithm parameterized by matching deficiency plus failure budget, independently of the number of source SCCs. The guide links the separate 3/2 implementation in PR #4; it is not duplicated here.
+The [joint manuscript PDF](robust-dedicated-actuator-placement.pdf), [LaTeX source](robust-dedicated-actuator-placement.tex), and [guide](robust-dedicated-actuator-placement.md) combine the \(3/2\) approximation, weighted safe/vulnerable spanning, and unit-cost quota spanning. The quota theorem gives an exact general-digraph algorithm parameterized by matching deficiency plus failure budget, independently of the number of source SCCs. The [weighted algorithm and proof](../weighted-flat-core.md) give the updated time and independence-query bounds. The standalone manuscript above records the original uniform-set algorithm.
 
