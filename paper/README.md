@@ -17,7 +17,7 @@ pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper paper/w
 
 ## Verify
 
-The existing root-level files are the accompanying implementation and checks; no duplicate copies are needed:
+The accompanying implementation and checks are in the scripts directory.
 
 - [scripts/weighted_fault_core.py](../scripts/weighted_fault_core.py): rank-oracle core construction and exact solver.
 - [scripts/audit_weighted_core.py](../scripts/audit_weighted_core.py): exhaustive subset and failure checks on the specified finite suites.

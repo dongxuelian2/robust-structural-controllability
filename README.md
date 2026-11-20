@@ -8,6 +8,9 @@ components impose additional accessibility quotas.
 
 ## Results and models
 
+- The [3/2 approximation](paper/robust-dedicated-actuator-placement.md)
+  runs in cubic time on arbitrary directed state graphs for unit-cost
+  dedicated actuators at distinct states under one actuator failure.
 - [Factor-two approximation](two-approximation.md): for a nonempty directed
   state graph, unit-cost dedicated actuators at distinct states, and one
   actuator failure, a quota-first algorithm gives a factor-two guarantee and
@@ -27,9 +30,9 @@ components impose additional accessibility quotas.
   failure budget, including the stated safe/vulnerable extension.
 
 The dedicated placement results use one actuator per selected state and unit
-costs. The weighted matroid theorem concerns selected-set spanning; the exact
-models, assumptions, and literature comparisons appear in their proof notes.
-Publication novelty remains a research question.
+costs. The weighted matroid theorem concerns selected-set spanning. The
+[flat-saturation revision](https://github.com/dongxuelian2/robust-structural-controllability/pull/16)
+gives the updated comparison with the quartic-exponent oracle time bound.
 
 The starting reference for robust structural controllability is Diogo Poças,
 Sérgio Pequito, and Guilherme Ramos, [*On the NP-hardness of the robust
