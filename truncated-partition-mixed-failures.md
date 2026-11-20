@@ -1,6 +1,7 @@
 # Exact polynomial-time mixed-failure spanning on truncated unit-partition matroids
 
-Research note, November 16, 2026. **Scope:** a promised matroid class, not a stronger worst-case bound for arbitrary independence-oracle matroids.
+Research note, November 20, 2026. The oracle promise covers rank
+truncations of unit-capacity partition matroids and their direct sums.
 
 ## Problem, promise, and prior results
 
@@ -9,11 +10,11 @@ Let a rank-\(r\) matroid \(M=(E,\mathcal I)\) be accessed by an independence ora
 \operatorname{rank}_M(B\setminus F)=r\quad\text{for every }F\subseteq B\cap V,\ |F|\le k.
 \]
 
-**Promise.** The nonloop elements have parallel classes \(C_1,\ldots,C_p\), and a set \(I\) is independent precisely if it contains no loops, \(|I|\le r\), and \(|I\cap C_i|\le1\) for every \(i\). Thus \(M\), after deleting loops, is the rank-\(r\) truncation of a unit-capacity partition matroid. This includes every rank-one or rank-two matroid and uniform matroids of all ranks. The algorithm assumes this promise; it does not recognize the property on arbitrary oracle inputs.
+**Promise.** The nonloop elements have parallel classes \(C_1,\ldots,C_p\), and a set \(I\) is independent precisely if it contains no loops, \(|I|\le r\), and \(|I\cap C_i|\le1\) for every \(i\). Thus \(M\), after deleting loops, is the rank-\(r\) truncation of a unit-capacity partition matroid. This includes every rank-one or rank-two matroid and uniform matroids of all ranks. The algorithm takes this property as an input promise.
 
-Bentert--Fomin--Golovach--Morelle (ESA 2025, Proposition 5) proved an \(O(n^2)\) algorithm on this class in the **all-vulnerable** weighted setting. Kundu--Nandi--Saurabh (arXiv:2611.16333v1, 2026, Theorem 1.1) proved a \(2^{O((r+k)^4)}n^{O(1)}\) general **mixed-status** independence-oracle bound. Neither earlier result is claimed here.
+Bentert--Fomin--Golovach--Morelle (ESA 2025, Proposition 5) proved an \(O(n^2)\) algorithm on this class in the **all-vulnerable** weighted setting. Kundu--Nandi--Saurabh (arXiv:2611.16333v1, 2026, Theorem 3.1) proved a \(2^{O((r+k)^4)}n^{O(1)}\) general **mixed-status** independence-oracle bound.
 
-**Theorem (polynomial-time mixed-status extension).** For matroids satisfying the promise, weighted fault-tolerant spanning with arbitrary safe/vulnerable element types and arbitrary failure budget \(k\) is solvable exactly in \(O(n^2)\) independence-oracle queries plus \(O(n^4\log(n+1))\) integer arithmetic operations, with polynomial bit complexity. A simpler reference dynamic program takes \(O(n^5)\) operations. The algorithm reports infeasibility or returns an optimum and a witness. The result is specific to this class; it does not improve the quartic general-oracle exponent.
+**Theorem (polynomial-time mixed-status extension).** For matroids satisfying the promise, weighted fault-tolerant spanning with arbitrary safe/vulnerable element types and arbitrary failure budget \(k\) is solvable exactly in \(O(n^2)\) independence-oracle queries plus \(O(n^4)\) integer arithmetic operations, with polynomial bit complexity. A simpler reference dynamic program takes \(O(n^5)\) operations. The algorithm reports infeasibility or returns an optimum and a witness.
 
 ## Normalization and failure threshold
 
@@ -67,7 +68,7 @@ O\left(\sum_{t=1}^{K}pQ_t(t+2)\right)
 \]
 Singleton and representative-pair tests take \(O(n^2)\) oracle calls and rank determination takes \(O(n)\) more. The numeric value of \(k\) can exceed \(n\) without increasing the bound because \(k'\le n\). Costs are sums of at most \(n\) input weights and have polynomial encoding length. Reconstructing one threshold run uses \(O(p\max_tQ_t)\) memory; value-only runs use \(O(\max_tQ_t)\).
 
-## Monge acceleration to O(n^4 log n)
+## Monge acceleration to \(O(n^4)\)
 
 The preceding DP is intentionally simple. We can improve its time bound without changing its optimal solutions. Fix a threshold \(t\) and write \(\widehat D_i[z]\) for the minimum cost, using the first \(i\) classes, of attaining **at least** \(z\) units of threshold coverage. Initialize \(\widehat D_0[0]=0\) and \(\widehat D_0[z>0]=+\infty\). This is equivalent to the capped-coverage DP for purposes of the final minimum \(\widehat D_p[Q_t]\).
 
@@ -88,28 +89,59 @@ A(z_1,u_2)+A(z_2,u_1).\tag{5}
 \]
 Thus the matrix is Monge. Its permissible column intervals have nondecreasing endpoints as the row \(z\) increases. If two row minimizers inverted their column order, their cross entries would both be permissible; inequality (5) would contradict one of the minima, choosing the leftmost minimizer in case of equality. Hence the **leftmost minimizing column is nondecreasing** across rows.
 
-The standard divide-and-conquer monotone-row-minima search evaluates each of the \(Q_t+1\) rows using \(O(Q_t\log(Q_t+1))\) total matrix evaluations; unlike plain \(O(Q_t m_i)\) convolution, this bound does not depend multiplicatively on \(m_i\). The optional safe-element branch adds a single comparison per row:
+Extend the vulnerable prefix costs to every integer with
+\[
+\widetilde P_i(j)=
+\begin{cases}
+-Wj,&j<0,\\
+P_i(j),&0\le j\le m_i,\\
+P_i(m_i)+W(j-m_i),&j>m_i,
+\end{cases}
+\qquad W=1+\sum_{e\in E}w(e).
+\]
+The slopes, including \(-W\) and \(W\) at the two ends, are
+nondecreasing. Thus \(\widehat D_{i-1}[u]+\widetilde P_i(z-u)\) is a
+full Monge matrix on \(0\le z,u\le Q_t\) by the difference inequality
+in (5). Use the finite sentinel \(W\) for unreachable predecessor
+states. An out-of-window entry or unreachable predecessor gives
+value at least \(W\). Every reachable transition costs at most
+\(W-1\), since the new elements lie in a class disjoint from the
+predecessor selection. Clipping each row minimum at \(W\) therefore
+gives the correct transition value and a valid predecessor whenever
+the minimum is finite in the original DP.
+
+The SMAWK algorithm [3] finds the leftmost row minima of this full
+Monge matrix in \(O(Q_t+1)\) evaluations. The optional safe-element
+branch adds one comparison per row
 \[
 \widehat D_i[z]=\min\left\{U_i[z],\
  w(s_i)+\widehat D_{i-1}[\max(0,z-t)]\right\}.
 \]
-Omit the second branch if no safe element exists. Use a finite sentinel larger than the sum of all input weights to implement \(+\infty\), keeping the Monge ordering valid even for unreachable states. Store minimizing columns and class choices for witness reconstruction.
+Use the second branch when a safe element exists. Recover a witness
+from the minimizing columns and class choices.
 
 The accelerated algorithm uses
 \[
-O\left(\sum_{t=1}^K p Q_t\log(Q_t+1)\right)
-=O\bigl(p(r+1)K^2\log(n+1)\bigr)
-\subseteq O(n^4\log(n+1))
+O\left(\sum_{t=1}^K p(Q_t+1)\right)
+=O\bigl(p(r+1)K^2\bigr)
+\subseteq O(n^4)
 \]
-integer arithmetic operations, still with \(O(n^2)\) oracle queries and polynomial bit complexity. This is a genuine reduction in the polynomial exponent **within the promised subclass**. It leaves the arbitrary-matroid oracle FPT exponent unchanged.
+integer arithmetic operations and \(O(n^2)\) oracle queries. The
+padded entries have \(O(\log(W+1)+\log(Q_t+1))\) bits, so bit
+complexity is polynomial as well.
 
-The file **truncated_partition_fast.py** implements this acceleration independently of the simpler **truncated_partition_fault.py**. Running **python audit_fast.py** checks 1,185 additional seeded fixtures against the baseline DP, including survivor ranks for every admissible failure of each returned witness. Running **python audit_monge_transition.py** exhaustively checks another 271,040 small convex-prefix transition matrices, verifying monotonicity of the leftmost row minimizers and equality of divide-and-conquer minima with full row search.
+The file **truncated_partition_fast.py** implements this acceleration.
+Running **python audit_fast.py** checks 1,185 seeded fixtures against
+the baseline DP, including survivor ranks for each returned witness.
+Running **python audit_monge_transition.py** compares SMAWK with
+direct search on 271,040 small convex-prefix matrices and checks the
+sentinel and a larger implicit Monge matrix.
 
 ## Direct-sum closure: a larger polynomial-time class
 
 The same theorem extends to all matroids whose **connected components** are rank truncations of unit-capacity partition matroids, with no decomposition supplied as an input. Such a direct sum need not be a truncation of one unit partition: \(U_{2,3}\oplus U_{2,3}\), of rank four, already provides a counterexample (it disallows selecting all three elements of the first summand, whereas a single rank-four truncation on six singleton classes would permit them).
 
-**Corollary.** Suppose each connected component \(M_i\) of an independence-oracle matroid \(M=\bigoplus_i M_i\) satisfies the truncation promise. With nonnegative binary-encoded weights, arbitrary safe/vulnerable labels and unbounded \(k\), optimal resilient spanning for \(M\) is computable in \(O(n^2)\) independence queries and \(O(n^4\log(n+1))\) arithmetic operations.
+**Corollary.** Suppose each connected component \(M_i\) of an independence-oracle matroid \(M=\bigoplus_i M_i\) satisfies the truncation promise. With nonnegative binary-encoded weights, arbitrary safe/vulnerable labels and unbounded \(k\), optimal resilient spanning for \(M\) is computable in \(O(n^2)\) independence queries and \(O(n^4)\) arithmetic operations.
 
 **Proof.** A basis \(B\) of \(M\) can be found by a greedy oracle scan. Build its *fundamental graph* on the whole ground set: for every nonloop \(e\notin B\) and every \(b\in B\), add the edge \(eb\) precisely when \((B-\{b\})\cup\{e\}\) is independent. Loops remain isolated. This requires \(O(nr)\le O(n^2)\) oracle tests. The connected components of the fundamental graph are exactly the connected components of the matroid (a standard theorem, e.g. Oxley, *Matroid Theory*, 2nd ed., Proposition 4.3.2). Their subsets therefore define the direct-sum factors without extra representation assumptions.
 
@@ -118,9 +150,9 @@ For selected elements \(X\) and failures \(F\), direct-sum additivity gives
 \operatorname{rank}_M(X\setminus F)
 =\sum_i \operatorname{rank}_{M_i}((X\cap E_i)\setminus(F\cap E_i)).
 \]
-Each summand is at most \(r_i=\operatorname{rank}(M_i)\), so the total equals \(\sum_i r_i\) after *every* global failure of size at most \(k\) if and only if every component's chosen set withstands *every* failure of size at most \(k\) restricted to that component. Necessity follows by concentrating the allowed failures in one component; sufficiency follows termwise. Costs add across components, hence the global optimum is the union of the independent component optima. Invoke the accelerated truncated-partition solver with the restricted oracle on each component; the sum of its oracle costs is \(O(\sum_i n_i^2)\le O(n^2)\), and the arithmetic cost \(O(\sum_i n_i^4\log(n_i+1))\le O(n^4\log(n+1))\). Rank-zero loop components contribute empty selections. QED.
+Each summand is at most \(r_i=\operatorname{rank}(M_i)\), so the total equals \(\sum_i r_i\) after *every* global failure of size at most \(k\) if and only if every component's chosen set withstands *every* failure of size at most \(k\) restricted to that component. Necessity follows by concentrating the allowed failures in one component; sufficiency follows termwise. Costs add across components, hence the global optimum is the union of the independent component optima. Invoke the accelerated truncated-partition solver with the restricted oracle on each component; the sum of its oracle costs is \(O(\sum_i n_i^2)\le O(n^2)\), and the arithmetic cost \(O(\sum_i n_i^4)\le O(n^4)\). Rank-zero loop components contribute empty selections. QED.
 
-**direct_sum_partition_fault.py** implements both fundamental-graph recovery and component optimization. **python audit_direct_sum.py** independently tests 575 seeded small direct-sum matroids with mixed statuses, loops and all allowed failures, comparing each answer with exhaustive selected-set optimization. This adds a genuinely larger tractable class but still does not improve the arbitrary-matroid oracle exponential bound.
+**direct_sum_partition_fault.py** implements both fundamental-graph recovery and component optimization. **python audit_direct_sum.py** independently tests 575 seeded small direct-sum matroids with mixed statuses, loops and all allowed failures, comparing each answer with exhaustive selected-set optimization.
 
 ## Example
 
@@ -130,9 +162,8 @@ For rank \(r=2\), failure budget \(k=2\), consider three classes. \(C_1\) has a 
 
 Run **python audit_truncated_partition.py** (Python 3.10+, standard library only). Its independent brute-force oracle enumerates every selected subset and every allowed failure for 462 seeded small fixtures, also checking the order-statistic identity; **303,728** selected subsets and all corresponding optimum values matched. Cases cover loops, zero weights, safe/vulnerable mixtures, all ranks from zero, and failure budgets exceeding the number of elements.
 
-Finite computation supports but does not establish the theorem. Publication priority of this particular mixed-status extension requires additional literature review. The general-oracle \(2^{O((r+k)^4)}\) bound is **not** improved by this result. The solver uses only an independence oracle; its correctness requires the stated class promise, which is not verified for arbitrary oracle inputs.
-
 ## References
 
 1. M. Bentert, F. V. Fomin, P. A. Golovach, L. Morelle, *Fault-Tolerant Matroid Bases*, ESA 2025, Proposition 5. https://doi.org/10.4230/LIPIcs.ESA.2025.83
-2. M. Kundu, S. Nandi, S. Saurabh, *When Elements Fail: Weighted Fault-Tolerant Matroid Bases*, arXiv:2611.16333v1, November 12, 2026, Theorem 1.1. https://arxiv.org/abs/2611.16333
+2. M. Kundu, S. Nandi, S. Saurabh, *When Elements Fail: Weighted Fault-Tolerant Matroid Bases*, arXiv:2611.16333v1, November 12, 2026, Theorem 3.1. https://arxiv.org/abs/2611.16333
+3. A. Aggarwal, M. M. Klawe, S. Moran, P. Shor, R. Wilber, *Geometric Applications of a Matrix-Searching Algorithm*, Algorithmica 2 (1987), 195–208. https://doi.org/10.1007/BF01840359

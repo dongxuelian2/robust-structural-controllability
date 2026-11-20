@@ -1,9 +1,62 @@
 """Faster polynomial exact solver for mixed safe/vulnerable failures on
 rank truncations of unit-capacity partition matroids (independence oracle).
 
-Uses a Monge min-plus convolution optimized by divide and conquer.
-The matroid-class promise is required; see the accompanying proof note.
+Uses SMAWK on a Monge extension of the convex min-plus transition.
+The accompanying proof note states the matroid-class promise.
 """
+
+
+def _leftmost_row_minima(size, value):
+    """SMAWK on a square totally monotone matrix accessed through value."""
+    minima = [0] * size
+
+    def search(rows, columns):
+        if not rows:
+            return
+        reduced = []
+        for column in columns:
+            while reduced:
+                row = rows[len(reduced) - 1]
+                if value(row, reduced[-1]) <= value(row, column):
+                    break
+                reduced.pop()
+            if len(reduced) < len(rows):
+                reduced.append(column)
+
+        search(rows[1::2], reduced)
+        offset = 0
+        for index in range(0, len(rows), 2):
+            row = rows[index]
+            right = minima[rows[index + 1]] if index + 1 < len(rows) else reduced[-1]
+            best_column = reduced[offset]
+            best_value = value(row, best_column)
+            while reduced[offset] < right:
+                offset += 1
+                column = reduced[offset]
+                current = value(row, column)
+                if current < best_value:
+                    best_column, best_value = column, current
+            minima[row] = best_column
+
+    search(range(size), range(size))
+    return minima
+
+
+def _vulnerable_transition(dp, prefix, inf):
+    maximum = len(prefix) - 1
+
+    def value(z, u):
+        count = z - u
+        if count < 0:
+            cost = -inf * count
+        elif count > maximum:
+            cost = prefix[-1] + inf * (count - maximum)
+        else:
+            cost = prefix[count]
+        return dp[u] + cost
+
+    minima = _leftmost_row_minima(len(dp), value)
+    return [(min(value(z, u), inf), u) for z, u in enumerate(minima)]
 
 
 def solve(weights, independent, k, vulnerable=None):
@@ -58,33 +111,12 @@ def solve(weights, independent, k, vulnerable=None):
             for x in vuln[:m]:
                 prefix.append(prefix[-1] + weights[x])
 
-            v_costs = [inf] * (Q + 1)
-            v_arg = [0] * (Q + 1)
-
-            def fill(lo, hi, opt_lo, opt_hi):
-                if lo > hi:
-                    return
-                z = (lo + hi) // 2
-                start = max(opt_lo, z - m)
-                end = min(opt_hi, z)
-                minval = None
-                minu = None
-                for u in range(start, end + 1):
-                    val = dp[u] + prefix[z - u]
-                    if minval is None or val < minval:
-                        minval, minu = val, u
-                assert minu is not None
-                v_costs[z] = min(minval, inf)
-                v_arg[z] = minu
-                fill(lo, z - 1, opt_lo, minu)
-                fill(z + 1, hi, minu, opt_hi)
-
-            fill(0, Q, 0, Q)
             new_dp = [inf] * (Q + 1)
             back = [None] * (Q + 1)
-            for z in range(Q + 1):
-                new_dp[z] = v_costs[z]
-                back[z] = (v_arg[z], False, z - v_arg[z])
+            for z, (cost, predecessor) in enumerate(_vulnerable_transition(dp, prefix, inf)):
+                if cost < inf:
+                    new_dp[z] = cost
+                    back[z] = (predecessor, False, z - predecessor)
                 if safe is not None:
                     u = max(0, z - tau)
                     val = min(dp[u] + weights[safe], inf)
