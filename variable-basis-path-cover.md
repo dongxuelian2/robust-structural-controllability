@@ -241,8 +241,8 @@ rather than merely a more complicated source graph H.
 
 ## Verification and priority
 
-`variable_basis.py` implements both polynomial maps.
-`python verify_variable_basis.py` checks every isolate-free labeled source
+`scripts/variable_basis.py` implements both polynomial maps.
+`python scripts/verify_variable_basis.py` checks every isolate-free labeled source
 graph through five vertices (814 graphs), every robust resource subset on
 each, the exact path-partition optimum, both solution maps and absence of
 mandatory resources when minimum degree is two. For sources through three

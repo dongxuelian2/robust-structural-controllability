@@ -175,7 +175,7 @@ are $2|R|+|P|+|\mathcal T|+1$ and $2|R|+2$. In the hard family a full
 selection minus any one vertex resource is feasible. Thus there is no
 fixed mandatory basis, and cover choices supply the missing rank.
 
-`verify_shared_backup_cover.py` enumerates the supports of both
+`scripts/verify_shared_backup_cover.py` enumerates the supports of both
 equation gadgets for both constructions. It also checks direct
 state-plus-input matching under all selected actuator failures in
 two padded control fixtures, and recovers covers after selecting

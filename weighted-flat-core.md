@@ -158,6 +158,6 @@ independence-oracle instances.
 [*When Elements Fail: Weighted Fault-Tolerant Matroid Bases*](https://arxiv.org/html/2611.16333v1),
 arXiv:2611.16333v1, 12 November 2026.
 
-The reference implementation is [weighted_flat_core.py](weighted_flat_core.py).
+The reference implementation is [scripts/weighted_flat_core.py](scripts/weighted_flat_core.py).
 Its `solve_independence` entry point takes a Boolean independence oracle.
-Run `python audit_weighted_flat_core.py` to reproduce the finite checks.
+Run `python scripts/audit_weighted_flat_core.py` to reproduce the finite checks.

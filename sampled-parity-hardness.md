@@ -148,6 +148,6 @@ $\min(n,s/2)$. Relative to the two baselines this gives factors at most
 $10/9$ and $18/17$, respectively, over all source densities. These
 limits apply to the guarded parity construction.
 
-`verify_parity_guards.py` checks the exact transfer, the random-filling
+`scripts/verify_parity_guards.py` checks the exact transfer, the random-filling
 and stratified survival bounds, and the rational exponent certificate.
 The $3/2-\epsilon$ target remains open.

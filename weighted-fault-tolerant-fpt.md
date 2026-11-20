@@ -289,12 +289,12 @@ small cores, which is already central to the ESA paper.
 
 ## Verification
 
-`weighted_fault_core.py` implements the core and the exact enumeration
+`scripts/weighted_fault_core.py` implements the core and the exact enumeration
 using an arbitrary rank oracle. Run the two independent audits with
 Python 3.10+ and no third-party packages:
 
-    python audit_weighted_core.py
-    python audit_weighted_independent.py
+    python scripts/audit_weighted_core.py
+    python scripts/audit_weighted_independent.py
 
 The first compares against every selected subset and every allowed
 failure in its small-instance suites, including exhaustive binary

@@ -46,15 +46,15 @@ The three-vertex digraph with outgoing masks [6,1,1] (arcs 0->1,2 and 1,2->0) gi
 
 ## Polynomial implementation and reproducible checks
 
-`three_halves_solver.py` retains the exact quota-flow matching from `two_approx_solver.py`. For each critical b, alternating search from unmatched right b visits exactly the external states e that can replace b. A reachable free left endpoint would contradict criticality. A path flip proves sufficiency; the symmetric difference with a replacement matching proves necessity. Creating a clique on each repair support constructs the co-repair graph and records a common repair witness for each edge. An Edmonds augmenting-forest algorithm with blossom contraction computes a **maximum**, not merely maximal, matching. Matched pairs and unmatched vertices then select repair witnesses, deduplicated before installation.
+`scripts/three_halves_solver.py` retains the exact quota-flow matching from `scripts/two_approx_solver.py`. For each critical b, alternating search from unmatched right b visits exactly the external states e that can replace b. A reachable free left endpoint would contradict criticality. A path flip proves sufficiency; the symmetric difference with a replacement matching proves necessity. Creating a clique on each repair support constructs the co-repair graph and records a common repair witness for each edge. An Edmonds augmenting-forest algorithm with blossom contraction computes a **maximum**, not merely maximal, matching. Matched pairs and unmatched vertices then select repair witnesses, deduplicated before installation.
 
 The quota flow, at most n alternating searches, clique construction and general-graph matching take O(n³) graph operations in total, using O(n²) storage. Python integer bitmasks have their usual bit-complexity costs. A maximal matching or a greedy selection of pairs does not justify the Tutte–Berge lower bound used here.
 
 Use Python 3.10+, without third-party packages:
-- `python audit_blossom.py`: compares actual blossom matching with independent subset-DP maximum matching on every simple graph of orders 0 through 6 and 1,200 seeded random graphs of orders 7 through 18, 35,068 total.
-- `python audit_three_halves.py`: all 66,066 looped state graphs through order 4 and 3,500 seeded random graphs of orders 5 through 11, 69,566 total. It independently enumerates matchable subsets, robust optima and repair supports, checks the maximum co-repair matching against subset DP, and verifies returned matching/repair certificates and the 3/2 bound.
+- `python scripts/audit_blossom.py`: compares actual blossom matching with independent subset-DP maximum matching on every simple graph of orders 0 through 6 and 1,200 seeded random graphs of orders 7 through 18, 35,068 total.
+- `python scripts/audit_three_halves.py`: all 66,066 looped state graphs through order 4 and 3,500 seeded random graphs of orders 5 through 11, 69,566 total. It independently enumerates matchable subsets, robust optima and repair supports, checks the maximum co-repair matching against subset DP, and verifies returned matching/repair certificates and the 3/2 bound.
 
-- `python audit_three_halves_independent.py`: 66,066 exhaustive plus 800 random instances; independently checks every optimum P, every critical subset rank identity, every Tutte–Berge vertex deletion, and the actual blossom solver against subset DP. No unpublished PR #2 helper is required.
+- `python scripts/audit_three_halves_independent.py`: 66,066 exhaustive plus 800 random instances; independently checks every optimum P, every critical subset rank identity, every Tutte–Berge vertex deletion, and the actual blossom solver against subset DP. No unpublished PR #2 helper is required.
 
 These finite checks supplement the proof; they do not establish publication novelty.
 

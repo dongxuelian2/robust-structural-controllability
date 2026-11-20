@@ -148,6 +148,6 @@ triples. The [fixed-anchor bound](parity-gadget-obstruction.md)
 uses a different hypothesis and also enforces presence of the label
 pairs inside the parity gadget.
 
-`verify_guard_compression.py` checks the rank-bound selections,
+`scripts/verify_guard_compression.py` checks the rank-bound selections,
 their transfers to control placements, and the row counts for
 one and two disjoint triples.

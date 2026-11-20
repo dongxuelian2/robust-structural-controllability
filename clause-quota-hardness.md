@@ -170,7 +170,7 @@ Here B=8k+1. Consequently a single unit of excess can conceal a number
 of violations linear in B. A stronger gap transfer from unbounded
 occurrence formulas needs a different consistency construction.
 
-`clause_quota.py` implements both truth maps. `verify_clause_quota.py`
+`scripts/clause_quota.py` implements both truth maps. `scripts/verify_clause_quota.py`
 checks all 128 clause ranks, all 31 bases, and 210 two-clause formulas.
 It tests 176,610 candidate supports, rounds 85,658 feasible supports, and
 lifts 800 truth assignments. Five sparse control fixtures check the

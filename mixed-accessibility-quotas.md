@@ -148,6 +148,6 @@ The theorem handles these groups by preserving their identities.
 The remaining parameterized problem asks for a time bound independent
 of \(u\).
 
-Run `python audit_mixed_accessibility_quotas.py` for 160 exact
+Run `python scripts/audit_mixed_accessibility_quotas.py` for 160 exact
 optimum comparisons and 34,352 price checks, including protected-group
 and total-cap discards.

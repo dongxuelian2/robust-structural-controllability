@@ -36,7 +36,7 @@ noncoloop a coloop, and e is not a coloop because P' already spanned.
 At most |K| additions therefore produce a robust original set of size at
 most the extended cost. Conversely an original robust set remains robust
 in the extension. The rank-oracle procedure is `protect_coloops` in
-`hardness_gadgets.py`.
+`scripts/hardness_gadgets.py`.
 
 Consequently removing literal mandatory states by parallel duplication does
 not by itself escape a forced-basis reduction: the original optimum can
@@ -87,7 +87,7 @@ the three edge gadgets (c_e,a_e,x_e) by (0,1,2),(3,4,5),(6,7,8), and the
 three vertex gadgets (s_v,t_v) by (9,10),(11,12),(13,14). Join x_01 to
 s_0,s_1, x_02 to s_0,s_2, and x_12 to s_1,s_2, in addition to the private
 gadget edges. The placement {1,10,12,14} is robust and optimum, of size 4,
-whereas m+tau(H)=5. `verify_hardness_gadgets.py` checks all 32,768 actuator
+whereas m+tau(H)=5. `scripts/verify_hardness_gadgets.py` checks all 32,768 actuator
 subsets of this target independently.
 
 ## A general obstruction for forced-basis covering reductions
@@ -261,7 +261,7 @@ Z contributes one isolated component of K[C]. Minimizing gives the
 formula. A spanning forest of each nontrivial K-component and a cover of
 H[Z] give the explicit optimum witness and solution maps.
 
-`verify_private_basis_spares.py` checks this identity for every forcing
+`scripts/verify_private_basis_spares.py` checks this identity for every forcing
 set on every simple graph without isolates through four vertices, and
 on additional five-vertex sources. It compares direct assignment ranks
 with the dual bicircular presentation, checks the independent-flat
@@ -293,6 +293,6 @@ because deleting any selected element must leave at least rank(M) elements.
 Choosing which bicircular side to dualize therefore does not by itself
 produce a new hardness source. The private-basis hyperforest objective in
 `private-basis-hyperforest.md` is the remaining, more general candidate.
-`audit_hardness.py` checks the spanning-tree placement and every actuator
+`scripts/audit_hardness.py` checks the spanning-tree placement and every actuator
 failure on all 388 connected simple source graphs with m>n through five
 vertices; the returned full matchings also certify the matching deficiency.

@@ -148,7 +148,7 @@ reach only the hubs and the noncycle intermediate vertices.
 
 ## Finite checks and the nontransversal prototype
 
-`python verify_basis_relaxation.py` checks every fundamental exchange in
+`python scripts/verify_basis_relaxation.py` checks every fundamental exchange in
 this family for k=1,...,12 by independent assignment matching, verifies
 the relaxed failure witnesses and the true rank deficit, and checks the
 full rank/robust-optimum tables for k=1. The latter gives OPT 8 versus 6.

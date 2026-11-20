@@ -17,17 +17,17 @@ pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper paper/w
 
 ## Verify
 
-The existing root-level files are the accompanying implementation and checks; no duplicate copies are needed:
+The accompanying implementation and checks are in the scripts directory.
 
-- [weighted_fault_core.py](../weighted_fault_core.py): rank-oracle core construction and exact solver.
-- [audit_weighted_core.py](../audit_weighted_core.py): exhaustive subset and failure checks on the specified finite suites.
-- [audit_weighted_independent.py](../audit_weighted_independent.py): independent deletion-DP checks and targeted counterexamples.
+- [scripts/weighted_fault_core.py](../scripts/weighted_fault_core.py): rank-oracle core construction and exact solver.
+- [scripts/audit_weighted_core.py](../scripts/audit_weighted_core.py): exhaustive subset and failure checks on the specified finite suites.
+- [scripts/audit_weighted_independent.py](../scripts/audit_weighted_independent.py): independent deletion-DP checks and targeted counterexamples.
 
 With Python 3.10 or newer and no third-party packages, run from the repository root:
 
 ```sh
-python audit_weighted_core.py
-python audit_weighted_independent.py
+python scripts/audit_weighted_core.py
+python scripts/audit_weighted_independent.py
 ```
 
 The reference solver uses the direct rank-one formula from the paper: compare the cheapest safe nonloop with the `k+1` cheapest vulnerable nonloops. Higher ranks use the general core-and-enumeration algorithm; the optional zero-failure shortcut is not implemented. Finite checks supplement the proofs.

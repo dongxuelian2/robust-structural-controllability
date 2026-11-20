@@ -23,7 +23,7 @@ complementary targets to centers. This is the same basis-by-basis proof as
 in the path-cover note, with S_e replacing an edge's two endpoints.
 Centers are dual loops. Every incidence component has positive deficiency,
 so robust spanning also supplies its source-SCC accessibility quota.
-`private_realize` in `variable_basis.py` implements the construction.
+`private_realize` in `scripts/variable_basis.py` implements the construction.
 
 Fix a set C of selected option resources, and write P for the selected
 private jobs and F=U\P for omitted privates. For each j form the labeled
@@ -117,7 +117,7 @@ reduction; it is not itself such a reduction.
 
 ## Exact verification
 
-`python verify_private_basis_spares.py` compares (1) against direct resource
+`python scripts/verify_private_basis_spares.py` compares (1) against direct resource
 assignment ranks and all one-resource deletions for every covering multiset
 of at most four option neighborhoods of size at most three on at most four
 jobs: 2,200 instances. For every covering C it separately checks (2) by

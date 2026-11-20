@@ -36,7 +36,7 @@ other rows are untouched. The number of rows is now
 
 The new presentation has full row rank and no more incidences than before.
 This elementary alternating-matching normalization is implemented by
-`full_rank_presentation` in `row_splitting.py`.
+`full_rank_presentation` in `scripts/row_splitting.py`.
 
 ## Splitting a large row preserves the robust optimum
 
@@ -121,7 +121,7 @@ target states. If v is a target, join it to a cycle center; if v is a
 center, join it to a cycle target. Every old leaf now has degree two, the
 cycle attachment point has degree three, and its other vertices have
 degree two. No new leaf is introduced. Bipartiteness, connectivity and
-planarity are preserved. This is `complete_leaves` in `hardness_gadgets.py`.
+planarity are preserved. This is `complete_leaves` in `scripts/hardness_gadgets.py`.
 
 Right centers remain a free summand: new left targets perfectly match
 the new right centers, separately from target matching. If v was a center,
@@ -201,7 +201,7 @@ degree-{2,3} universality for the general directed problem.
 
 ## Verification
 
-`python verify_row_splitting.py` checks presentation compression on all
+`python scripts/verify_row_splitting.py` checks presentation compression on all
 3,241 multisets of at most six rows on up to three targets, including zero
 rows and rank-deficient presentations. It compares the entire transversal
 rank table before and after compression. It then checks 298 row-splitting
@@ -220,7 +220,7 @@ gadget verifier checks eight leafless or padded realizations and 404
 robust cover-extraction maps.
 
 `cotransversal_reduction` and `cotransversal_from_placement` in
-`row_splitting.py` implement the two maps. The reverse map also accepts
+`scripts/row_splitting.py` implement the two maps. The reverse map also accepts
 instances padded by `subdivide_ports`.
 Compose `complete_leaves(cotransversal_reduction(...))` for the minimum
 degree-two version; the same reverse map accepts this completion.

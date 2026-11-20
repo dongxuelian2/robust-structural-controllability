@@ -1,30 +1,50 @@
 # Robust Structural Controllability under Actuator Failures
 
-Mathematical research on fault-tolerant actuator placement in structured linear systems. The focus is on approximation algorithms, exact algorithms for restricted digraph classes, and verifiable combinatorial bounds.
+Research on dedicated actuator placement under failures, including
+approximation algorithms, exact algorithms, and fault-tolerant matroid
+spanning. The state graph defines a transversal matroid; its dual translates
+matching feasibility into a spanning condition. Source strongly connected
+components impose additional accessibility quotas.
 
-## Research target
+## Results and models
 
-For the one-input-failure robust minimal structural controllability problem (1-RMSCP), study whether the known **5/2-approximation** for general directed graphs can be improved to **2**. The 2026 reference already provides a **2-approximation for strongly connected digraphs**.
+- The [3/2 approximation](paper/robust-dedicated-actuator-placement.md)
+  runs in cubic time on arbitrary directed state graphs for unit-cost
+  dedicated actuators at distinct states under one actuator failure.
+- [Factor-two approximation](two-approximation.md): for a nonempty directed
+  state graph, unit-cost dedicated actuators at distinct states, and one
+  actuator failure, a quota-first algorithm gives a factor-two guarantee and
+  runs in cubic graph operations. The note also gives a family where the
+  independent-repair strategy approaches factor two.
+- [Bounded-core algorithm](bounded-core-theorem.md): the same one-failure
+  placement model has an exact algorithm polynomial for each fixed matching
+  deficiency `d`, obtained by enumerating robust cores of at most `2d` states.
+- [Disjoint-quota theorem](quota-core-proof.md): unit-cost robust matroid
+  spanning with disjoint quotas is fixed-parameter tractable in matroid rank
+  and failure budget. Applied to dedicated actuators, the parameters are
+  matching deficiency and the number of failures.
+- [Weighted fault-tolerant spanning](paper/weighted-fault-tolerant-spanning.pdf)
+  ([LaTeX source](paper/weighted-fault-tolerant-spanning.tex),
+  [proof note](weighted-fault-tolerant-fpt.md)): weighted selected-set
+  spanning in oracle matroids is fixed-parameter tractable in rank and
+  failure budget, including the stated safe/vulnerable extension.
 
-Secondary questions:
+The [flat-saturation algorithm](weighted-flat-core.md) gives a quartic exponent
+in total time and a cubic exponent in independence queries. Bounds for special
+classes appear in the [parallel-class theorem](parallel-class-fpt.md) and the
+[partition-truncation theorem](truncated-partition-mixed-failures.md).
 
-- Exact algorithms or structural characterizations for restricted classes, including bounded-treewidth and planar digraphs.
-- Tightness examples and improved lower bounds for existing approximation schemes.
-- Extensions to multiple input failures when supported by new mathematical results.
+The [weighted purchase-quota theorem](weighted-disjoint-quotas.md) handles any
+number of disjoint groups. The [robust-accessibility theorem](mixed-accessibility-quotas.md)
+handles mixed failure statuses with an additional parameter for the source
+groups. The [graph-resource family](graph-resource-approximation/README.md) has
+an \(8/7\)-approximation. The [lower-bound excess theorem](lower-bound-excess-hardness.md)
+gives NP-completeness at matching deficiency plus one.
 
-Distinguish the dedicated-input and unrestricted-input models, including whether multiple inputs may actuate the same state. All claims should use the precise model and cost measure from the cited paper.
-
-## Starting reference
-
-Diogo Poças, Sérgio Pequito, and Guilherme Ramos, **On the NP-hardness of the robust minimal structural controllability problem**, *Automatica*, 190 (2026), article 113074.
-
-DOI: https://doi.org/10.1016/j.automatica.2026.113074
-
-The reference establishes NP-hardness even for one input failure and approximation guarantees of 5/2 in general digraphs and 2 in strongly connected digraphs.
-
-## Research outputs
-
-Keep proved theorems, precise counterexamples, and minimal exact computational checks in this repository. A self-contained theorem for a restricted graph class is useful even if the main approximation target is not attained.
+The starting reference for robust structural controllability is Diogo Poças,
+Sérgio Pequito, and Guilherme Ramos, [*On the NP-hardness of the robust
+minimal structural controllability problem*](https://doi.org/10.1016/j.automatica.2026.113074),
+*Automatica* 190 (2026), 113074.
 
 ## Sparse degree and hardness results
 
@@ -38,7 +58,7 @@ Keep proved theorems, precise counterexamples, and minimal exact computational c
 
 [Stratified parity sampling](sampled-parity-hardness.md) gives **263/260−ε** on general digraphs and **503/500−ε** on strongly connected digraphs under **NP ≠ RP**. Three draws per variable and a bound on repeated hits of deleted variables give deletion cost above \(3n/20\) in the bad case. The target excess equals the minimum deletion count. An [anchored parity obstruction](parity-gadget-obstruction.md) proves that pure cotransversal matching needs at least seven fixed elements to encode ternary parity while independently prohibiting missing label pairs.
 
-[Guard compression obstructions](guard-compression-obstructions.md) show when optional guards make all parity instances attain the matching lower bound. A local block with selectable auxiliary resources needs at least four jobs per independent ternary equation if failure of the shared backup pins all canonical labels. Run `python verify_guard_compression.py` for exact checks.
+[Guard compression obstructions](guard-compression-obstructions.md) show when optional guards make all parity instances attain the matching lower bound. A local block with selectable auxiliary resources needs at least four jobs per independent ternary equation if failure of the shared backup pins all canonical labels. Run `python scripts/verify_guard_compression.py` for exact checks.
 
 [General directed degree universality](general-sparse-equivalence.md): every feasible general directed instance, including multiple source SCCs and zero matching deficiency, has an exact realization in a weakly connected, loopless, bipartite graph with all underlying degrees in {2,3}, no mandatory location and girth at least N^(1−delta). Both solution maps are polynomial and cost nonincreasing. A connector made entirely of matching-matroid loops preserves accessibility without changing the optimum. More generally this realizes arbitrary coloop-free cotransversal robustness with disjoint quota-two groups that need not cover the ground set. The sparse class therefore has the same constant approximation threshold as the general problem; this is a structural theorem, not a new numerical lower bound.
 
@@ -56,7 +76,21 @@ Keep proved theorems, precise counterexamples, and minimal exact computational c
 
 [Basis-relaxation obstruction](basis-relaxation-gap.md): replacing a matroid by the assignment model of its fundamental exchanges at an arbitrary basis can underestimate robust OPT by a factor approaching 3/2, even for simple, cosimple fundamental transversal matroids with resources serving at most two jobs. Maximizing total column degrees in a maximal dual presentation does not fix the loss. This is a proved relaxation gap, not an NP-hardness claim. All 513 bases of the nontransversal prototype are also audited; every basis contained in an optimum placement has a strict relaxation gap in that example. A separate self-dual transversal family shows that every basis can admit spurious optimum-size placements even when all optimum values are exact.
 
-Exact checks (Python 3.10+, standard library only): `python verify_outdegree_two.py`, `python verify_hardness_gadgets.py`, `python audit_hardness.py`, `python verify_variable_basis.py`, `python verify_private_basis_spares.py`, `python verify_gammoid_obstructions.py`, `python verify_assignment_transfer.py`, `python verify_row_splitting.py`, `python verify_basis_relaxation.py`, `python verify_scc_cover.py`, `python verify_partition_assignment.py`, `python verify_quota_cotransversal.py`, `python verify_clause_quota.py`, `python verify_amplified_clause_quota.py`, `python verify_shared_backup_cover.py`, `python verify_direct_lin2.py`, and `python verify_parity_guards.py`.
-## Weighted fault tolerant spanning manuscript
+Exact checks (Python 3.10+, standard library only): `python scripts/verify_outdegree_two.py`, `python scripts/verify_hardness_gadgets.py`, `python scripts/audit_hardness.py`, `python scripts/verify_variable_basis.py`, `python scripts/verify_private_basis_spares.py`, `python scripts/verify_gammoid_obstructions.py`, `python scripts/verify_assignment_transfer.py`, `python scripts/verify_row_splitting.py`, `python scripts/verify_basis_relaxation.py`, `python scripts/verify_scc_cover.py`, `python scripts/verify_partition_assignment.py`, `python scripts/verify_quota_cotransversal.py`, `python scripts/verify_clause_quota.py`, `python scripts/verify_amplified_clause_quota.py`, `python scripts/verify_shared_backup_cover.py`, `python scripts/verify_direct_lin2.py`, and `python scripts/verify_parity_guards.py`.
 
-The [paper PDF](paper/weighted-fault-tolerant-spanning.pdf) and [editable LaTeX source](paper/weighted-fault-tolerant-spanning.tex) give an exact FPT result for weighted selected-set spanning in oracle matroids, parameterized by rank and failure budget, with a safe/vulnerable extension. See the [paper guide](paper/README.md) for model boundaries, compilation, and the existing verification scripts.
+## Verification
+
+Python 3.10 or newer and the standard library are sufficient. From the
+repository root:
+
+```sh
+python scripts/verify_core_theorem.py
+python scripts/check_two_approx.py
+python scripts/audit_weighted_core.py
+python scripts/audit_weighted_independent.py
+```
+
+The checks compare algorithms with exhaustive or independent finite-instance
+oracles. Each proof note specifies its test domain and corresponding solver.
+The [paper guide](paper/README.md) gives manuscript build instructions and
+links to the integrated control manuscript.

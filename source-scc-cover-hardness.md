@@ -272,9 +272,9 @@ theorem cannot simply be applied to retain this objective.
 
 ## Exact certificates
 
-`scc_cover.py` builds both the binary-tree construction and a direct-port
+`scripts/scc_cover.py` builds both the binary-tree construction and a direct-port
 version, implements source-loop completion and odd padding, and implements
-both cover maps. `verify_scc_cover.py` checks
+both cover maps. `scripts/verify_scc_cover.py` checks
 the actual state-plus-input matching after failures of every forced
 actuator. It compares all placements containing B when there are at most
 12 other states, and fixed-seed placements otherwise, against the full

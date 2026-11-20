@@ -195,7 +195,7 @@ The bound replaces the occurrence-dependent loss of the
 [variable cycle](clause-quota-hardness.md) by a constant. The
 [direct parity reduction](direct-lin2-hardness.md) gives the
 stronger general numerical bound 843/838−ε.
-`verify_amplified_clause_quota.py` checks the four Hamilton path lists,
+`scripts/verify_amplified_clause_quota.py` checks the four Hamilton path lists,
 the exact minimum anchored robust sets, dominated exchanges, small
 directed cuts, and both truth maps. Two control fixtures also check
 source quotas and direct input-failure matching, including odd padding.

@@ -118,7 +118,7 @@ from group sizes at least two. The initial sum of unmet quotas is
 size is at most h+(2p+2l-2h); the lower bound gives equality. No repeated
 actuator is used. This proves the formula and a polynomial exact algorithm.
 It applies with arbitrary source SCCs and self-loops, not just bidirected
-graphs. `outdegree_two_solver.py` returns an optimum placement.
+graphs. `scripts/outdegree_two_solver.py` returns an optimum placement.
 
 ## A subcubic reduction with no additional actuator cost
 
@@ -250,7 +250,7 @@ The cyclic-order qualification is essential in the implementation.
 rotation of a planar source embedding. Arbitrary/default orders can produce
 a nonplanar target even from a planar source: the wheel with spokes 0--i
 (i=1,2,3,4) and rim 1--3--2--4--1 is an explicit example.
-`audit_hardness.py` checks nine internally disjoint paths forming a K_3,3
+`scripts/audit_hardness.py` checks nine internally disjoint paths forming a K_3,3
 subdivision in that default target, and a genus-zero rotation system for
 the embedding-ordered target. The mathematical planarity statement above
 uses the latter construction.
@@ -350,7 +350,7 @@ claim at this girth. This stronger statement uses O(log m) rounds rather
 than a fixed number of rounds; no actuator baseline grows with the padding.
 
 For the minimum-degree-two version, first apply `complete_leaves` from
-`hardness_gadgets.py`: attach a balanced four-cycle by a bridge at each
+`scripts/hardness_gadgets.py`: attach a balanced four-cycle by a bridge at each
 leaf. The proof in `row-splitting-equivalence.md` shows that this adds only
 parallel targets and dual loops, preserves OPT and both solution maps,
 and removes all mandatory actuators. It preserves planarity as well.
@@ -368,9 +368,9 @@ bipartite graphs.
 
 Python 3.10+, standard library only:
 
-    python verify_outdegree_two.py
-    python verify_hardness_gadgets.py
-    python audit_hardness.py
+    python scripts/verify_outdegree_two.py
+    python scripts/verify_hardness_gadgets.py
+    python scripts/audit_hardness.py
 
 The first script exhausts all 15,002 looped directed graphs of maximum
 outdegree two on one through four states and checks 500 fixed-seed graphs

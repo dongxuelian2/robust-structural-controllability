@@ -128,6 +128,6 @@ $$
 
 The source gap and amplifier constants are from
 [Chlebík–Chlebíková, Theorem 2 and Section 3](https://pure.port.ac.uk/ws/portalfiles/portal/1887750/3DM_JOURNAL_revision_old.pdf).
-`verify_direct_lin2.py` checks both cost maps with exact source
+`scripts/verify_direct_lin2.py` checks both cost maps with exact source
 matchings and checks actual actuator failures and recovery on two
 padded control graphs. The $3/2-\epsilon$ target remains open.

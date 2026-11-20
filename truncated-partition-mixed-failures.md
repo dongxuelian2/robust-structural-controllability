@@ -130,10 +130,10 @@ integer arithmetic operations and \(O(n^2)\) oracle queries. The
 padded entries have \(O(\log(W+1)+\log(Q_t+1))\) bits, so bit
 complexity is polynomial as well.
 
-The file **truncated_partition_fast.py** implements this acceleration.
-Running **python audit_fast.py** checks 1,185 seeded fixtures against
+The file **scripts/truncated_partition_fast.py** implements this acceleration.
+Running **python scripts/audit_fast.py** checks 1,185 seeded fixtures against
 the baseline DP, including survivor ranks for each returned witness.
-Running **python audit_monge_transition.py** compares SMAWK with
+Running **python scripts/audit_monge_transition.py** compares SMAWK with
 direct search on 271,040 small convex-prefix matrices and checks the
 sentinel and a larger implicit Monge matrix.
 
@@ -152,7 +152,7 @@ For selected elements \(X\) and failures \(F\), direct-sum additivity gives
 \]
 Each summand is at most \(r_i=\operatorname{rank}(M_i)\), so the total equals \(\sum_i r_i\) after *every* global failure of size at most \(k\) if and only if every component's chosen set withstands *every* failure of size at most \(k\) restricted to that component. Necessity follows by concentrating the allowed failures in one component; sufficiency follows termwise. Costs add across components, hence the global optimum is the union of the independent component optima. Invoke the accelerated truncated-partition solver with the restricted oracle on each component; the sum of its oracle costs is \(O(\sum_i n_i^2)\le O(n^2)\), and the arithmetic cost \(O(\sum_i n_i^4)\le O(n^4)\). Rank-zero loop components contribute empty selections. QED.
 
-**direct_sum_partition_fault.py** implements both fundamental-graph recovery and component optimization. **python audit_direct_sum.py** independently tests 575 seeded small direct-sum matroids with mixed statuses, loops and all allowed failures, comparing each answer with exhaustive selected-set optimization.
+**scripts/direct_sum_partition_fault.py** implements both fundamental-graph recovery and component optimization. **python scripts/audit_direct_sum.py** independently tests 575 seeded small direct-sum matroids with mixed statuses, loops and all allowed failures, comparing each answer with exhaustive selected-set optimization.
 
 ## Example
 
@@ -160,7 +160,7 @@ For rank \(r=2\), failure budget \(k=2\), consider three classes. \(C_1\) has a 
 
 ## Reproducible verification
 
-Run **python audit_truncated_partition.py** (Python 3.10+, standard library only). Its independent brute-force oracle enumerates every selected subset and every allowed failure for 462 seeded small fixtures, also checking the order-statistic identity; **303,728** selected subsets and all corresponding optimum values matched. Cases cover loops, zero weights, safe/vulnerable mixtures, all ranks from zero, and failure budgets exceeding the number of elements.
+Run **python scripts/audit_truncated_partition.py** (Python 3.10+, standard library only). Its independent brute-force oracle enumerates every selected subset and every allowed failure for 462 seeded small fixtures, also checking the order-statistic identity; **303,728** selected subsets and all corresponding optimum values matched. Cases cover loops, zero weights, safe/vulnerable mixtures, all ranks from zero, and failure budgets exceeding the number of elements.
 
 ## References
 

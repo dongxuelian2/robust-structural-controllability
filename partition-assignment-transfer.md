@@ -167,8 +167,8 @@ avoidability persist.
 
 ## Certificates and scope
 
-`partition_assignment_transfer.py` implements the construction, job
-splitting, odd padding and the reverse map. `verify_partition_assignment.py`
+`scripts/partition_assignment_transfer.py` implements the construction, job
+splitting, odd padding and the reverse map. `scripts/verify_partition_assignment.py`
 enumerates feasible small uniform assignments and every resource partition
 whose groups have size at least two. It independently checks original
 resource ranks, actual state-plus-input matchings under failures, both

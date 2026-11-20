@@ -230,7 +230,7 @@ restricted control theorem; that question remains separate from its proof.
 
 ## Reproducible finite verification
 
-Run `python verify_lower_bound_excess.py` with Python 3.10 or later. The
+Run `python scripts/verify_lower_bound_excess.py` with Python 3.10 or later. The
 standard-library verifier passed:
 
 - all 1,098 simple H graphs of orders two through five, inspecting 264,359

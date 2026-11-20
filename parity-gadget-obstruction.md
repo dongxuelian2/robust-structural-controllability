@@ -91,4 +91,4 @@ four-set. Every triangle contains a fixed column's row and is nonflat.
 But a complement containing two opposite edges and one edge of a
 different pair is a spanning path and is also an independent flat.
 Its selection misses one pair and doubles another at the same cost.
-`verify_parity_guards.py` checks both of these small presentations.
+`scripts/verify_parity_guards.py` checks both of these small presentations.

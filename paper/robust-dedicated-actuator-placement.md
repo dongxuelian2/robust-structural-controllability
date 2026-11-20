@@ -10,7 +10,7 @@ The manuscript gives complete proofs of three results:
 - Weighted selected-set fault-tolerant spanning in an independence-oracle matroid with safe and vulnerable elements. Flat saturation gives a quartic exponent in total time and a cubic exponent in independence queries. Proposition 5.9 gives subquartic regimes under a cardinality cap or a disjoint-base packing requirement.
 - Exact unit-cost spanning with arbitrarily many disjoint quota-(k+1) groups, FPT in rank plus failure budget. The control corollary applies to arbitrary digraphs independently of the source-SCC count.
 
-The quota algorithm completes its small robust core using original elements, including loops. Weighted purchase quotas and a parameterized extension to mixed-status source survival are developed in [PR #12](https://github.com/dongxuelian2/robust-structural-controllability/pull/12). The optimal polynomial-time approximation factor remains open.
+The quota algorithm completes its small robust core using original elements, including loops. Weighted purchase quotas and a parameterized extension to mixed-status source survival are developed in the [weighted quota notes](../weighted-disjoint-quotas.md). The optimal polynomial-time approximation factor remains open.
 
 ## Compile
 
@@ -26,11 +26,11 @@ pdflatex -interaction=nonstopmode -halt-on-error robust-dedicated-actuator-place
 
 All implementations use Python 3.10 or newer and the standard library.
 
-The [flat-saturation solver](../weighted_flat_core.py), [proof note](../weighted-flat-core.md), and [audit](../audit_weighted_flat_core.py) accompany the updated weighted result. Run `python audit_weighted_flat_core.py` from the repository root.
+The [flat-saturation solver](../scripts/weighted_flat_core.py), [proof note](../weighted-flat-core.md), and [audit](../scripts/audit_weighted_flat_core.py) accompany the updated weighted result. Run `python scripts/audit_weighted_flat_core.py` from the repository root.
 
-The [weighted and quota snapshot](https://github.com/dongxuelian2/robust-structural-controllability/tree/9d62c26633643d05973e3ecefc5d36e7a8b426c1) contains `quota_fault_core.py`, `weighted_fault_core.py`, their audits, and the shared `bounded_core_solver.py`. These files are unchanged by the manuscript revision.
+The [weighted and quota snapshot](https://github.com/dongxuelian2/robust-structural-controllability/tree/9d62c26633643d05973e3ecefc5d36e7a8b426c1) contains `quota_fault_core.py`, `weighted_fault_core.py`, their audits, and the shared `bounded_core_solver.py` at the root.
 
-The 3/2 implementation from PR #4 is fixed at [commit b510683](https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2). That snapshot contains the [solver](https://github.com/dongxuelian2/robust-structural-controllability/blob/b510683764600ccd318eb7db566c35a816c2edc2/three_halves_solver.py), [proof note](https://github.com/dongxuelian2/robust-structural-controllability/blob/b510683764600ccd318eb7db566c35a816c2edc2/three-halves-approximation.md), both audits below, and its `two_approx_solver.py` and `bounded_core_solver.py` dependencies. No branch-tip version or merge of PR #4 is required.
+The 3/2 implementation from PR #4 is fixed at [commit b510683](https://github.com/dongxuelian2/robust-structural-controllability/tree/b510683764600ccd318eb7db566c35a816c2edc2). That snapshot contains the [solver](https://github.com/dongxuelian2/robust-structural-controllability/blob/b510683764600ccd318eb7db566c35a816c2edc2/three_halves_solver.py), [proof note](https://github.com/dongxuelian2/robust-structural-controllability/blob/b510683764600ccd318eb7db566c35a816c2edc2/three-halves-approximation.md), both audits below, and its `two_approx_solver.py` and `bounded_core_solver.py` dependencies at the root.
 
 For isolated checkouts of the two fixed versions:
 
@@ -45,4 +45,4 @@ git worktree add --detach ../robust-approx-check b510683764600ccd318eb7db566c35a
 
 The audits compare the implementations with independent exact calculations on small matroids and directed graphs, and include larger threshold and exhaustion fixtures. Mathematical proofs are in the manuscript; finite tests check implementation behavior.
 
-Sparse-hardness research remains separate in [PR #3](https://github.com/dongxuelian2/robust-structural-controllability/pull/3).
+The [degree and hardness notes](../hardness-degree-threshold.md) describe the sparse control reductions.

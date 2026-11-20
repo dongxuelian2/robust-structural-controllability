@@ -125,7 +125,7 @@ construction with `complete_leaves` as proved in
 `row-splitting-equivalence.md`. This gives all degrees in {2,3}, preserves
 OPT and the same reverse map, and permits the same girth padding.
 
-The reduction is implemented in `assignment_transfer.py`. A source set
+The reduction is implemented in `scripts/assignment_transfer.py`. A source set
 lifts to its retained original-root indices. To reverse a placement, call
 `assignment_from_placement`, including after `subdivide_ports` padding.
 All actuators remain distinct, of unit cost, and vulnerable to failure.
@@ -146,7 +146,7 @@ The outer minimization remains; the identity is not a polynomial algorithm.
 
 ## Exact checks
 
-`python verify_assignment_transfer.py` exhausts all feasible multisets of
+`python scripts/verify_assignment_transfer.py` exhausts all feasible multisets of
 at most six nonempty resource neighborhoods on up to three jobs: 979
 sources. It checks every robust set using one added dominated resource,
 128,128 exchanges in total, against direct assignment ranks. It separately

@@ -212,9 +212,9 @@ persist.
 
 ## Certificates and scope
 
-`quota_cotransversal.py` constructs the graph and both solution maps;
+`scripts/quota_cotransversal.py` constructs the graph and both solution maps;
 `sparse_control_graph` accepts an arbitrary feasible control source.
-`verify_quota_cotransversal.py` checks redundant and full-rank presentations,
+`scripts/verify_quota_cotransversal.py` checks redundant and full-rank presentations,
 partial and multiple quota groups, every feasible directed source through
 three states, rank-zero sources, large-row gates, optional leaf copies,
 arbitrary target placements and odd lengths three and nine. Direct

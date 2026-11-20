@@ -119,7 +119,7 @@ proves hardness already at fixed rank at least three over the rationals.
 
 ## Reproducible finite checks
 
-Run `python audit_parallel_class_fpt.py` with Python 3.10 or newer. No packages
+Run `python scripts/audit_parallel_class_fpt.py` with Python 3.10 or newer. No packages
 are needed. It compares exhaustive subset-and-failure optimization against
 independent class-count enumeration and ambient-hyperplane inequalities over
 GF(2) and GF(3). It also checks the epigraph identity at every integer prefix

@@ -96,4 +96,4 @@ The companion [robust-accessibility theorem](mixed-accessibility-quotas.md) char
 
 ## Reproduction
 
-Run `python audit_weighted_quotas.py` with Python 3 and assertions enabled. The deterministic run checks 96,797 marginals, 71,782 same-group inequalities, 179 optimum comparisons, and 874 sampled exchanges. It exercises 6 color-cap and 772 total-cap discards. The small-instance tests include loops, zero weights, and mixed statuses.
+Run `python scripts/audit_weighted_quotas.py` with Python 3 and assertions enabled. The deterministic run checks 96,797 marginals, 71,782 same-group inequalities, 179 optimum comparisons, and 874 sampled exchanges. It exercises 6 color-cap and 772 total-cap discards. The small-instance tests include loops, zero weights, and mixed statuses.

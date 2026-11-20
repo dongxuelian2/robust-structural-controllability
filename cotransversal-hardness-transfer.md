@@ -76,7 +76,7 @@ robust sets remain robust using their retained representatives. Every
 robust set has at least d+1>=2 elements; accessibility in the connected
 control graph therefore adds no cost. This proves the optimum identity
 and the reverse map, implemented by `protect_coloops`. The constructor is
-`cotransversal_graph` in `hardness_gadgets.py`.
+`cotransversal_graph` in `scripts/hardness_gadgets.py`.
 
 Parallel extension expands cocircuits by replacing members with their
 parallel classes; it cannot create a two-element cocircuit when none
@@ -111,7 +111,7 @@ optimum seven. A placement of size seven is
 
     {0,1,2,3,4,6,7}.
 
-The finite certificate in `verify_gammoid_obstructions.py` enumerates all
+The finite certificate in `scripts/verify_gammoid_obstructions.py` enumerates all
 8,192 supports, checks all 1,716 six-input exclusions independently using
 actual state-plus-input matching, and checks every failure of this witness.
 The 21-state incidence graph has one degree-four target. Splitting target
@@ -205,7 +205,7 @@ constant. Actuators on internal gates undo the intended orientation.
 
 ## Verification and next requirement
 
-`python verify_gammoid_obstructions.py` is standard-library only. In
+`python scripts/verify_gammoid_obstructions.py` is standard-library only. In
 addition to the finite nontransversality certificate, it checks the comb
 linkings by independent integer vertex-capacitated max flow for k=4,...,12.
 It exhausts all 1,595 loopless full-row-rank presentations on at most four
