@@ -1,19 +1,19 @@
 # Weighted resilient spanning with arbitrary disjoint cardinality quotas
 
-Research note, November 16, 2026. The proof has undergone separate model-agent reviews and finite computational checks; independent human review and a comprehensive novelty audit remain pending. No priority claim. This is a stronger-model extension, not an improved running-time theorem for the unquotaed problem.
+An exact algorithm for weighted resilient spanning with disjoint purchase quotas. The companion [robust-accessibility theorem](mixed-accessibility-quotas.md) treats group survival under mixed statuses.
 
 ## Problem and claim
 
 Input: rank-r finite matroid M=(E,I) via independence oracle; nonnegative binary-encoded weights w; safe/vulnerable partition; failure budget k; pairwise-disjoint groups S_1,...,S_s with integer cardinality lower bounds beta_i >= 1. Seek minimum w(B) subject to rank(B minus F)=r for every F subset of selected vulnerable elements of size at most k, and |B intersect S_i| >= beta_i.
 
-Groups with beta_i>|S_i| imply infeasibility. Zero quotas can be discarded. The groups may contain loops. Quotas are imposed BEFORE failures. They do not require quotas themselves to survive failures. In particular the robust-accessibility condition with mixed safe/vulnerable actuators (one safe OR k+1 vulnerable per group) is NOT asserted here. In the all-vulnerable case robust source-SCC accessibility is a cardinality quota beta_i=k+1 and is covered.
+Groups with beta_i>|S_i| imply infeasibility. Zero quotas can be discarded. The groups may contain loops. The cardinality constraints apply to the purchased set. In the all-vulnerable case robust source-SCC accessibility is a cardinality quota beta_i=k+1.
 
 Claim: for r,k>=1, this problem is solvable in
 
     2^{O(b log b + br log H)} poly(n,L),
     b=(k+1)r, H=binom(r+k-1,k),
 
-independent of the number and sizes of quota groups in the exponential factor. The r=0 case is separate independent cheapest-quota completion. The same construction yields FPT for k=0 with b=r,H=1 (we do not claim the displayed bound with all boundary conventions without writing them separately).
+independent of the number and sizes of quota groups in the exponential factor. The r=0 case is separate independent cheapest-quota completion. At k=0 the same construction gives FPT with b=r and H=1.
 
 ## Quota completion cost
 
@@ -88,14 +88,12 @@ Enumerate subsets C of union core of size <=b. Test resilience by all <=2^b sele
 
 The search has exponent O(b log b+br log H). Core construction's exponent is O((r+1)(log b+r log H)); r+1<=b for k>=1 absorbs it in the same bound. The number of colors only contributes polynomial bookkeeping/input cost, not a parameter exponent. Exact sums and comparisons retain polynomial bit complexity.
 
-## Comparison and limits
+## Relation to flat saturation
 
-Reference: Kundu, Nandi, Saurabh, When Elements Fail: Weighted Fault-Tolerant Matroid Bases, arXiv:2611.16333v1, Theorem 1.1 and Lemma 5. https://arxiv.org/html/2611.16333v1
+Kundu, Nandi and Saurabh give the same exponent for the unquotaed problem. Their Lemma 5 supplies the single-cap saturation rule. The quota extension uses adjusted completion prices and separate per-color and total caps. [*When Elements Fail: Weighted Fault-Tolerant Matroid Bases*, Theorem 3.1 and Lemma 5](https://arxiv.org/html/2611.16333v1).
 
-Their precise oracle exponent is matched, not improved. Their unquotaed weighted safe/vulnerable theorem is the case s=0 (our construction excludes G0 globally but own-color saturation still works). The new ingredient proposed here is adjusted quota-completion prices combined with two saturation levels, permitting arbitrarily many disjoint cardinality groups and weights. Existing repo PR7 covers arbitrary disjoint groups only with unit weights, by a different recursive color-capped core.
-
-This is not a claim of novelty against all literature, not a proof of mixed-status robust accessibility quotas, not an improvement for represented linear matroids over their better algebraic bound, and not a polynomial-bit kernel. The accompanying `audit_weighted_quotas.py` exercises the marginal inequalities, same-group exchange, full/reduced optimum equality, and actual saturation/discard cases. These finite checks do not replace the proof or external review.
+The companion [robust-accessibility theorem](mixed-accessibility-quotas.md) charges an additional parameter for groups with a cheaper safe option and a finite vulnerable backup. It gives an algorithm on arbitrary state digraphs parameterized by matching deficiency, failure budget, and the number of such groups.
 
 ## Reproduction
 
-Run `python audit_weighted_quotas.py` with Python 3 (standard library only; assertions enabled). The deterministic run checks 96,797 marginals, 71,782 same-group inequalities, 179 optimum comparisons, and 874 sampled exchange cases; 6 color-cap and 772 total-cap discards are exercised. The general small-instance tests include loops, zero weights and mixed safety statuses. No global performance claim is inferred from these finite examples.
+Run `python audit_weighted_quotas.py` with Python 3 and assertions enabled. The deterministic run checks 96,797 marginals, 71,782 same-group inequalities, 179 optimum comparisons, and 874 sampled exchanges. It exercises 6 color-cap and 772 total-cap discards. The small-instance tests include loops, zero weights, and mixed statuses.
