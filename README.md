@@ -41,7 +41,7 @@ groups. The [graph-resource family](graph-resource-approximation/README.md) has
 an \(8/7\)-approximation. The [lower-bound excess theorem](lower-bound-excess-hardness.md)
 gives NP-completeness at matching deficiency plus one.
 
-The [linear source-quota algorithm](linear-source-quotas.md) gives a
+The [linear source-quota algorithm](linear-source-quotas.md) ([PDF](paper/linear-source-quotas.pdf)) gives a
 one-sided randomized exact algorithm for weighted actuator placement on
 arbitrary directed state graphs, parameterized by matching deficiency
 and failure budget.
