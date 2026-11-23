@@ -41,6 +41,11 @@ groups. The [graph-resource family](graph-resource-approximation/README.md) has
 an \(8/7\)-approximation. The [lower-bound excess theorem](lower-bound-excess-hardness.md)
 gives NP-completeness at matching deficiency plus one.
 
+The [linear source-quota algorithm](linear-source-quotas.md) gives a
+one-sided randomized exact algorithm for weighted actuator placement on
+arbitrary directed state graphs, parameterized by matching deficiency
+and failure budget.
+
 The starting reference for robust structural controllability is Diogo Poças,
 Sérgio Pequito, and Guilherme Ramos, [*On the NP-hardness of the robust
 minimal structural controllability problem*](https://doi.org/10.1016/j.automatica.2026.113074),
