@@ -38,12 +38,19 @@ queries is \(2^{O(rD)}\operatorname{poly}(n)\).
   queries throughout the search.
 - For \(s=1,m=O(p^{3/2})\), the total time is
   \(2^{O(p^{7/2})}\operatorname{poly}(n,L)\).
-- For \(m=b,s\ge\sqrt p\), we have
+- For \(m=b,\sqrt p\le s\le k+1\), we have
   \(\log(t+1)=O((1+(k+1)/s)\log(p+1))\). The total time is
   \(2^{O(p^{7/2}\log(p+1))}\operatorname{poly}(n,L)\).
 
 The last two runs find an unrestricted optimum when one exists under their
 respective restrictions. The caller supplies the cap or packing requirement.
+If \(k+1<\sqrt p\), then \(b<p^{3/2}\), so the first restricted bound
+already applies to the unrestricted optimum. For \(s\ge k+1\), a union of
+\(s\) disjoint bases is resilient by the pigeonhole principle. With
+nonnegative weights, the optimum is a minimum-weight basis of the union
+of \(s\) copies of the matroid, provided its rank is \(sr\) and the size
+cap permits it. Matroid union and greedy optimization give a polynomial-time
+algorithm for this case.
 Rank zero has the empty optimum. At \(k=0\), the allowed packing requirement
 is one and matroid greedy finds a minimum-cost basis when \(m\ge r\).
 
@@ -114,7 +121,9 @@ The scan costs \(n(N+1)^{O(r)}\operatorname{poly}(r)\) operations and
 oracle calls. Threshold integers have \(O(D)\) bits.
 
 Enumerate core subsets of size at most \(m\). Check resilience over
-their allowed failures. For \(s>1\), check packing by successively
+their allowed failures. For \(s>1\), a polynomial-time packing test computes the rank of the candidate
+in the union of \(s\) copies of its restricted matroid and tests equality
+with \(sr\). The reference implementation instead checks packing by successively
 removing a basis, memoizing by the available set and the number of
 bases still required. There are at most \(s\,2^m\) such states per
 candidate and at most \(2^m\) basis choices at each state. Each check
@@ -160,4 +169,6 @@ arXiv:2611.16333v1, 12 November 2026.
 
 The reference implementation is [scripts/weighted_flat_core.py](scripts/weighted_flat_core.py).
 Its `solve_independence` entry point takes a Boolean independence oracle.
+The solver accepts packing requirements from one through \(k+1\); it uses
+bounded subset recursion rather than a matroid-union implementation.
 Run `python scripts/audit_weighted_flat_core.py` to reproduce the finite checks.
