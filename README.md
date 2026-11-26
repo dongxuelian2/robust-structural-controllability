@@ -8,6 +8,8 @@ components impose additional accessibility quotas.
 
 ## Results and models
 
+The [integrated arXiv manuscript](paper/robust-dedicated-actuator-placement.pdf) presents the 3/2 approximation, deterministic weighted source-quota algorithm, and one-sided randomized mixed-failure algorithm around the matching–accessibility decomposition.
+
 - The [3/2 approximation](paper/robust-dedicated-actuator-placement.md)
   runs in cubic time on arbitrary directed state graphs for unit-cost
   dedicated actuators at distinct states under one actuator failure.

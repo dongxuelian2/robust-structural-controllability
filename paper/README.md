@@ -36,5 +36,4 @@ The 5 November refinement uses the classical Bollobas set-pairs inequality to sh
 
 ## Integrated control manuscript
 
-The [joint manuscript PDF](robust-dedicated-actuator-placement.pdf), [LaTeX source](robust-dedicated-actuator-placement.tex), and [guide](robust-dedicated-actuator-placement.md) combine the \(3/2\) approximation, weighted safe/vulnerable spanning, and unit-cost quota spanning. The quota theorem gives an exact general-digraph algorithm parameterized by matching deficiency plus failure budget, independently of the number of source SCCs. The [weighted algorithm and proof](../weighted-flat-core.md) describe the flat-saturation framework of Kundu et al. and the independence-query and restricted-case refinements in the integrated manuscript. The standalone manuscript above records the original uniform-set algorithm.
-
+The [revised arXiv manuscript](robust-dedicated-actuator-placement.pdf) ([source](robust-dedicated-actuator-placement.tex), [guide](robust-dedicated-actuator-placement.md)) combines the 3/2 approximation, deterministic weighted source-quota optimization, and one-sided randomized mixed-failure optimization. See the guide for build and verification commands. Earlier standalone mathematical results remain in their dedicated notes.

@@ -129,8 +129,8 @@ algorithm for arbitrary directed state graphs
 \begin{table}[htbp]
 \centering\small
 \caption{Algorithms for arbitrary directed state graphs. Here
-$p=d+k$, $\ell$ is the total cost encoding length, and polynomial
-factors in the input size are suppressed for the parameterized bounds.}
+$p=d+k$, $\ell$ is the total cost encoding length, and $\delta$ is the allowed
+probability of a suboptimal or unsuccessful randomized trial.}
 \label{tab:results}
 \begin{tabular}{@{}p{0.29\linewidth}p{0.27\linewidth}p{0.35\linewidth}@{}}
 \toprule
@@ -139,7 +139,7 @@ Model & Guarantee & Time \\
 Unit cost, $k=1$ & $3/2$ approximation & $O(n^3)$ graph operations \\
 Weighted, all vulnerable & Deterministic optimum & $2^{O(p^4)}\operatorname{poly}(n,\ell)$ \\
 Weighted, mixed failures & Optimum with probability $\ge 1-\delta$ &
-$2^{O(kdp\log(d+1))}\operatorname{poly}(n,\ell,\log(1/\delta))$ \\
+$2^{O(kdp\log(d+1))}$\newline$\cdot\operatorname{poly}(n,\ell,\log(1/\delta))$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -622,10 +622,11 @@ For $r\ge1$ write
 \]
 The following lemmas include the rank-one and zero-failure cases.
 
+\subsection{Small resilient witnesses}
 The layered bound below follows the construction of Bentert
 et al.~\cite[Proposition~6]{BFGL}.
 \begin{lemma}\label{lem:small}
-Every resilient set $B$ contains a resilient subset $B_0$ of cardinality at most $b$. Consequently, if a feasible solution exists, there is a minimum-weight solution of cardinality at most $b$.
+Every resilient set $B$ contains a resilient subset $B_0$ of cardinality at most $b$.
 \end{lemma}
 \begin{proof}
 Successively choose a maximal independent subset $I_j$ of $B\setminus\bigcup_{i<j}I_i$, for $j=0,\ldots,k$, allowing empty layers, and put
@@ -635,7 +636,7 @@ Fix $F\subseteq B_0\cap V$ with $|F|\leq k$. The layers are disjoint, so some $I
 \[
  B\setminus F\subseteq \cl(B_0\setminus F).
 \]
-Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus $B_0$ is resilient. Nonnegative weights give $w(B_0)\leq w(B)$, and applying this construction to an optimum proves the second assertion.
+Since $F$ is also an allowed failure of $B$, its left-hand side spans $M$. Thus $B_0$ is resilient. Removing matroid loops from $B_0$ preserves resilience.
 \end{proof}
 
 \subsection{Deficient hyperplanes and resilience-preserving exchanges}
@@ -753,9 +754,9 @@ A minimum-weight resilient set satisfying all disjoint cardinality
 quotas, or infeasibility, can be found deterministically in
 \[
  2^{O(b(\log(b+1)+r\log(H+1)))}\operatorname{poly}(n,\ell)
- \ \subseteq\ 2^{O((r+k)^4)}\operatorname{poly}(n,\ell)
 \]
-time for $r,k\ge1$, where $\ell$ is the total binary weight
+time for $r,k\ge1$, in particular
+$2^{O((r+k)^4)}\operatorname{poly}(n,\ell)$ time, where $\ell$ is the total binary weight
 encoding length. The exponential factor is independent of $s$.
 For $r=0$ and for $k=0$, the problem is polynomial-time solvable.
 \end{theorem}
@@ -984,7 +985,7 @@ There are at most
  N_F=\sum_{i=0}^{\min(k,b)}\binom bi
        \le (eb/k)^k\le (2er)^k
 \]
-failure factors. The first inequality follows by evaluating
+failure factors. The bound by $(eb/k)^k$ follows by evaluating
 $(1+x)^b$ at $x=k/b$. A factor has degree at most $r(k+1)$.
 There are $O(r(r+k))$ shared variables, including the tags,
 because $q\le b$. Thus the coefficient dimension is bounded by

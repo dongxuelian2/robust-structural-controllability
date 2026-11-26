@@ -24,6 +24,8 @@ jobs:
           pdfinfo robust-dedicated-actuator-placement.pdf
           pdftotext robust-dedicated-actuator-placement.pdf /tmp/manuscript.txt
           grep -q 'worst-case tie-breaking' /tmp/manuscript.txt
+          grep -q 'Mixed-failure actuator optimization' /tmp/manuscript.txt
+          grep -q 'Weighted disjoint quotas' /tmp/manuscript.txt
       - name: Commit compiled PDF to revision branch
         run: |
           set -eu
