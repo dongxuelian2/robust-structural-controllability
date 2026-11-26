@@ -3,6 +3,9 @@ on:
   push:
     branches: ['revision/control-manuscript']
     paths: ['paper/robust-dedicated-actuator-placement.tex', '.github/workflows/build-revised-manuscript.yml']
+concurrency:
+  group: revised-manuscript-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
@@ -26,5 +29,7 @@ jobs:
           set -eu
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin "${GITHUB_REF_NAME}"
+          test "$(git rev-parse FETCH_HEAD)" = "$GITHUB_SHA"
           git add paper/robust-dedicated-actuator-placement.pdf
           git diff --cached --quiet || (git commit -m "Rebuild corrected manuscript PDF" && git push)

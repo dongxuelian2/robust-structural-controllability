@@ -29,8 +29,7 @@ components impose additional accessibility quotas.
   spanning in oracle matroids is fixed-parameter tractable in rank and
   failure budget, including the stated safe/vulnerable extension.
 
-The [flat-saturation algorithm](weighted-flat-core.md) gives a quartic exponent
-in total time and a cubic exponent in independence queries. Bounds for special
+The [flat-saturation algorithm](weighted-flat-core.md) uses the quartic-time framework of Kundu, Nandi, and Saurabh and gives a cubic parameter exponent in cached independence queries, with subquartic regimes for restricted cardinality and packing. Bounds for special
 classes appear in the [parallel-class theorem](parallel-class-fpt.md) and the
 [partition-truncation theorem](truncated-partition-mixed-failures.md).
 

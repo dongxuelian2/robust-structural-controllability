@@ -1,13 +1,13 @@
 # Algorithms for Robust Dedicated Actuator Placement
 
-**Preprint manuscript:** The LaTeX source and checked-in PDF reflect the current editorial revision. The preprint has not been submitted to a journal.
+**Preprint manuscript:** The LaTeX source and checked-in PDF reflect the current editorial revision. The integrated manuscript is a revised preprint.
 
 [PDF](robust-dedicated-actuator-placement.pdf) · [LaTeX](robust-dedicated-actuator-placement.tex)
 
 The manuscript gives complete proofs of three results:
 
 - A cubic-time 3/2 approximation for unit-cost, distinct-state dedicated actuators under one actuator failure on arbitrary directed graphs.
-- Weighted selected-set fault-tolerant spanning in an independence-oracle matroid with safe and vulnerable elements. Flat saturation gives a quartic exponent in total time and a cubic exponent in independence queries. Proposition 5.9 gives subquartic regimes under a cardinality cap or a disjoint-base packing requirement.
+- Weighted selected-set fault-tolerant spanning in an independence-oracle matroid with safe and vulnerable elements. The model and quartic total-time bound are due to Kundu, Nandi, and Saurabh (arXiv:2611.16333v1). The integrated manuscript bounds cached independence queries with a cubic parameter exponent and gives subquartic regimes under a cardinality cap or an intermediate disjoint-base packing requirement. Large packings (at least k+1 disjoint bases) reduce to minimum-weight matroid union. The reference solver uses exact bounded subset search for packing checks.
 - Exact unit-cost spanning with arbitrarily many disjoint quota-(k+1) groups, FPT in rank plus failure budget. The control corollary applies to arbitrary digraphs independently of the source-SCC count.
 
 The quota algorithm completes its small robust core using original elements, including loops. Weighted purchase quotas and a parameterized extension to mixed-status source survival are developed in the [weighted quota notes](../weighted-disjoint-quotas.md). The optimal polynomial-time approximation factor remains open.
