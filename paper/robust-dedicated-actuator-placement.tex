@@ -31,71 +31,132 @@ University of Electronic Science and Technology of China, Chengdu, China}
 \begin{document}
 \maketitle
 \begin{abstract}
-We study dedicated actuators installed at distinct states of a structured
-linear system. Failures remove actuators but preserve states and state arcs.
-For unit costs and one failure, an exact source-quota relaxation followed by
-maximum matching in a \emph{common-repair graph} yields a
-$3/2$-approximation on arbitrary directed state graphs using $O(n^3)$
-elementary graph operations. The analysis combines fundamental cocircuit
-unions with the Tutte--Berge formula. For multiple failures, we give an
-exact algorithm fixed-parameter tractable in the maximum-matching deficiency
-and failure budget, independently of the number of source strongly
-connected components. The underlying result solves resilient matroid
-spanning with an arbitrary number of disjoint unit-cost quota constraints.
-For weighted spanning with safe and vulnerable elements, we record a
-quartic-exponent time bound via flat saturation and a cubic-exponent
-independence-query bound. We obtain subquartic time under a small
-cardinality cap or a disjoint-base packing requirement. The weighted
-spanning results apply to strongly connected state graphs.
+We consider linear systems for which the locations of possible nonzero
+state couplings are known and the actuator locations must be chosen before
+failures occur. Each installed actuator directly controls one distinct
+state. The objective is to minimize installation cost while preserving
+structural controllability after the loss of any prescribed number of
+actuators. The design constraints separate into a spanning condition in
+the dual of the state matching matroid and an accessibility requirement
+for each source strongly connected component. For unit costs and one
+failure, we use a minimum-cost source-quota relaxation and a matching
+of common actuator repairs to obtain a $3/2$-approximation in $O(n^3)$
+graph operations on arbitrary directed state graphs. For multiple
+failures, we obtain an exact unit-cost algorithm parameterized by the
+state matching deficiency and failure budget, with no dependence on
+the number of source components in the parameter. For strongly
+connected state graphs, nonnegative installation costs and mixed safe
+and vulnerable locations are handled by exact parameterized matroid
+spanning. We also give a cubic-exponent independence-query bound and
+restricted subquartic time bounds for weighted spanning.
 \end{abstract}
+
 \noindent\textbf{Keywords:} structural controllability; dedicated actuators;
 fault tolerance; matroid spanning; approximation algorithms;
 fixed-parameter tractability.
 
 \section{Introduction}
-A structurally controllable system can lose controllability when an actuator
-fails. Redundant placement must protect both the matching condition and
-accessibility from the installed inputs. These requirements have different
-combinatorial forms: robust spanning in a matroid and lower quotas on source
-strongly connected components. Keeping both requirements explicit permits
-approximation and exact parameterized algorithms within the same model.
+Actuators determine where an external controller can influence the
+dynamics of a network. When installing an actuator at every state is
+unnecessary or expensive, a natural design problem is to choose a
+small set of directly actuated states. In large-scale systems the
+interconnection pattern may be known before the numerical coupling
+coefficients are identified. Structural controllability provides a
+criterion for such design: it guarantees controllability for generic
+values of the free coefficients~\cite{Lin,PKA}. Minimum-cardinality
+and minimum-cost structural input placement have been studied in
+this setting~\cite{PKA,PKAcost}.
 
-First, we give a cubic-time $3/2$-approximation for one actuator failure
-and unit costs (Theorem~\ref{thm:three-halves}). The repair argument applies
-to arbitrary matroids, while an exact graph relaxation supplies the
-required lower bound. Example~\ref{ex:star} attains the ratio for one
-optimal solution of the relaxation.
+A placement designed only for the nominal system can become
+uncontrollable when an installed actuator goes offline. Consider a
+network with several subsystems that cannot receive influence from
+outside their own subsystem. Each such subsystem needs at least one
+surviving input, and tolerating $k$ losses requires at least $k+1$
+installed inputs in each of them. Even when this reachability
+requirement holds, the surviving input and state connections may
+fail the independent matching condition for structural
+controllability. A placement must protect both properties
+simultaneously. We study the joint design of primary and redundant
+actuators, with all locations chosen before the failures are known.
 
-Second, we give an exact fixed-parameter algorithm for weighted resilient
-spanning in arbitrary independence-oracle matroids, allowing both safe and
-vulnerable elements (Theorem~\ref{thm:weighted}). Extending the uniform-set
-core method of Bentert et al.~\cite{BFGL}, a weight-ordered recursion
-preserves an optimum selected set, including after a large uniform set
-has been found. A set-pairs inequality sharpens the hyperplane count.
-The parameter is matroid rank plus failure budget, and the objective
-charges every selected element.
+The design problem has two distinct computational difficulties.
+First, even a single failure leads to a combinatorial optimization
+problem rather than the ordinary minimum structural input placement
+problem~\cite{PPR,GuoBackup}. Second, protecting against $k$ failures by
+explicitly enumerating every possible set of failed inputs grows
+rapidly with $k$. We exploit the fact that the number of states left
+unmatched by a maximum state matching, denoted by $d$, measures the
+rank deficit that the inputs must supply. The parameter $d$ can be
+small even when the state graph is large. Source-component
+accessibility, in contrast, can impose many separate requirements
+even for small $d$.
 
-Third, we solve exact unit-cost resilient spanning with arbitrarily many
-disjoint quota groups (Theorem~\ref{thm:quota-fpt}). Because a bounded
-resilient core may omit elements needed for accessibility, the construction
-also preserves quota-completion cost through groupwise representative caps.
-This yields an algorithm fixed-parameter tractable in matching deficiency
-and failure budget on arbitrary digraphs
-(Corollary~\ref{cor:general-control-fpt}), without parameterizing the number
-of source components.
+Our results address these difficulties at three levels.
+For one actuator failure and unit costs, we compute a placement
+satisfying nominal matching feasibility and all robust accessibility
+requirements, then add actuators that repair possible matching
+failures. A single backup can repair several different single-failure
+scenarios; matching pairs of such scenarios and bounding the cost of
+any robust solution yields a $3/2$-approximation in cubic time
+(Theorem~\ref{thm:three-halves}). This joint objective differs from
+optimizing backups for a prescribed primary placement.
 
-Po\c{c}as, Pequito, and Ramos~\cite{PPR} establish NP-hardness
-and approximation guarantees of $5/2$ on general digraphs and $2$ on
-strongly connected digraphs for the robust minimal structural
-controllability problem. These are reference points rather than
-like-for-like comparisons without specifying actuator and failure models.
-Section~\ref{sec:scope} distinguishes the relevant earlier work.
-Section~\ref{sec:model} fixes the model and matroid reduction;
-Section~\ref{sec:approx} gives the approximation algorithm;
-Sections~\ref{sec:weighted} and~\ref{sec:quota-fpt} develop the two exact
-parameterized algorithms; and Section~\ref{sec:conclusion} concludes.
+For an arbitrary failure budget, Theorem~\ref{thm:quota-fpt} and
+Corollary~\ref{cor:general-control-fpt} give an exact unit-cost
+algorithm on general state digraphs. Its parameter is $d+k$.
+The underlying construction preserves the cost of completing the
+source-component quotas as well as the spanning condition.
+Consequently the number of source components need not enter the
+parameter.
 
-\section{Related work and model distinctions}\label{sec:scope}
+For heterogeneous installation costs, Theorem~\ref{thm:weighted}
+studies weighted resilient matroid spanning with designated safe
+and vulnerable elements. The weight-ordered uniform-set construction
+preserves an optimal purchased set, and the flat-saturation
+construction gives bounds on time and independence queries. For a
+strongly connected state graph the resulting exact algorithm handles
+weighted dedicated-actuator placement with both failure statuses.
+The extension to arbitrary source quotas with mixed costs and
+failure statuses is discussed in the conclusion.
+
+Section~\ref{sec:scope} places the results in the control and
+combinatorial optimization literature. Section~\ref{sec:model}
+specifies the system equations, the failure model and their graph
+and matroid representations. Section~\ref{sec:approx} treats the
+single-failure approximation. Sections~\ref{sec:weighted}
+and~\ref{sec:quota-fpt} establish the exact parameterized results.
+
+\section{Related work}\label{sec:scope}
+\subsection{Structural input design and actuator failures}
+Lin~\cite{Lin} introduced structural controllability for linear
+systems with independently parameterized entries. The graph
+criterion combines input accessibility with the absence of
+dilations. Pequito, Kar, and Aguiar~\cite{PKA} developed a framework
+for structural input, output and feedback configuration selection,
+including minimum dedicated-input placement using maximum
+matchings and source components. Their subsequent minimum-cost
+input/output design work~\cite{PKAcost} treats heterogeneous
+installation costs in nominal structural systems.
+
+Robust minimal controllability for numerical linear systems
+has been studied by Pequito et al.~\cite{PRKAP}, who use the
+requirement that controllability survives a prescribed number of
+input failures. In the structural setting, Guo et
+al.~\cite{GuoBackup} study the minimum backup problem for a
+given primary actuator set, reducing it to hitting set. In our
+formulation both primary and backup locations are design variables;
+the cost counts their union. Po\c{c}as, Pequito, and
+Ramos~\cite{PPR} establish NP-hardness of robust minimal
+structural controllability and give approximation guarantees
+of $5/2$ on general digraphs and $2$ on strongly connected
+digraphs. Our approximation theorem concerns one dedicated
+actuator per state, unit installation costs and one actuator
+failure; the exact algorithms use the parameters $d$ and $k$
+under the stated cost and accessibility assumptions.
+These model restrictions specify the scope of comparison with
+earlier guarantees.
+
+\subsection{Fault-tolerant combinatorial optimization}
 The robust purchased-set objective differs from choosing an ordinary basis
 after failures. Bentert et al.~\cite{BFGL} prove unweighted FPT in rank plus
 failure budget and explicitly pose the weighted question. In the ESA 2025 proceedings version of~\cite{BFGL},
@@ -115,13 +176,13 @@ rule, bound the oracle queries in the exhaustive search by caching,
 and derive a smaller obstruction count when the selected set packs
 disjoint bases.
 
-The all-vulnerable case of Theorem~\ref{thm:weighted} addresses the
-weighted selected-set problem posed in Section~1.1 of~\cite{BFGL}.
-Section~7 of its ESA proceedings version prints the condition
-$\rk(M-F)=\rk(M)$ in a separate formulation; that condition should
-be distinguished from $\rk_M(B\setminus F)=\rk(M)$, the selected-set
-condition used here and in related fault-tolerant design~\cite{AHMS}.
-We make no claim about the intended interpretation of the printed text.
+The all-vulnerable case of Theorem~\ref{thm:weighted} uses the
+weighted selected-set condition $\rk_M(B\setminus F)=\rk(M)$
+for each permitted failure in the purchased set $B$. This is
+the objective discussed in Section~1.1 of~\cite{BFGL} and in
+related fault-tolerant design~\cite{AHMS}. It models the total
+installation cost, with the surviving subset allowed to depend
+on the failure scenario.
 
 Theorem~7 of Adjiashvili, Bindewald, and Michaels~\cite{ABMnodes}
 gives a $7/4$-approximation for uniform-cardinality node-robust
@@ -143,15 +204,93 @@ optimum preservation for a dependent purchased set under all failures.
 Likewise, the cheapest-surviving-basis preservers of Dey and Kavitha~\cite{DK}
 optimize a different object, as Example~\ref{ex:basis-preserver} shows.
 
-\section{Model and the dual matching matroid}\label{sec:model}
-Let $G=(E,\mathcal A)$ be a nonempty finite directed state graph with $n=|E|$;
-self-loops are allowed. Each prescribed nonzero entry of the state and input
-matrices is a separate free parameter. Structural controllability means that
-a controllable numerical realization exists, equivalently that almost every
-realization is controllable. A placement $P\subseteq E$ installs one
-dedicated input at each selected state, at most one per state. An actuator
-failure removes the installed input while the state vertices and arcs
-remain intact; the placement is fixed before failures occur.
+\section{System model and graph characterization}\label{sec:model}
+\subsection{Linear dynamics and actuator placement}
+Consider a continuous-time linear time-invariant system
+\begin{equation}\label{eq:dynamics}
+ \dot{x}(t)=Ax(t)+B_Pu(t),\qquad x(t)\in\mathbb R^n.
+\end{equation}
+The state matrix has a prescribed structural pattern
+$\bar A\in\{0,\star\}^{n\times n}$: a zero entry is fixed to
+zero and each $\star$ entry represents a separate free real
+parameter. We assume $n\ge1$. A numerical realization of a
+pattern is a real matrix obtained by assigning values to these
+parameters. Write $E=\{1,\ldots,n\}$ for the state indices and
+$e_i$ for the $i$th coordinate vector of $\mathbb R^n$.
+
+A placement $P=\{p_1,\ldots,p_m\}\subseteq E$ installs one
+independent dedicated actuator at each selected state. Its
+input matrix is
+\begin{equation}\label{eq:dedicated}
+ B_P=[b_{p_1}e_{p_1}\ \cdots\ b_{p_m}e_{p_m}],
+ \qquad u(t)\in\mathbb R^m,
+\end{equation}
+where the coefficients $b_{p_j}$ are free parameters independent
+of the entries of $A$. All states are candidate locations,
+and at most one actuator may be installed at each state.
+The notation $\bar B_P$ denotes the corresponding structural
+pattern.
+
+A numerical pair $(A,B_P)$ is controllable if its Kalman
+controllability matrix has full row rank:
+\[
+ \operatorname{rank}[B_P,\ AB_P,\ldots,A^{n-1}B_P]=n.
+\]
+The structural pair $(\bar A,\bar B_P)$ is structurally
+controllable if there exists a controllable numerical
+realization. For independent free parameters this is equivalent
+to controllability for almost every realization~\cite{Lin,PKA},
+because the full-rank condition is expressed by nonzero polynomial
+minors of the controllability matrix.
+
+An actuator failure at state $i\in P$ removes its input column
+from~\eqref{eq:dedicated}. Thus for a set $F\subseteq P$ of
+failed actuators, the surviving pair is
+$(\bar A,\bar B_{P\setminus F})$; the state matrix and its
+pattern remain unchanged. We call $P$ $k$-robust if the surviving
+pair is structurally controllable for every $F\subseteq P$
+with $|F|\le k$. Since the family of permitted failures is
+finite, structural controllability of each surviving pattern
+also implies simultaneous controllability of all survivors
+for almost every common assignment of the free coefficients.
+The placement is chosen before $F$ is known. When costs
+$w_i\ge0$ are specified, the objective is
+$\min_{P}\sum_{i\in P}w_i$ subject to $k$-robustness.
+For unit costs this is minimum cardinality. In the mixed
+failure model only specified vulnerable actuators may fail.
+
+\subsection{From state couplings to matching and accessibility}
+The state graph $G=(E,\mathcal A)$ has an arc $j\to i$
+exactly when $\bar A_{ij}=\star$; self-loops are allowed.
+For a placement $P$, the input-state digraph additionally
+has an input vertex and one arc from that input to each
+corresponding actuated state. The classical structural
+controllability criterion~\cite{Lin,PKA} requires both:
+every state must be reachable from an input, and the
+bipartite graph of state and input connections must admit
+a matching covering all right-state vertices. The first
+requirement transmits control influence through the
+network; the second supplies enough independent state
+and input directions to eliminate structural dilations.
+
+For example, take three states $a,b,c$ with the bidirected
+couplings $a\leftrightarrow b$ and $a\leftrightarrow c$.
+The corresponding state pattern and an input at $a$ are
+\[
+ \bar A=\begin{pmatrix}0&\star&\star\\
+ \star&0&0\\ \star&0&0\end{pmatrix},\qquad
+ \bar B_{\{a\}}=\begin{pmatrix}\star\\0\\0\end{pmatrix}.
+\]
+Every state is reachable from $a$, but both $b$ and $c$
+can only be matched to the same left-state vertex $a$.
+The pair is not structurally controllable. Inputs at
+$b$ and $c$, on the other hand, allow a covering matching
+even after either input fails: the surviving input covers
+one leaf, a state edge covers the other, and a state
+edge covers $a$. This example motivates treating
+accessibility and matching separately.
+
+\subsection{The dual matching matroid}
 
 Write $S_1,\ldots,S_s$ for the source strongly connected components (SCCs),
 those having no entering state arc from another SCC. Form the state
@@ -172,11 +311,9 @@ For $X\subseteq E$, duality gives
 In particular, $X$ spans $M$ if and only if $E\setminus X$ is independent
 in $\mathcal T$. A rank oracle for $M$ is computable by bipartite matching.
 
-We call a placement \emph{$k$-robust} if every failure of at most $k$
-selected actuators leaves the system structurally controllable. For
-matroid spanning we use \emph{resilient} for the analogous property,
-with the failing elements specified explicitly. Throughout, an
-\emph{actuator} is a dedicated input assigned to one state.
+We use \emph{resilient spanning} for the matroid analogue of
+$k$-robustness: after each permitted failure the remaining elements
+must still span the matroid.
 
 The standard structural-controllability criterion combines accessibility
 with a matching saturating all state vertices~\cite{Lin,PKA}.
@@ -217,14 +354,22 @@ set of size greater than $r$ by a dependent set. A parallel class
 consists of nonloop elements with the same rank-one closure.
 
 \begin{problem}[Robust dedicated-actuator placement]\label{prob:control}
-Given a state digraph, an actuator-failure budget $k$, and available
-distinct-state locations, find a minimum-cost $k$-robust placement or
-certify infeasibility. The unit-cost case minimizes the number of
-installed actuators.
+Given the structural state pattern $\bar A$, a failure budget $k$
+and nonnegative costs for the $n$ distinct state locations, find a
+minimum-cost $k$-robust placement or certify infeasibility. Equivalently,
+optimize over the state digraph induced by $\bar A$ subject
+to~\eqref{eq:control}.
 \end{problem}
 
 \section{A cubic-time 3/2-approximation}\label{sec:approx}
 Throughout this section $k=1$ and every actuator has unit cost.
+By Proposition~\ref{prop:control}, every source component needs two
+inputs and the selected states must span the matching matroid even
+after deleting one of them. We enforce the accessibility requirement
+at the first stage; the second stage adds only the inputs necessary
+to repair the possible losses of spanning. The cost of this
+augmentation is bounded against the globally optimal robust
+placement.
 
 \subsection{An exact source-quota relaxation}
 Minimize $|P|$ subject to $P$ spanning $M$ and $|P\cap S_i|\ge2$ for
@@ -355,7 +500,7 @@ original noncritical element fails, the surviving part of $P$ spans. If
 $b\in D$ fails, its witness repairs the deficiency. The source quotas
 persist under additions. By Lemma~\ref{lem:packing},
 \[
- |P\cup R|\le L+|D|-\nu\le\OPT+\frac{\OPT}{2}.
+ |P\cup R_{\rm rep}|\le L+|D|-\nu\le\OPT+\frac{\OPT}{2}.
 \]
 For the complexity, retain the state matching $J$ obtained from the quota
 flow. It covers $I=E\setminus P$. For each $b\in P$, explore alternating
@@ -398,6 +543,13 @@ this case.
 \end{example}
 
 \section{Weighted resilient matroid spanning}\label{sec:weighted}
+In a strongly connected state graph, any surviving input makes all
+states accessible. For positive matching deficiency $d$, a spanning
+set in the dual matching matroid must be nonempty; hence robust
+matching already ensures accessibility. This permits an exact
+weighted approach based on matroid spanning. The general matroid
+result below also allows some locations to be safe, so they contribute
+to spanning but are excluded from the failure scenarios.
 Let $M=(E,\mathcal I)$ be a rank-$r$ independence-oracle matroid,
 $V\subseteq E$ the vulnerable elements, $E\setminus V$ the safe elements,
 and $k\ge0$ the failure budget. A set $B$ is \emph{resilient} if
@@ -720,9 +872,15 @@ theorem.
 \section{Exact parameterized optimization with source quotas}
 \label{sec:quota-fpt}
 
-On a general state digraph, spanning must be combined with source-SCC
-accessibility quotas. The following matroid theorem permits an arbitrary
-number of disjoint quota groups, with unit costs and all elements vulnerable.
+On a general state digraph, a surviving spanning set may leave a
+source component without inputs. The preceding weighted construction
+preserves spanning, while source-component accessibility imposes an
+additional set of design constraints. In the unit-cost case we can
+handle these by retaining a small resilient core and then completing
+its source quotas. The key is to preserve the cost of this completion
+even when the number of source components is large. The following
+matroid theorem permits an arbitrary number of disjoint quota groups,
+with unit costs and all elements vulnerable.
 
 \begin{problem}[Quota-constrained resilient spanning]\label{prob:quotas}
 Given a rank-$r$ independence-oracle matroid, disjoint quota groups
@@ -935,6 +1093,19 @@ A Framework for Structural Input/Output and Control Configuration Selection
 in Large-Scale Systems.
 \emph{IEEE Transactions on Automatic Control} 61(2), 303--318, 2016.
 \href{https://doi.org/10.1109/TAC.2015.2437525}{doi:10.1109/TAC.2015.2437525}.
+\bibitem{PKAcost} S. Pequito, S. Kar, and A. P. Aguiar.
+Minimum cost input/output design for large-scale linear structural systems.
+\emph{Automatica} 68, 384--391, 2016.
+\href{https://arxiv.org/abs/1407.3327}{arXiv:1407.3327}.
+\bibitem{PRKAP} S. Pequito, G. Ramos, S. Kar, A. P. Aguiar, and J. Ramos.
+The robust minimal controllability problem.
+\href{https://arxiv.org/abs/1401.4209}{arXiv:1401.4209}, 2014.
+\bibitem{GuoBackup} B. Guo, O. Karaca, S. Azhdari, M. Kamgarpour,
+and G. Ferrari-Trecate.
+Actuator placement for structural controllability beyond strong
+connectivity and towards robustness.
+In \emph{IEEE Conference on Decision and Control}, 5294--5299, 2021.
+\href{https://doi.org/10.1109/CDC45484.2021.9683002}{doi:10.1109/CDC45484.2021.9683002}.
 \bibitem{PPR} D. Po\c{c}as, S. Pequito, and G. Ramos.
 On the NP-hardness of the robust minimal structural controllability problem.
 \emph{Automatica} 190, Article 113074, 2026.
