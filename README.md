@@ -44,7 +44,13 @@ gives NP-completeness at matching deficiency plus one.
 The [linear source-quota algorithm](linear-source-quotas.md) ([PDF](paper/linear-source-quotas.pdf)) gives a
 one-sided randomized exact algorithm for weighted actuator placement on
 arbitrary directed state graphs, parameterized by matching deficiency
-and failure budget.
+and failure budget. The [derandomized actuator placement note](derandomized-actuator-placement.md)
+combines Ingleton–Piff strict-gammoid duality with Koana–Kumabe cut-covering
+compression to remove the matching-rank \(\rho\) dependence for bounded
+protected-group count \(u\) and decouple \(u\) from \(d\) and \(k\), gives
+\(\rho\)-free and \(u\)-free deterministic algorithms for \(d\le 2\) and primal
+transversal matroids, and establishes rank-oracle and Strict Gammoid
+\(q\)-Parity barriers.
 
 The starting reference for robust structural controllability is Diogo Poças,
 Sérgio Pequito, and Guilherme Ramos, [*On the NP-hardness of the robust
@@ -93,6 +99,8 @@ python scripts/verify_core_theorem.py
 python scripts/check_two_approx.py
 python scripts/audit_weighted_core.py
 python scripts/audit_weighted_independent.py
+python scripts/audit_linear_accessibility_quotas.py
+python scripts/audit_deterministic_actuator_placement.py
 ```
 
 The checks compare algorithms with exhaustive or independent finite-instance
