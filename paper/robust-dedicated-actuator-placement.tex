@@ -49,8 +49,8 @@ safe and vulnerable locations through weighted resilient matroid spanning.
 For a matroid of rank $r$ on $n$ elements, the weighted algorithm uses
 $2^{O((r+k)^4)}\operatorname{poly}(n,\ell)$ time and
 $2^{O((r+k)^3)}\operatorname{poly}(n)$ independence queries, where $\ell$
-is the weight encoding length. A small cardinality cap or a disjoint-base
-packing requirement yields subquartic parameter exponents in time.
+is the weight encoding length. A cardinality cap of $O((r+k)^{3/2})$ or a requirement of at least
+$\sqrt{r+k}$ disjoint bases yields subquartic exponents in $r+k$.
 \end{abstract}
 
 \noindent\textbf{Keywords:} structural controllability; dedicated actuators;
@@ -81,10 +81,10 @@ controllability. A placement must protect both properties
 simultaneously. We study the joint design of primary and redundant
 actuators, with all locations chosen before the failures are known.
 
-The design problem has two distinct computational difficulties.
+The design problem has two distinct computational difficulties. Here $n$ denotes the number of states and $k$ the maximum number of failed inputs.
 First, nominal minimum dedicated-input placement is solvable in
-polynomial time~\cite{PKA}, whereas robust minimal structural
-controllability is NP-hard~\cite{PPR}. Second, explicitly enumerating
+polynomial time~\cite{PKA}, whereas the dedicated robust problem is NP-hard even for one
+input failure~\cite{PPR}. Second, explicitly enumerating
 failure sets of size at most $k$ among $n$ possible locations requires
 $\sum_{i=0}^{\min(k,n)}\binom{n}{i}$ scenarios, which grows as a
 polynomial of degree $k$ in $n$ for fixed $k$. We exploit the fact that the number of states left
@@ -148,15 +148,15 @@ al.~\cite{GuoBackup} study the minimum backup problem for a
 given primary actuator set, reducing it to hitting set. In our
 formulation both primary and backup locations are design variables;
 the cost counts their union. Po\c{c}as, Pequito, and
-Ramos~\cite{PPR} establish NP-hardness of robust minimal
-structural controllability and give approximation guarantees
-of $5/2$ on general digraphs and $2$ on strongly connected
-digraphs. Our approximation theorem concerns one dedicated
-actuator per state, unit installation costs and one actuator
-failure; the exact algorithms use the parameters $d$ and $k$
-under the stated cost and accessibility assumptions.
-These model restrictions specify the scope of comparison with
-earlier guarantees.
+Ramos~\cite{PPR} establish NP-hardness even for one input
+failure. Their dedicated version (Problem~2) prohibits repeated
+actuation of the same state, as does our model, and minimizes
+the number of installed inputs subject to structural
+controllability after any permitted input failures. For one failure,
+their cubic-time algorithms achieve ratios $5/2$ on general
+digraphs and $2$ on strongly connected digraphs.
+Theorem~\ref{thm:three-halves} improves both guarantees to
+$3/2$ with the same cubic-time bound.
 
 \subsection{Fault-tolerant combinatorial optimization}
 The robust purchased-set objective differs from choosing an ordinary basis
@@ -310,7 +310,7 @@ must still span the matroid.
 The two graph conditions of Section~\ref{sec:model} now give the
 following placement criterion.
 \begin{proposition}\label{prop:control}
-A placement $P$ is $k$-robust if and only if
+In the all-vulnerable model, a placement $P$ is $k$-robust if and only if
 \begin{equation}\label{eq:control}
  \rk_M(P\setminus F)=d\quad(F\subseteq P,\ |F|\le k),
  \qquad |P\cap S_i|\ge k+1\quad(1\le i\le s).
@@ -350,7 +350,11 @@ Given the structural state pattern $\bar A$, a failure budget $k$
 and nonnegative costs for the $n$ distinct state locations, find a
 minimum-cost $k$-robust placement or certify infeasibility. Equivalently,
 optimize over the state digraph induced by $\bar A$ subject
-to~\eqref{eq:control}.
+to~\eqref{eq:control} in the all-vulnerable case. If a vulnerable
+set $V\subseteq E$ is supplied, the rank tests range over
+$F\subseteq P\cap V$, $|F|\le k$, and each source component must
+contain a selected safe location or at least $k+1$ selected
+vulnerable locations.
 \end{problem}
 
 \section{A cubic-time 3/2-approximation}\label{sec:approx}
@@ -1126,7 +1130,7 @@ Minimum cost input/output design for large-scale linear structural systems.
 \href{https://doi.org/10.1016/j.automatica.2016.02.005}{doi:10.1016/j.automatica.2016.02.005}.
 \bibitem{PRKAP} S. Pequito, G. Ramos, S. Kar, A. P. Aguiar, and J. Ramos.
 The robust minimal controllability problem.
-\emph{Automatica} 82, 137--146, 2017.
+\emph{Automatica} 82, 261--268, 2017.
 \href{https://doi.org/10.1016/j.automatica.2017.04.053}{doi:10.1016/j.automatica.2017.04.053}.
 \bibitem{GuoBackup} B. Guo, O. Karaca, S. Azhdari, M. Kamgarpour,
 and G. Ferrari-Trecate.
